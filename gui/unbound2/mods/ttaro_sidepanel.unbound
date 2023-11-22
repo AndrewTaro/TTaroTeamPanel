@@ -136,7 +136,7 @@
 		(macro SP_GET_PREF_BOOL _varName="'isVisibilityByPlaneVisible'" _prefKey="SP_USERPREFS_KEY.VISIBILITY_AIR")
 		(var isVisibilityEnabled:bool = "isVisibilityByShipVisible || isVisibilityByPlaneVisible")
 		#ALT
-		(macro SP_GET_PREF_BOOL _varName="'isVisibleOnlyAlt'" _prefKey="SP_USERPREFS_KEY.ALT_VISIBLE")
+		(macro SP_GET_PREF_BOOL _varName="'isVisibleOnlyAlt'" _prefKey="SP_USERPREFS_KEY.ALT_VISIBLE" _default=false)
 		(var camera:gfx = "$datahub.getSingleComponent(CC.camera)")
 		(var altVision:bool = "camera ? camera.altVision : false" (event "camera.evAltVisionChanged"))
 	)
@@ -158,26 +158,26 @@
 		(element SP_ShipIconItem "_entity" "_isAlly" _userPrefsNum="_userPrefsNum")
 		#
 
-		(element SP_ShipConfigImageItem "'url:../modules/icon_module_Artillery_researched.png'"
+		(element SP_ShipConfigImageItem "'url:../modules/icon_module_Artillery_researched.png'" _userPrefsNum="_userPrefsNum"
 			(bind visible "isArtilleryEnabled")
 		)
-		(element SP_ShipConfigImageItem "'url:../modules/icon_module_Torpedoes_researched.png'"
+		(element SP_ShipConfigImageItem "'url:../modules/icon_module_Torpedoes_researched.png'" _userPrefsNum="_userPrefsNum"
 			(bind visible "isTorpedoEnabled")
 			(style
 				(alpha = 0.8)
 			)
 		)
-		(element SP_ShipConfigImageItem "'url:../battle_hud/icon_frag/icon_frag_bomb.png'"
+		(element SP_ShipConfigImageItem "'url:../battle_hud/icon_frag/icon_frag_bomb.png'" _userPrefsNum="_userPrefsNum"
 			(bind visible "isAirSupportEnabled")
 			(style
 				(alpha = 0.7)
 			)
 		) #TODO FIX
 		#(element SP_ShipConfigImageItem "'url:../battle_hud/crosshair/indicators/crosshair_indicator_energy_white.png'") #TODO FIX
-		(element SP_ShipConfigImageItem "'url:../modules/icon_module_Engine_researched.png'"
+		(element SP_ShipConfigImageItem "'url:../modules/icon_module_Engine_researched.png'" _userPrefsNum="_userPrefsNum"
 			(bind visible "isMobilityEnabled")
 		)
-		(element SP_ShipConfigImageItem "'url:../crew_commander/skills/detection_visibility_range.png'"
+		(element SP_ShipConfigImageItem "'url:../crew_commander/skills/detection_visibility_range.png'" _userPrefsNum="_userPrefsNum"
 			(bind visible "isVisibilityEnabled")
 		)
 
@@ -526,7 +526,7 @@
 		(var ttxCollection:gfx = "$datahub.getCollection(CC.mods_ShipParamsInBattle)")
 		(var ttxEntity:gfx = "$datahub.getPrimaryEntity(CC.mods_ShipParamsInBattle, _entity.avatar.id)" (event "ttxCollection.evAdded"))
 		#(macro SP_GET_USERPREFS)
-		(macro SP_GET_PREF_BOOL _varName="'isVisibleOnlyAlt'" _prefKey="SP_USERPREFS_KEY.ALT_VISIBLE")
+		(macro SP_GET_PREF_BOOL _varName="'isVisibleOnlyAlt'" _prefKey="SP_USERPREFS_KEY.ALT_VISIBLE" _default=false)
 		(var camera:gfx = "$datahub.getSingleComponent(CC.camera)")
 		(var altVision:bool = "camera ? camera.altVision : false" (event "camera.evAltVisionChanged"))
 	)
@@ -550,6 +550,7 @@
 (def element SP_ShipConfigArtilleryItem(_ttxEntity:gfx, _userPrefsNum:dict=null)
 	(scope
 		(var artilleryTTX:gfx = "_ttxEntity.mods_ShipParamsInBattle.shipTTX.artillery")
+		(var hasMainGun:bool = "artilleryTTX.mainGun.length > 0")
 		(var range:number = "artilleryTTX.mgMaxDist.value")
 		(var reload:number = "artilleryTTX.mgReloadTime.value")
 		#(macro SP_GET_USERPREFS)
@@ -560,7 +561,7 @@
 
 	(bind visible "isEnabled")
 	(style
-		(bind alpha "artilleryTTX ? 1.0 : 0.0")
+		(bind alpha "hasMainGun ? 1.0 : 0.0")
 		#(width = "SP_SHIPCONFIG_ELEMENT_WIDTH.WITH_UNIT")
 	)
 
@@ -569,10 +570,10 @@
 			(align = "middle|center")
 		)
 		(block
-			(element SP_ShipConfigTextItem _text="range" _unit="'km'" _userPrefsNum="_userPrefsNum"
+			(element SP_ShipConfigTextItem _value="range" _unit="'km'" _userPrefsNum="_userPrefsNum"
 				(bind visible "isArtilleryRangeVisible")
 			)
-			(element SP_ShipConfigTextItem _text="reload" _unit="'s'" _userPrefsNum="_userPrefsNum"
+			(element SP_ShipConfigTextItem _value="reload" _unit="'s'" _userPrefsNum="_userPrefsNum"
 				(bind visible "isArtilleryReloadVisible")
 			)
 		)
@@ -618,17 +619,17 @@
 			(align = "middle|center")
 		)
 		(block
-			#(element SP_ShipConfigTextItem _text="ranges" _unit="'km'")
-			(element SP_ShipConfigTextItem _text="torpedoRange" _unit="'km'" _userPrefsNum="_userPrefsNum"
+			#(element SP_ShipConfigTextItem _value="ranges" _unit="'km'" _userPrefsNum="_userPrefsNum")
+			(element SP_ShipConfigTextItem _value="torpedoRange" _unit="'km'" _userPrefsNum="_userPrefsNum"
 				(bind visible "isTorpedoRangeVisible")
 			)
-			(element SP_ShipConfigTextItem _text="torpedoDeepwaterRange" _unit="'km'" _userPrefsNum="_userPrefsNum"
+			(element SP_ShipConfigTextItem _value="torpedoDeepwaterRange" _unit="'km'" _userPrefsNum="_userPrefsNum"
 				(bind visible "isTorpedoRangeVisible && torpedoDeepwaterRange")
 			)
-			(element SP_ShipConfigTextItem _text="torpedoAltRange" _unit="'km'" _userPrefsNum="_userPrefsNum"
+			(element SP_ShipConfigTextItem _value="torpedoAltRange" _unit="'km'" _userPrefsNum="_userPrefsNum"
 				(bind visible "isTorpedoRangeVisible && torpedoAltRange")
 			)
-			(element SP_ShipConfigTextItem _text="reload" _unit="'s'" _userPrefsNum="_userPrefsNum"
+			(element SP_ShipConfigTextItem _value="reload" _unit="'s'" _userPrefsNum="_userPrefsNum"
 				(bind visible "isTorpedoReloadVisible")
 			)
 		)
@@ -661,10 +662,10 @@
 			(align = "middle|center")
 		)
 		(block
-			(element SP_ShipConfigTextItem _text="range" _unit="'km'" _userPrefsNum="_userPrefsNum"
+			(element SP_ShipConfigTextItem _value="range" _unit="'km'" _userPrefsNum="_userPrefsNum"
 				(bind visible "isAirSupportRangeVisible")
 			)
-			(element SP_ShipConfigTextItem _text="reload" _unit="'s'" _userPrefsNum="_userPrefsNum"
+			(element SP_ShipConfigTextItem _value="reload" _unit="'s'" _userPrefsNum="_userPrefsNum"
 				(bind visible "isAirSupportReloadVisible")
 			)
 		)
@@ -689,7 +690,7 @@
 		)
 		#(element SP_ShipConfigImageItem "'url:../battle_hud/crosshair/indicators/crosshair_indicator_energy_white.png'") #TODO FIX
 		(block
-			(element SP_ShipConfigTextItem _text="capacity" _unit="'s'" _userPrefsNum="_userPrefsNum")
+			(element SP_ShipConfigTextItem _value="capacity" _unit="'s'" _userPrefsNum="_userPrefsNum")
 		)
 	)
 )
@@ -721,10 +722,10 @@
 			(align = "middle|center")
 		)
 		(block
-			(element SP_ShipConfigTextItem _text="surfaceSpeed" _unit="'kts'" _userPrefsNum="_userPrefsNum"
+			(element SP_ShipConfigTextItem _value="surfaceSpeed" _unit="'kts'" _userPrefsNum="_userPrefsNum"
 				(bind visible "isSurfaceMobilityVisible")
 			)
-			(element SP_ShipConfigTextItem _text="underwaterSpeed" _unit="'kts'" _userPrefsNum="_userPrefsNum"
+			(element SP_ShipConfigTextItem _value="underwaterSpeed" _unit="'kts'" _userPrefsNum="_userPrefsNum"
 				(bind visible "isUnderwaterMobilityVisible && underwaterSpeed")
 			)
 		)
@@ -754,10 +755,10 @@
 			(align = "middle|center")
 		)
 		(block
-			(element SP_ShipConfigTextItem _text="visibilityByShip" _unit="'km'" _userPrefsNum="_userPrefsNum"
+			(element SP_ShipConfigTextItem _value="visibilityByShip" _unit="'km'" _userPrefsNum="_userPrefsNum"
 				(bind visible "isVisibilityByShipVisible")
 			)
-			(element SP_ShipConfigTextItem _text="visibilityByPlane" _unit="'km'" _userPrefsNum="_userPrefsNum"
+			(element SP_ShipConfigTextItem _value="visibilityByPlane" _unit="'km'" _userPrefsNum="_userPrefsNum"
 				(bind visible "isVisibilityByPlaneVisible")
 			)
 		)
@@ -767,7 +768,7 @@
 #Image Item
 (def element SP_ShipConfigImageItem (_iconPath:str, _userPrefsNum:dict=null)
 	(scope
-		(var isValueVisible:bool = "_text || _showZero")
+		#(var isValueVisible:bool = "_value || _showZero")
 		#(macro SP_GET_USERPREFS)
 		(macro SP_GET_PREF_BOOL _varName="'isUnitVisible'" _prefKey="SP_USERPREFS_KEY.UNITS_VISIBLE")
 	)
@@ -786,9 +787,9 @@
 )
 
 #Text Item
-(def element SP_ShipConfigTextItem (_text:number, _unit:str=null, _showZero:bool=false, _userPrefsNum:dict=null)
+(def element SP_ShipConfigTextItem (_value:number, _unit:str=null, _showZero:bool=false, _userPrefsNum:dict=null)
 	(scope
-		(var isValueVisible:bool = "_text || _showZero")
+		(var isValueVisible:bool = "_value || _showZero")
 		#(macro SP_GET_USERPREFS)
 		(macro SP_GET_PREF_BOOL _varName="'isUnitVisible'" _prefKey="SP_USERPREFS_KEY.UNITS_VISIBLE")
 	)
@@ -809,7 +810,7 @@
 			(style
 				(marginRight = "XS")
 			)
-			(bind text "isValueVisible ? formatFloatingPoint(_text, 1) : ''")
+			(bind text "isValueVisible ? formatFloatingPoint(_value, 1) : ''")
 		)
 		(tf
 			(bind visible "isUnitVisible")
