@@ -154,7 +154,7 @@
 		#For margin
 		(element SP_PlayerDivisionItem "_entity")
 		(element SP_PlayerInfoItem "_entity" "_isAlly" _userPrefsNum="_userPrefsNum")
-		(element SP_ShipTierItem "_entity")
+		(element SP_ShipTierItem "_entity" _userPrefsNum="_userPrefsNum")
 		(element SP_ShipIconItem "_entity" "_isAlly" _userPrefsNum="_userPrefsNum")
 		#
 
@@ -184,8 +184,8 @@
 		#For margin
 		(element SP_PlayerDivisionItem "_entity")
 		(element SP_PlayerInfoItem "_entity" "_isAlly" _userPrefsNum="_userPrefsNum")
-		(element SP_ShipTierItem "_entity")
-		(element SP_ShipIconItem "_entity" "_isAlly")
+		(element SP_ShipTierItem "_entity" _userPrefsNum="_userPrefsNum")
+		(element SP_ShipIconItem "_entity" "_isAlly" _userPrefsNum="_userPrefsNum")
 		#
 	)
 )
@@ -224,9 +224,9 @@
 			)
 			(element SP_PlayerDivisionItem "_entity")
 			(element SP_PlayerInfoItem "_entity" "_isAlly" _userPrefsNum="_userPrefsNum")
-			(element SP_ShipTierItem "_entity")
+			(element SP_ShipTierItem "_entity" _userPrefsNum="_userPrefsNum")
 			(element SP_ShipIconItem "_entity" "_isAlly" _userPrefsNum="_userPrefsNum")
-			(element SP_ShipConfigurationsItem "_entity")
+			(element SP_ShipConfigurationsItem "_entity" _userPrefsNum="_userPrefsNum")
 		)
 	)
 
@@ -243,9 +243,9 @@
 				(align = "center|middle")
 				(bind alpha "isAlive ? 1.0 : 0.4")
 			)
-			(element SP_ShipConfigurationsItem "_entity")
+			(element SP_ShipConfigurationsItem "_entity" _userPrefsNum="_userPrefsNum")
 			(element SP_ShipIconItem "_entity" "_isAlly" _userPrefsNum="_userPrefsNum")
-			(element SP_ShipTierItem "_entity")
+			(element SP_ShipTierItem "_entity" _userPrefsNum="_userPrefsNum")
 			(element SP_PlayerInfoItem "_entity" "_isAlly" _userPrefsNum="_userPrefsNum")
 			(element SP_PlayerDivisionItem "_entity")
 		)
@@ -259,7 +259,7 @@
 )
 
 #Player Info
-(def element SP_PlayerInfoItem (_entity:gfx, _isAlly:bool=false, _userPrefsNum=null)
+(def element SP_PlayerInfoItem (_entity:gfx, _isAlly:bool=false, _userPrefsNum:dict=null)
 	(scope
 		
 	)
@@ -349,7 +349,7 @@
 )
 
 #Ship Info
-(def element SP_ShipInfoItem(_entity:gfx, _isAlly:bool=false, _userPrefsNum="_userPrefsNum")
+(def element SP_ShipInfoItem(_entity:gfx, _isAlly:bool=false, _userPrefsNum:dict=null)
 	(hblock
 		(style
 			#(margin = [3,3,3,3])
@@ -538,12 +538,12 @@
 			(align = "middle|center")
 		)
 
-		(element SP_ShipConfigArtilleryItem "ttxEntity")
-		(element SP_ShipConfigTorpedoItem "ttxEntity")
-		(element SP_ShipConfigAirSupportItem "ttxEntity")
+		(element SP_ShipConfigArtilleryItem "ttxEntity" _userPrefsNum="_userPrefsNum")
+		(element SP_ShipConfigTorpedoItem "ttxEntity" _userPrefsNum="_userPrefsNum")
+		(element SP_ShipConfigAirSupportItem "ttxEntity" _userPrefsNum="_userPrefsNum")
 		#(element SP_ShipConfigBatteryItem "ttxEntity")
-		(element SP_ShipConfigMobilityItem "ttxEntity")
-		(element SP_ShipConfigVisibilityItem "ttxEntity")
+		(element SP_ShipConfigMobilityItem "ttxEntity" _userPrefsNum="_userPrefsNum")
+		(element SP_ShipConfigVisibilityItem "ttxEntity" _userPrefsNum="_userPrefsNum")
 	)
 )
 
@@ -569,10 +569,10 @@
 			(align = "middle|center")
 		)
 		(block
-			(element SP_ShipConfigTextItem _text="range" _unit="'km'"
+			(element SP_ShipConfigTextItem _text="range" _unit="'km'" _userPrefsNum="_userPrefsNum"
 				(bind visible "isArtilleryRangeVisible")
 			)
-			(element SP_ShipConfigTextItem _text="reload" _unit="'s'"
+			(element SP_ShipConfigTextItem _text="reload" _unit="'s'" _userPrefsNum="_userPrefsNum"
 				(bind visible "isArtilleryReloadVisible")
 			)
 		)
@@ -619,16 +619,16 @@
 		)
 		(block
 			#(element SP_ShipConfigTextItem _text="ranges" _unit="'km'")
-			(element SP_ShipConfigTextItem _text="torpedoRange" _unit="'km'"
+			(element SP_ShipConfigTextItem _text="torpedoRange" _unit="'km'" _userPrefsNum="_userPrefsNum"
 				(bind visible "isTorpedoRangeVisible")
 			)
-			(element SP_ShipConfigTextItem _text="torpedoDeepwaterRange" _unit="'km'"
+			(element SP_ShipConfigTextItem _text="torpedoDeepwaterRange" _unit="'km'" _userPrefsNum="_userPrefsNum"
 				(bind visible "isTorpedoRangeVisible && torpedoDeepwaterRange")
 			)
-			(element SP_ShipConfigTextItem _text="torpedoAltRange" _unit="'km'"
+			(element SP_ShipConfigTextItem _text="torpedoAltRange" _unit="'km'" _userPrefsNum="_userPrefsNum"
 				(bind visible "isTorpedoRangeVisible && torpedoAltRange")
 			)
-			(element SP_ShipConfigTextItem _text="reload" _unit="'s'"
+			(element SP_ShipConfigTextItem _text="reload" _unit="'s'" _userPrefsNum="_userPrefsNum"
 				(bind visible "isTorpedoReloadVisible")
 			)
 		)
@@ -661,10 +661,10 @@
 			(align = "middle|center")
 		)
 		(block
-			(element SP_ShipConfigTextItem _text="range" _unit="'km'"
+			(element SP_ShipConfigTextItem _text="range" _unit="'km'" _userPrefsNum="_userPrefsNum"
 				(bind visible "isAirSupportRangeVisible")
 			)
-			(element SP_ShipConfigTextItem _text="reload" _unit="'s'"
+			(element SP_ShipConfigTextItem _text="reload" _unit="'s'" _userPrefsNum="_userPrefsNum"
 				(bind visible "isAirSupportReloadVisible")
 			)
 		)
@@ -689,7 +689,7 @@
 		)
 		#(element SP_ShipConfigImageItem "'url:../battle_hud/crosshair/indicators/crosshair_indicator_energy_white.png'") #TODO FIX
 		(block
-			(element SP_ShipConfigTextItem _text="capacity" _unit="'s'")
+			(element SP_ShipConfigTextItem _text="capacity" _unit="'s'" _userPrefsNum="_userPrefsNum")
 		)
 	)
 )
@@ -721,10 +721,10 @@
 			(align = "middle|center")
 		)
 		(block
-			(element SP_ShipConfigTextItem _text="surfaceSpeed" _unit="'kts'"
+			(element SP_ShipConfigTextItem _text="surfaceSpeed" _unit="'kts'" _userPrefsNum="_userPrefsNum"
 				(bind visible "isSurfaceMobilityVisible")
 			)
-			(element SP_ShipConfigTextItem _text="underwaterSpeed" _unit="'kts'"
+			(element SP_ShipConfigTextItem _text="underwaterSpeed" _unit="'kts'" _userPrefsNum="_userPrefsNum"
 				(bind visible "isUnderwaterMobilityVisible && underwaterSpeed")
 			)
 		)
@@ -754,10 +754,10 @@
 			(align = "middle|center")
 		)
 		(block
-			(element SP_ShipConfigTextItem _text="visibilityByShip" _unit="'km'"
+			(element SP_ShipConfigTextItem _text="visibilityByShip" _unit="'km'" _userPrefsNum="_userPrefsNum"
 				(bind visible "isVisibilityByShipVisible")
 			)
-			(element SP_ShipConfigTextItem _text="visibilityByPlane" _unit="'km'"
+			(element SP_ShipConfigTextItem _text="visibilityByPlane" _unit="'km'" _userPrefsNum="_userPrefsNum"
 				(bind visible "isVisibilityByPlaneVisible")
 			)
 		)
@@ -859,11 +859,11 @@
 )
 
 (def macro SP_GET_PREF_NUMBER (_varName:expression, _prefKey:expression, _default:expression="0", _modifier:expression="1.0")
-	(var name="_varName" type=number value="_prefKey in _userPrefsNum ? (round(_userPrefsNum[_prefKey]) * _modifier) : _default" (event "userPrefsComponent.evUserPrefsChanged"))
+	(var name="_varName" type=number value="_prefKey in _userPrefsNum ? (round(_userPrefsNum[_prefKey]) * _modifier) : _default")
 	#(var name="_varName" type=number value="_default")
 )
 
 (def macro SP_GET_PREF_BOOL (_varName:expression, _prefKey:expression, _default:expression="true")
-	(var name="_varName" type=bool value="_prefKey in _userPrefsNum ? round(_userPrefsNum[_prefKey]) : _default" (event "userPrefsComponent.evUserPrefsChanged"))
+	(var name="_varName" type=bool value="_prefKey in _userPrefsNum ? round(_userPrefsNum[_prefKey]) : _default")
 	#(var name="_varName" type=bool value="_default")
 )
