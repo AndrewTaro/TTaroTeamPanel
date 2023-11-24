@@ -14,9 +14,11 @@
 	ALT_VISIBLE: 'ttSidePanelShipStatsVisibleOnAlt',
 	UNITS_VISIBLE: 'ttSidePanelShipStatsUnitsVisible',
 	POS_OFFSET: 'ttSidePanelPosOffset',
+	SCALE_OFFSET: 'ttSidePanelScaleOffset',
 	#NAMES
 	CLAN_NAME: 'ttSidePanelClanNameVisible',
 	PLAYER_NAME: 'ttSidePanelPlayerNameVisible',
+	KILL_COUNT: 'ttSidePanelPlayerKillsVisible',
 	SHIP_NAME: 'ttSidePanelShipNameVisible',
 	SHIP_TIER: 'ttSidePanelShipTierVisible',
 	SHIP_ICON: 'ttSidePanelShipIconVisible',
@@ -72,12 +74,15 @@
 		(var allyCollection:gfx = "avatarCollection ? avatarCollection.getChildByPath('team.ally.sortedAlive') : null" (event "avatarCollection.evChildAdded") (event "collection.evChildRemoved"))
 		(var allyItems:array = "allyCollection ? allyCollection.items : null" (event "allyCollection.evAdded") (event "allyCollection.evRemoved")  (event "allyCollection.evUpdated"))
 		(var allyCount:number = "allyItems.length")
+		(macro SP_GET_PREF_NUMBER "'scaleOffset'" "SP_USERPREFS_KEY.SCALE_OFFSET" _modifier="0.1" _default="0.0")
+		(var sizeScale:number = "1 + scaleOffset - 0.5")
 	)
 
 	(style
 		(position = absolute)
 		(left = 0)
 	)
+	(macro BIND_FAIR_SCALE "sizeScale")
 
 	(element SP_HeaderItem _isAlly="true" _userPrefsNum="_userPrefsNum")
 
@@ -95,13 +100,17 @@
 		(var enemyCollection:gfx = "avatarCollection ? avatarCollection.getChildByPath('team.enemy.sortedAlive') : null" (event "avatarCollection.evChildAdded") (event "collection.evChildRemoved"))
 		(var enemyItems:array = "enemyCollection ? enemyCollection.items : null" (event "enemyCollection.evAdded") (event "enemyCollection.evRemoved") (event "enemyCollection.evUpdated"))
 		(var enemyCount:number = "enemyItems.length")
+		(macro SP_GET_PREF_NUMBER "'scaleOffset'" "SP_USERPREFS_KEY.SCALE_OFFSET" _modifier="0.1" _default="0.0")
+		(var sizeScale:number = "1 + scaleOffset - 0.5")
 	)
 
 	(style
 		(position = absolute)
 		(right = 0)
 		(align="right")
+		(pivotX = 100%)
 	)
+	(macro BIND_FAIR_SCALE "sizeScale")
 
 	(element SP_HeaderItem _isAlly="false" _userPrefsNum="_userPrefsNum")
 
@@ -154,6 +163,7 @@
 		#For margin
 		(element SP_PlayerDivisionItem "_entity")
 		(element SP_PlayerInfoItem "_entity" "_isAlly" _userPrefsNum="_userPrefsNum")
+		(element SP_PlayerKillCountItem "_entity" _userPrefsNum="_userPrefsNum")
 		(element SP_ShipTierItem "_entity" _userPrefsNum="_userPrefsNum")
 		(element SP_ShipIconItem "_entity" "_isAlly" _userPrefsNum="_userPrefsNum")
 		#
@@ -182,10 +192,11 @@
 		)
 
 		#For margin
-		(element SP_PlayerDivisionItem "_entity")
-		(element SP_PlayerInfoItem "_entity" "_isAlly" _userPrefsNum="_userPrefsNum")
-		(element SP_ShipTierItem "_entity" _userPrefsNum="_userPrefsNum")
 		(element SP_ShipIconItem "_entity" "_isAlly" _userPrefsNum="_userPrefsNum")
+		(element SP_ShipTierItem "_entity" _userPrefsNum="_userPrefsNum")
+		(element SP_PlayerKillCountItem "_entity" _userPrefsNum="_userPrefsNum")
+		(element SP_PlayerInfoItem "_entity" "_isAlly" _userPrefsNum="_userPrefsNum")
+		(element SP_PlayerDivisionItem "_entity")
 		#
 	)
 )
@@ -224,6 +235,7 @@
 			)
 			(element SP_PlayerDivisionItem "_entity")
 			(element SP_PlayerInfoItem "_entity" "_isAlly" _userPrefsNum="_userPrefsNum")
+			(element SP_PlayerKillCountItem "_entity" _userPrefsNum="_userPrefsNum")
 			(element SP_ShipTierItem "_entity" _userPrefsNum="_userPrefsNum")
 			(element SP_ShipIconItem "_entity" "_isAlly" _userPrefsNum="_userPrefsNum")
 			(element SP_ShipConfigurationsItem "_entity" _userPrefsNum="_userPrefsNum")
@@ -246,6 +258,7 @@
 			(element SP_ShipConfigurationsItem "_entity" _userPrefsNum="_userPrefsNum")
 			(element SP_ShipIconItem "_entity" "_isAlly" _userPrefsNum="_userPrefsNum")
 			(element SP_ShipTierItem "_entity" _userPrefsNum="_userPrefsNum")
+			(element SP_PlayerKillCountItem "_entity" _userPrefsNum="_userPrefsNum")
 			(element SP_PlayerInfoItem "_entity" "_isAlly" _userPrefsNum="_userPrefsNum")
 			(element SP_PlayerDivisionItem "_entity")
 		)
@@ -345,6 +358,25 @@
 		(class $TextDefault13NM)
 		#(bind class "isAFK ? '$FontColorUnready' : tkStatus ? '$FontColorTeamkiller' : '$None'")
 		(bind text "pureName")
+	)
+)
+
+(def element SP_PlayerKillCountItem (_entity:gfx, _userPrefsNum:dict=null)
+	(scope
+		(var killCount:number = "_entity.avatar.frags" (event "_entity.avatar.evFragsChanged"))
+		(macro SP_GET_PREF_BOOL _varName="'isPlayerKillCountVisible'" _prefKey="SP_USERPREFS_KEY.KILL_COUNT")
+	)
+	(style
+		#(marginLeft = 3px)
+		#(marginRight = 3px)
+		(width = 7px)
+		(align = "middle|center")
+	)
+	(bind visible "isPlayerKillCountVisible")
+	(tf
+		(class $TextDefaultNM)
+		#(bind class "isAFK ? '$FontColorUnready' : tkStatus ? '$FontColorTeamkiller' : '$None'")
+		(bind text "killCount ? killCount : ''")
 	)
 )
 
@@ -448,6 +480,11 @@
 		(var healthMax:number = "healthComponent ? healthComponent.max : 0" (event "healthComponent.evMaxChanged"))
 		(var healthRatio:number = "healthMax ? healthValue / healthMax : 1")
 
+		#regeneration
+		(macro GET_MARKER_ENTITY_COMPONENT 'dataComponent')
+		(var regenMaxValue:number = "dataComponentComponent ? dataComponentComponent.data.maxValue : 0" (event "dataComponentComponent.evDataChanged"))
+		(var regenRatio:number = "healthMax ? regenMaxValue / healthMax : 0")
+
 		#relation
 		(var teamId:number = "_markerEntity.avatar ? _markerEntity.avatar.teamId : 0" (event "_markerEntity.avatar.evTeamIdChanged"))
 		(macro GET_MARKER_ENTITY_COMPONENT 'relation')
@@ -503,6 +540,20 @@
 				(scale9grid = [1, 1, 44, 2])
 				(alpha = "0.8")
 			)
+		)
+
+		(block
+			(class $FullsizeAbsolute)
+			(bind scaleX "regenRatio")
+			(bind visible "dataComponentComponent")
+			
+			(style
+				(bind backgroundColor "0xFFFFFFFF")
+				(backgroundSize = "fill")
+			)
+			#Edit here to change color
+			(bind colorTransform "{ redMultiplier:0,greenMultiplier:0,blueMultiplier:0,alphaMultiplier:0.4,redOffset:230,greenOffset:230,blueOffset:230,alphaOffset:0 }")
+			#(bind colorTransform "{ redMultiplier: redScale, greenMultiplier: greenScale, blueMultiplier: blueScale, alphaMultiplier: alphaScale}")
 		)
 
 		(block
@@ -621,7 +672,7 @@
 		(block
 			#(element SP_ShipConfigTextItem _value="ranges" _unit="'km'" _userPrefsNum="_userPrefsNum")
 			(element SP_ShipConfigTextItem _value="torpedoRange" _unit="'km'" _userPrefsNum="_userPrefsNum"
-				(bind visible "isTorpedoRangeVisible")
+				(bind visible "!torpedoesTTX || (isTorpedoRangeVisible && torpedoRange)") #shows if there is no torp just for margin
 			)
 			(element SP_ShipConfigTextItem _value="torpedoDeepwaterRange" _unit="'km'" _userPrefsNum="_userPrefsNum"
 				(bind visible "isTorpedoRangeVisible && torpedoDeepwaterRange")
