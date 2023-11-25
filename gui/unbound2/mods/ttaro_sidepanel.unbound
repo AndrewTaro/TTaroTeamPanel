@@ -22,6 +22,8 @@
 	SHIP_NAME: 'ttSidePanelShipNameVisible',
 	SHIP_TIER: 'ttSidePanelShipTierVisible',
 	SHIP_ICON: 'ttSidePanelShipIconVisible',
+	SHIP_DETECTION: 'ttSidePanelShipDetectionVisible',
+	HEALTHBAR_OPACITY: 'ttSidePanelHealthBarOpacity',
 	#SHIPCONFIGS
 	#Artillery
 	ARTILLERY_RANGE: 'ttSidePanelArtilleryRangeVisible',
@@ -166,6 +168,7 @@
 		(element SP_PlayerKillCountItem "_entity" _userPrefsNum="_userPrefsNum")
 		(element SP_ShipTierItem "_entity" _userPrefsNum="_userPrefsNum")
 		(element SP_ShipIconItem "_entity" "_isAlly" _userPrefsNum="_userPrefsNum")
+		(element SP_ShipDetectionItem "_entity" _userPrefsNum="_userPrefsNum")
 		#
 
 		(element SP_ShipConfigImageItem "'url:../modules/icon_module_Artillery_researched.png'" _userPrefsNum="_userPrefsNum"
@@ -192,6 +195,7 @@
 		)
 
 		#For margin
+		(element SP_ShipDetectionItem "_entity" _userPrefsNum="_userPrefsNum")
 		(element SP_ShipIconItem "_entity" "_isAlly" _userPrefsNum="_userPrefsNum")
 		(element SP_ShipTierItem "_entity" _userPrefsNum="_userPrefsNum")
 		(element SP_PlayerKillCountItem "_entity" _userPrefsNum="_userPrefsNum")
@@ -227,7 +231,7 @@
 			(height = "SP_PLAYER_ROW_SIZE.HEIGHT")
 		)
 
-		(element SP_ShipHealthBarItem "_entity" "_isAlly")
+		(element SP_ShipHealthBarItem "_entity" "_isAlly" _userPrefsNum="_userPrefsNum")
 		(hblock
 			(style
 				(align = "center|middle")
@@ -238,6 +242,7 @@
 			(element SP_PlayerKillCountItem "_entity" _userPrefsNum="_userPrefsNum")
 			(element SP_ShipTierItem "_entity" _userPrefsNum="_userPrefsNum")
 			(element SP_ShipIconItem "_entity" "_isAlly" _userPrefsNum="_userPrefsNum")
+			(element SP_ShipDetectionItem "_entity" _userPrefsNum="_userPrefsNum")
 			(element SP_ShipConfigurationsItem "_entity" _userPrefsNum="_userPrefsNum")
 		)
 	)
@@ -249,13 +254,14 @@
 			(height = "SP_PLAYER_ROW_SIZE.HEIGHT")
 		)
 
-		(element SP_ShipHealthBarItem "_entity" "_isAlly")
+		(element SP_ShipHealthBarItem "_entity" "_isAlly" _userPrefsNum="_userPrefsNum")
 		(hblock
 			(style
 				(align = "center|middle")
 				(bind alpha "isAlive ? 1.0 : 0.4")
 			)
 			(element SP_ShipConfigurationsItem "_entity" _userPrefsNum="_userPrefsNum")
+			(element SP_ShipDetectionItem "_entity" _userPrefsNum="_userPrefsNum")
 			(element SP_ShipIconItem "_entity" "_isAlly" _userPrefsNum="_userPrefsNum")
 			(element SP_ShipTierItem "_entity" _userPrefsNum="_userPrefsNum")
 			(element SP_PlayerKillCountItem "_entity" _userPrefsNum="_userPrefsNum")
@@ -464,7 +470,37 @@
 	)
 )
 
-(def element SP_ShipHealthBarItem(_entity:gfx, _isAlly:bool=false)
+(def element SP_ShipDetectionItem(_entity:gfx, _userPrefsNum:dict=null)
+	(scope
+		(var _markerEntity:gfx = "_entity")
+		(macro GET_MARKER_ENTITY_COMPONENT 'vehicle')
+		(var isDetected:bool = "vehicleComponent.visibilityFlags" (event "vehicleComponent.evVisibilityFlagsChanged"))
+		(var wasDetected:bool = "false" watch=false)
+		(bind wasDetected "true" watch=false init=false (bind enabled "!(wasDetected) && isDetected") (event "vehicleComponent.evVisibilityFlagsChanged"))
+		(macro GET_MARKER_ENTITY_COMPONENT 'health')
+		(var isAlive:bool = "healthComponent ? healthComponent.isAlive : false")
+		(macro SP_GET_PREF_BOOL _varName="'isShipDetectionVisible'" _prefKey="SP_USERPREFS_KEY.SHIP_DETECTION")
+		(var iconColorTransform:dict = "isDetected  ? {redMultiplier:0,greenMultiplier:0,blueMultiplier:0,alphaMultiplier:1.0,redOffset:0xFF,greenOffset:0x99,blueOffset:0x33,alphaOffset:0 }
+													: {redMultiplier:0,greenMultiplier:0,blueMultiplier:0,alphaMultiplier:0.6,redOffset:0xFF,greenOffset:0xFF,blueOffset:0xFF,alphaOffset:0 }")
+	)
+	(style
+		(align = "center|middle")
+		(bind alpha "_entity ? 1.0 : 0.0")
+		(width = "14")
+	)
+	(bind visible "isShipDetectionVisible")
+	(block
+		(bind visible "isAlive && (isDetected || wasDetected)")
+		(controller $Sector
+			(bind color "0xFFFFFFFF")
+			(bind arc "360")
+			(bind radius "4")
+		)
+		(bind colorTransform "iconColorTransform")
+	)
+)
+
+(def element SP_ShipHealthBarItem(_entity:gfx, _isAlly:bool=false, _userPrefsNum:dict=null)
 	(scope
 		#entity
 		(var _markerEntity:gfx = "_entity")
@@ -479,6 +515,7 @@
 		(var healthValue:number = "healthComponent ? healthComponent.value : 0" (event "healthComponent.evValueChanged"))
 		(var healthMax:number = "healthComponent ? healthComponent.max : 0" (event "healthComponent.evMaxChanged"))
 		(var healthRatio:number = "healthMax ? healthValue / healthMax : 1")
+		(var isAlive:bool = "healthComponent ? healthComponent.isAlive : false")
 
 		#regeneration
 		(macro GET_MARKER_ENTITY_COMPONENT 'dataComponent')
@@ -498,6 +535,8 @@
 		(var relationStrByDiplomacy:str = "DIPLOMACY_RELATION_TO_RELATION_STR[diplomacyRelationValue]")
 
 		#bar color
+		(macro SP_GET_PREF_NUMBER "'alphaScale'" "SP_USERPREFS_KEY.HEALTHBAR_OPACITY" _modifier="0.1" _default="0.4")
+		(var regenBarColorTransform:dict = "{redMultiplier:0,greenMultiplier:0,blueMultiplier:0,alphaMultiplier:0.4,redOffset:230,greenOffset:230,blueOffset:230,alphaOffset:0 }")
 		(var markerColorTransform:dict = 
 			"	diplomacyRelationComponent	? TWO_TEAMS_COLOR_TRANSFORMS[relationStrByDiplomacy] :
 				isAlly						? TWO_TEAMS_COLOR_TRANSFORMS['ally'] :
@@ -513,8 +552,6 @@
 		(bind right "_isAlly ? auto : 0")
 		(pivotX = "0")
 		(pivotY = "0")
-		#(alpha = "0.3")
-		#(marginTop = -3) #TODO: may have a better solution
 	)
 	(style
 		(width = "SP_PLAYER_ROW_SIZE.WIDTH")
@@ -542,32 +579,52 @@
 			)
 		)
 
-		(block
-			(class $FullsizeAbsolute)
-			(bind scaleX "regenRatio")
-			(bind visible "dataComponentComponent")
+		# (block
+		# 	(class $FullsizeAbsolute)
+		# 	(bind scaleX "regenRatio")
+		# 	(bind visible "dataComponentComponent")
 			
-			(style
-				(bind backgroundColor "0xFFFFFFFF")
-				(backgroundSize = "fill")
-			)
-			#Edit here to change color
-			(bind colorTransform "{ redMultiplier:0,greenMultiplier:0,blueMultiplier:0,alphaMultiplier:0.4,redOffset:230,greenOffset:230,blueOffset:230,alphaOffset:0 }")
-			#(bind colorTransform "{ redMultiplier: redScale, greenMultiplier: greenScale, blueMultiplier: blueScale, alphaMultiplier: alphaScale}")
-		)
+		# 	(style
+		# 		(bind backgroundColor "0xFFFFFFFF")
+		# 		(backgroundSize = "fill")
+		# 	)
+		# 	#Edit here to change color
+		# 	(bind colorTransform "{ redMultiplier:0,greenMultiplier:0,blueMultiplier:0,alphaMultiplier:0.4,redOffset:230,greenOffset:230,blueOffset:230,alphaOffset:0 }")
+		# 	#(bind colorTransform "{ redMultiplier: redScale, greenMultiplier: greenScale, blueMultiplier: blueScale, alphaMultiplier: alphaScale}")
+		# )
 
-		(block
+		# (block
+		# 	(class $FullsizeAbsolute)
+		# 	(bind scaleX "healthRatio")
+
+		# 	(style
+		# 		(bind backgroundColor "0xFFFFFFFF")
+		# 		(backgroundSize = "fill")
+		# 		(alpha = "0.4")
+		# 	)
+
+		# 	(bind colorTransform "markerColorTransform")
+		# )
+
+		(mc 'flash.display.Sprite'
 			(class $FullsizeAbsolute)
-			(bind scaleX "healthRatio")
-
+			(element SP_HealthBarTestElement "regenBarColorTransform" "regenRatio")
+			(element SP_HealthBarTestElement "markerColorTransform" "healthRatio")
+			(blendMode = 'layer')
 			(style
-				(bind backgroundColor "0xFFFFFFFF")
-				(backgroundSize = "fill")
-				(alpha = "0.4")
+				(bind alpha "alphaScale")
 			)
-
-			(bind colorTransform "markerColorTransform")
+			(bind visible "isAlive")
 		)
+	)
+)
+
+(def element SP_HealthBarTestElement(_colorTransform:dict, _scaleX:number)
+	(block
+		(class $FullsizeAbsolute)
+		(macro DRAW_RECT "0" "0" "SP_PLAYER_ROW_SIZE.WIDTH" "SP_PLAYER_ROW_SIZE.HEIGHT")
+		(bind colorTransform "_colorTransform")
+		(bind scaleX "_scaleX")
 	)
 )
 
@@ -873,10 +930,6 @@
 			)
 		)
 	)
-)
-
-#Detection Info
-(def element SP_ShipDetectionItem(_entity:gfx)
 )
 
 #Active Consumables Info
