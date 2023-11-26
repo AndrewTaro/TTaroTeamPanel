@@ -659,8 +659,8 @@
 	(scope
 		(var artilleryTTX:gfx = "_ttxEntity.mods_ShipParamsInBattle.shipTTX.artillery")
 		(var hasMainGun:bool = "artilleryTTX.mainGun.length > 0")
-		(var range:number = "artilleryTTX.mgMaxDist.value")
-		(var reload:number = "artilleryTTX.mgReloadTime.value")
+		(var range:number = "artilleryTTX ? artilleryTTX.mgMaxDist.value : null")
+		(var reload:number = "artilleryTTX ? artilleryTTX.mgReloadTime.value : null")
 		#(macro SP_GET_USERPREFS)
 		(macro SP_GET_PREF_BOOL _varName="'isArtilleryRangeVisible'" _prefKey="SP_USERPREFS_KEY.ARTILLERY_RANGE")
 		(macro SP_GET_PREF_BOOL _varName="'isArtilleryReloadVisible'" _prefKey="SP_USERPREFS_KEY.ARTILLERY_RELOAD")
@@ -692,16 +692,16 @@
 	(scope
 		(var torpedoesTTX:gfx = "_ttxEntity.mods_ShipParamsInBattle.shipTTX.torpedoes")
 		#normal torps
-		(var torpedoTTX:gfx = "torpedoesTTX.torpedo")
-		(var torpedoRange:number = "torpedoTTX.maxDist.value")
+		(var torpedoTTX:gfx = "torpedoesTTX ? torpedoesTTX.torpedo : null")
+		(var torpedoRange:number = "torpedoTTX ? torpedoTTX.maxDist.value : null")
 		(var torpedoRangeStr:str = "torpedoTTX ? formatFloatingPoint(torpedoRange, 1) : ''")
 		#deepwater torps
-		(var torpedoDeepwaterTTX:gfx = "torpedoesTTX.torpedoDeepwater")
-		(var torpedoDeepwaterRange:number = "torpedoDeepwaterTTX.maxDist.value")
+		(var torpedoDeepwaterTTX:gfx = "torpedoesTTX ? torpedoesTTX.torpedoDeepwater : null")
+		(var torpedoDeepwaterRange:number = "torpedoDeepwaterTTX ? torpedoDeepwaterTTX.maxDist.value : null")
 		(var torpedoDeepwaterRangeStr:str = "torpedoDeepwaterTTX ? formatFloatingPoint(torpedoDeepwaterRange, 1) : ''")
 		#alt torps
-		(var torpedoAltTTX:gfx = "torpedoesTTX.torpedoAlt")
-		(var torpedoAltRange:number = "torpedoAltTTX.maxDist.value")
+		(var torpedoAltTTX:gfx = "torpedoesTTX ? torpedoesTTX.torpedoAlt : null")
+		(var torpedoAltRange:number = "torpedoAltTTX ? torpedoAltTTX.maxDist.value : null")
 		(var torpedoAltRangeStr:str = "torpedoAltTTX ? formatFloatingPoint(torpedoAltRange, 1) : ''")
 		#all ranges
 		(var ranges:str = "	torpedoRangeStr + 
@@ -751,8 +751,8 @@
 (def element SP_ShipConfigAirSupportItem(_ttxEntity:gfx, _userPrefsNum:dict=null)
 	(scope
 		(var airSupportTTX:gfx = "_ttxEntity.mods_ShipParamsInBattle.shipTTX.airSupport")
-		(var range:number = "airSupportTTX.maxDist.value")
-		(var reload:number = "airSupportTTX.reloadTime.value")
+		(var range:number = "airSupportTTX ? airSupportTTX.maxDist.value : null")
+		(var reload:number = "airSupportTTX ? airSupportTTX.reloadTime.value : null")
 		#(macro SP_GET_USERPREFS)
 		(macro SP_GET_PREF_BOOL _varName="'isAirSupportRangeVisible'" _prefKey="SP_USERPREFS_KEY.AIRSUPPORT_RANGE")
 		(macro SP_GET_PREF_BOOL _varName="'isAirSupportReloadVisible'" _prefKey="SP_USERPREFS_KEY.AIRSUPPORT_RELOAD")
@@ -783,7 +783,7 @@
 (def element SP_ShipConfigBatteryItem(_ttxEntity:gfx)
 	(scope
 		(var batteryTTX:gfx = "_ttxEntity.mods_ShipParamsInBattle.shipTTX.battery")
-		(var capacity:number = "batteryTTX.capacity.value")
+		(var capacity:number = "batteryTTX ? batteryTTX.capacity.value : null")
 	)
 
 	#(bind visible "batteryTTX")
@@ -807,11 +807,11 @@
 	(scope
 		#surface speed
 		(var mobilityTTX:gfx = "_ttxEntity.mods_ShipParamsInBattle.shipTTX.mobility")
-		(var surfaceSpeed:number = "mobilityTTX.speed.value")
+		(var surfaceSpeed:number = "mobilityTTX ? mobilityTTX.speed.value : null")
 
 		#underwater speed
 		(var underwaterMobilityTTX:gfx = "_ttxEntity.mods_ShipParamsInBattle.shipTTX.underwaterMobility")
-		(var underwaterSpeed:number = "underwaterMobilityTTX.speed.value")
+		(var underwaterSpeed:number = "underwaterMobilityTTX ? underwaterMobilityTTX.speed.value : null")
 
 		#(macro SP_GET_USERPREFS)
 		(macro SP_GET_PREF_BOOL _varName="'isSurfaceMobilityVisible'" _prefKey="SP_USERPREFS_KEY.SPEED_SURFACE")
@@ -843,8 +843,8 @@
 (def element SP_ShipConfigVisibilityItem(_ttxEntity:gfx, _userPrefsNum:dict=null)
 	(scope
 		(var visibilityTTX:gfx = "_ttxEntity.mods_ShipParamsInBattle.shipTTX.visibility")
-		(var visibilityByShip:number = "visibilityTTX.visibilityByShip.normal.value") #CAPTAIN SKILL FIX
-		(var visibilityByPlane:number = "visibilityTTX.visibilityByPlane.normal.value") #CAPTAIN SKILL FIX
+		(var visibilityByShip:number = "visibilityTTX ? visibilityTTX.visibilityByShip.normal.value : null") #CAPTAIN SKILL FIX
+		(var visibilityByPlane:number = "visibilityTTX ? visibilityTTX.visibilityByPlane.normal.value : null") #CAPTAIN SKILL FIX
 
 		#(macro SP_GET_USERPREFS)
 		(macro SP_GET_PREF_BOOL _varName="'isVisibilityByShipVisible'" _prefKey="SP_USERPREFS_KEY.VISIBILITY_SURFACE")
