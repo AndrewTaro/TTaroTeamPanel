@@ -136,6 +136,9 @@
 		(macro SP_GET_PREF_BOOL _varName="'isTorpedoRangeVisible'" _prefKey="SP_USERPREFS_KEY.TORPEDO_RANGE")
 		#(macro SP_GET_PREF_BOOL _varName="'isTorpedoReloadVisible'" _prefKey="SP_USERPREFS_KEY.TORPEDO_RELOAD")
 		(var isTorpedoEnabled:bool = "isTorpedoRangeVisible")
+		#AntiAir
+		(macro SP_GET_PREF_BOOL _varName="'isAntiAirRangeVisible'" _prefKey="SP_USERPREFS_KEY.ANTIAIR_RANGE")
+		(var isAntiAirEnabled:bool = "isAntiAirRangeVisible")
 		#AirSupport
 		(macro SP_GET_PREF_BOOL _varName="'isAirSupportRangeVisible'" _prefKey="SP_USERPREFS_KEY.AIRSUPPORT_RANGE")
 		(macro SP_GET_PREF_BOOL _varName="'isAirSupportReloadVisible'" _prefKey="SP_USERPREFS_KEY.AIRSUPPORT_RELOAD")
@@ -187,7 +190,13 @@
 			(style
 				(alpha = 0.7)
 			)
-		) #TODO FIX
+		)
+		(element SP_ShipConfigImageItem "'url:../battle_hud/lower_log_modifiers/AAAuraDamage.png'" _userPrefsNum="_userPrefsNum"
+			(bind visible "isAntiAirEnabled")
+			(style
+				(alpha = 0.7)
+			)
+		)
 		#(element SP_ShipConfigImageItem "'url:../battle_hud/crosshair/indicators/crosshair_indicator_energy_white.png'") #TODO FIX
 		(element SP_ShipConfigImageItem "'url:../modules/icon_module_Engine_researched.png'" _userPrefsNum="_userPrefsNum"
 			(bind visible "isMobilityEnabled")
@@ -634,6 +643,7 @@
 		(element SP_ShipConfigArtilleryItem "ttxEntity" _userPrefsNum="_userPrefsNum")
 		(element SP_ShipConfigTorpedoItem "ttxEntity" _userPrefsNum="_userPrefsNum")
 		(element SP_ShipConfigAirSupportItem "ttxEntity" _userPrefsNum="_userPrefsNum")
+		(element SP_ShipAntiAirItem "ttxEntity" _userPrefsNum="_userPrefsNum")
 		#(element SP_ShipConfigBatteryItem "ttxEntity")
 		(element SP_ShipConfigMobilityItem "ttxEntity" _userPrefsNum="_userPrefsNum")
 		(element SP_ShipConfigVisibilityItem "ttxEntity" _userPrefsNum="_userPrefsNum")
