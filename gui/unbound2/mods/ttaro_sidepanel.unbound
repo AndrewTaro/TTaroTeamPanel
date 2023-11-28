@@ -553,7 +553,15 @@
 	(scope
 		(var healthComponent:gfx = "_entity.hasComponent(CC.health) ? _entity.health : null")
 		(var isAlive:bool = "healthComponent ? healthComponent.isAlive : false")
+		#For tooltip
+		(event evHideInfotip)
+		(event evMenuItemClicked) #maybe unnecessary?
+		(var selfPlayer:gfx = "$datahub.getSingleEntity(CC.accountSelf)")
+		(var mouse:gfx = "$datahub.getSingleComponent(CC.mouse)")
+		(var isMouseActive:bool = "mouse.active" (event "mouse.evActiveChanged"))
 	)
+	#For tooltip
+	(dispatch evHideInfotip args="{}" (bind trigger "isMouseActive") (event "evMenuItemClicked"))
 
 	(style
 		#(marginTop = 1px)
@@ -591,10 +599,18 @@
 		)
 	)
 	
+	#Tooltip for Detailed Ship Stats
 	(controller $Tooltip
 		(renderer = 'SP_TooltipShipConfigurationsItem')
 		(args "_entity")
 		(macro DEFAULT_TOOLTIP_BEHAVIOUR "0")
+	)
+
+	#Context Menu for Report/Compliment/Division
+	(controller $Tooltip (renderer = 'ContextMenuPlayer')
+		(args _playerEntity="_entity" _selfPlayer="selfPlayer")
+		(macro DEFAULT_MENU_BEHAVIOUR "evHideInfotip" "1")
+		(cache=false)
 	)
 
 	(element HorizontalDividerTwoPx
@@ -634,14 +650,12 @@
 
 (def element SP_PlayerDivisionItem (_entity:gfx)
 	(scope
-		(var divisionId:number = "_entity.divisionMember.divisionId" (event "_entity.divisionMember.evDivisionChanged"))
-		(var divisionEntity:gfx = "$datahub.getPrimaryEntity(CC.division, divisionId)")
-		(var divisionTag:str = "divisionEntity.division.name" (event "divisionEntity.division.evNameChanged"))
-		(var divisionSign:number = "_entity.divisionMember.divisionSign" (event "_entity.divisionMember.evDivisionChanged"))
-		(var isInSameDivision:bool = "_entity.divisionMember.isInSameDivision" (event "_entity.divisionMember.evDivisionChanged"))
-		(var division:bool = "_entity.divisionMember.division" (event "_entity.divisionMember.evDivisionChanged"))
+		(var divisionMemberComponent:gfx = "_entity.hasComponent(CC.divisionMember) ? _entity.divisionMember : null")
+		(var divisionSign:number = "divisionMemberComponent ? divisionMemberComponent.divisionSign : null" (event "divisionMemberComponent.evDivisionChanged"))
+		(var isInSameDivision:bool = "divisionMemberComponent ? divisionMemberComponent.isInSameDivision : false" (event "divisionMemberComponent.evDivisionChanged"))
+		(var division:number = "divisionMemberComponent ? divisionMemberComponent.division : 0" (event "divisionMemberComponent.evDivisionChanged"))
 		(var isInDivision:bool = "division > 0")
-		(var isDivisionHidden:bool = "_entity.divisionMember.divisionHidden" (event "_entity.divisionMember.evDivisionHiddenChanged"))
+		(var isDivisionHidden:bool = "divisionMemberComponent ? divisionMemberComponent.divisionHidden" (event "divisionMemberComponent.evDivisionHiddenChanged"))
 		(var divisionIconIndex:number = "isInSameDivision ? (divisionSign + 1) : (divisionSign + 1 + 10)")
 	)
 	(style
