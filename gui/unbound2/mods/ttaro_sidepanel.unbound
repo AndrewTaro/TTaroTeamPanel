@@ -4,11 +4,27 @@
 	WIDTH: 200,
 	HEIGHT: 27
 })
-#(def constant SP_SHIPCONFIG_ELEMENT_WIDTH "48")
 (def constant SP_SHIPCONFIG_ELEMENT_WIDTH {
 	WITH_UNIT: 48,
 	NO_UNIT: 32
 })
+
+#--------------------------------------------------------------------------------
+#For Masters Tournament and the ship-weight rules:
+#1. Un-comment out the following constant
+#2. Create a dict like the existing entries. {shipId[str] : shipWeight[number]},
+#   Single-quotation must be used for the keys, not the double.
+#3. Done. You don't have to edit anything further and should be able to see the values in the game.
+#--------------------------------------------------------------------------------
+# (def constant SP_SHIPWEIGHT_DATA {
+# 	'4179572720': 300,
+# 	'3760075984': 12,
+# 	'4178458320': 60,
+# 	'4074158064': 50,
+# 	'4074682192': 160,
+# })
+#--------------------------------------------------------------------------------
+
 (def constant SP_USERPREFS_KEY {
 	#GENERAL
 	ALT_VISIBLE: 'ttSidePanelShipStatsVisibleOnAlt',
@@ -47,7 +63,7 @@
 	HYDRO_RANGE: 'ttSidePanelHydroRangeVisible',
 })
 
-(def constant MOD_SIDEPANEL_CONSUMABLES {
+(def constant SP_CONSUMABLES_DATA {
     '4181112272': {rls: 9.0, sonar: 7.0, },
     '3764303664': {sonar: 5.5, },
     '3751196368': {sonar: 7.0, },
@@ -372,7 +388,9 @@
     '4075730768': {sonar: 5.0, },
 })
 
-
+#--------------------------------------------------------------------------------
+#Main Elements
+#--------------------------------------------------------------------------------
 (def element TTaroSidePanels () layout=true
 	(scope
 		(macro STAGE_SIZE)
@@ -454,7 +472,7 @@
 	)
 )
 
-#Header
+#Header for ship configs
 (def element SP_HeaderItem (_isAlly:bool=false, _userPrefsNum:dict=null)
 	(scope
 		#Artillery
@@ -504,10 +522,11 @@
 		#For margin
 		(element SP_PlayerDivisionItem "_entity")
 		(element SP_PlayerInfoItem "_entity" "_isAlly" _userPrefsNum="_userPrefsNum")
-		(element SP_PlayerKillCountItem "_entity" _userPrefsNum="_userPrefsNum")
+		(element SP_ShipWeightItem "_entity" _userPrefsNum="_userPrefsNum") #For tournament
 		(element SP_ShipTierItem "_entity" _userPrefsNum="_userPrefsNum")
 		(element SP_ShipIconItem "_entity" "_isAlly" _userPrefsNum="_userPrefsNum")
 		(element SP_ShipDetectionItem "_entity" _userPrefsNum="_userPrefsNum")
+		(element SP_PlayerKillCountItem "_entity" _userPrefsNum="_userPrefsNum")
 		#
 
 		(element SP_ShipConfigImageItem "'url:../crew_commander/skills/detection_visibility_range.png'" _isVisible="isVisibilityEnabled" _userPrefsNum="_userPrefsNum")
@@ -558,10 +577,11 @@
 			)
 			(element SP_PlayerDivisionItem "_entity")
 			(element SP_PlayerInfoItem "_entity" "_isAlly" _userPrefsNum="_userPrefsNum")
-			(element SP_PlayerKillCountItem "_entity" _userPrefsNum="_userPrefsNum")
+			(element SP_ShipWeightItem "_entity" _userPrefsNum="_userPrefsNum") #For tournament
 			(element SP_ShipTierItem "_entity" _userPrefsNum="_userPrefsNum")
 			(element SP_ShipIconItem "_entity" "_isAlly" _userPrefsNum="_userPrefsNum")
 			(element SP_ShipDetectionItem "_entity" _userPrefsNum="_userPrefsNum")
+			(element SP_PlayerKillCountItem "_entity" _userPrefsNum="_userPrefsNum")
 			(element SP_ShipConfigurationsItem "_entity" "_isAlly" _userPrefsNum="_userPrefsNum")
 		)
 	)
@@ -682,12 +702,12 @@
 	(style
 		#(marginLeft = 3px)
 		#(marginRight = 3px)
-		(width = 7px)
+		(width = 10px)
 		(align = "middle|center")
 	)
 	(bind visible "isPlayerKillCountVisible")
 	(tf
-		(class $TextDefaultNM)
+		(class $TextDefaultBoldNM)
 		#(bind class "isAFK ? '$FontColorUnready' : tkStatus ? '$FontColorTeamkiller' : '$None'")
 		(bind text "killCount ? killCount : ''")
 	)
@@ -755,6 +775,28 @@
 		(bind text "shipName")
 	)
 )
+
+#For Tournamnet
+(def element SP_ShipWeightItem(_entity:gfx, _userPrefsNum:dict=null)
+	(scope
+		(var shipEntity:gfx = "_entity.avatar.ship.ref.ship" (event "_entity.avatar.evShipRefChanged"))
+		(var shipId:str = "shipEntity ? toString(shipEntity.id) : null") #uint long
+		(var isShipWeightEnabled:bool = "SP_SHIPWEIGHT_DATA")
+		(var shipWeight:str = "shipId ? (SP_SHIPWEIGHT_DATA && shipId in SP_SHIPWEIGHT_DATA) ? SP_SHIPWEIGHT_DATA[shipId] : '0' : ''") #uint long
+		#(macro SP_GET_USERPREFS)
+		#(macro SP_GET_PREF_BOOL _varName="'isShipTierVisible'" _prefKey="SP_USERPREFS_KEY.SHIP_TIER")
+	)
+	(style
+		(width = 20px)
+		(align = "center")
+	)
+	(bind visible "isShipWeightEnabled")
+	(tf
+		(class $TextDefaultBoldNM)
+		(bind text "shipWeight")
+	)
+)
+#
 
 (def element SP_ShipTierItem(_entity:gfx, _userPrefsNum:dict=null)
 	(scope
@@ -908,7 +950,9 @@
 	)
 )
 
-#TTX
+#--------------------------------------------------------------------------------
+#TTXs
+#--------------------------------------------------------------------------------
 (def element SP_ShipConfigurationsItem(_entity:gfx, _isAlly:bool=false, _userPrefsNum:dict=null)
 	(scope
 		(var ttxCollection:gfx = "$datahub.getCollection(CC.mods_ShipParamsInBattle)")
@@ -1193,7 +1237,7 @@
 		(var avatarId:number = "_ttxEntity.mods_ShipParamsInBattle.avatarId")
 		(var avatarEntity:gfx = "$datahub.getPrimaryEntity(CC.avatar, avatarId)")
 		(var shipId:str = "avatarEntity ? toString(avatarEntity.avatar.ship.ref.ship.id) : null" (event "avatarEntity.avatar.evShipRefChanged"))
-		(var consumables:dict = "shipId in MOD_SIDEPANEL_CONSUMABLES ? MOD_SIDEPANEL_CONSUMABLES[shipId] : null")
+		(var consumables:dict = "shipId in SP_CONSUMABLES_DATA ? SP_CONSUMABLES_DATA[shipId] : null")
 		(var radarRange:number = "consumables && 'rls' in consumables ? consumables['rls'] : null")
 		(var hydroRange:number = "consumables && 'sonar' in consumables ? consumables['sonar'] : null")
 
@@ -1281,6 +1325,9 @@
 	)
 )
 
+#--------------------------------------------------------------------------------
+#Tooltip Items
+#--------------------------------------------------------------------------------
 (def element SP_TooltipShipConfigurationsItem(_entity:gfx, _userPrefsNum:dict=null)
 	(scope
 		(var ttxCollection:gfx = "$datahub.getCollection(CC.mods_ShipParamsInBattle)")
@@ -1641,10 +1688,13 @@
 	)
 )
 
-#Active Consumables Info
+#Active Consumables Info: wip
 (def element SP_ShipActiveConsumablesItem(_entity:gfx)
 )
 
+#--------------------------------------------------------------------------------
+#Macros
+#--------------------------------------------------------------------------------
 (def macro SP_GET_ISAFK ()
 	#Returns isAFK:bool
 	#
