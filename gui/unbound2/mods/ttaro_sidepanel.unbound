@@ -11,10 +11,15 @@
 
 #--------------------------------------------------------------------------------
 #For Masters Tournament and the ship-weight rules:
-#1. Un-comment out the following constant
-#2. Create a dict like the existing entries. {shipId[str] : shipWeight[number]},
-#   Single-quotation must be used for the keys, not the double.
-#3. Done. You don't have to edit anything further and should be able to see the values in the game.
+#
+#	1. Un-comment out the following constant, or make the same one on another file.
+#		a. File name is your choice. The only requirement is to call it "SP_SHIPWEIGHT_DATA"
+#	2. Create entries like the existing ones, and replace them. {shipId[str] : shipWeight[number], ...}
+#		a. Ship ID can be retrieved from gameparams.
+#   	b. Single-quotation must be used for the keys, not the double.
+#		c. Do not forget the comma at the end of each line.
+#		d. Indent does not matter. But I recommend you putting 4 spaces or 1 tab for the sake of readablity.
+#	3. Done. You don't have to edit anything further and should be able to see the values in the game.
 #--------------------------------------------------------------------------------
 # (def constant SP_SHIPWEIGHT_DATA {
 # 	'4179572720': 300,
@@ -395,12 +400,12 @@
 	(scope
 		(macro STAGE_SIZE)
 		(macro SP_GET_USERPREFS)
-		(macro SP_GET_PREF_NUMBER "'posOffset'" "SP_USERPREFS_KEY.POS_OFFSET" _modifier="10.0" _default="0.0")
+		(macro SP_GET_PREF_NUMBER "'posOffset'" "SP_USERPREFS_KEY.POS_OFFSET" _modifier="10.0" _default="50.0")
 		(var posTop:number = "SP_ELEMENT_TOP + posOffset - 50")
 	)
 	(bindcall externalCall 'inputMapping.onAction' "['createParamsForAllShipsInBattle', {}]" on='addedToStage')
-	#(macro trace "$datahub.getCollection(CC.mods_ShipParamsInBattle).items[1].mods_ShipParamsInBattle.shipTTX.visibility.visibilityByShip.normal.value")
-	#(macro trace "$datahub.getPrimaryEntity(CC.avatar, $datahub.getCollection(CC.mods_ShipParamsInBattle).items[1].mods_ShipParamsInBattle.avatarId).avatar.name")
+	#Hide the default Ub1 ears
+	(bindcall externalCall 'direct.action' "['option.set', ['battle.ears.enabled', false]]" init=false watch=false on='addedToStage')
 
 	(style
 		(bind width "stageWidth")
@@ -425,7 +430,7 @@
 		(var allyCollection:gfx = "avatarCollection ? avatarCollection.getChildByPath('team.ally.sortedAlive') : null" (event "avatarCollection.evChildAdded") (event "collection.evChildRemoved"))
 		(var allyItems:array = "allyCollection ? allyCollection.items : null" (event "allyCollection.evAdded") (event "allyCollection.evRemoved")  (event "allyCollection.evUpdated"))
 		(var allyCount:number = "allyItems.length")
-		(macro SP_GET_PREF_NUMBER "'scaleOffset'" "SP_USERPREFS_KEY.SCALE_OFFSET" _modifier="0.1" _default="0.0")
+		(macro SP_GET_PREF_NUMBER "'scaleOffset'" "SP_USERPREFS_KEY.SCALE_OFFSET" _modifier="0.1" _default="0.5")
 		(var sizeScale:number = "1 + scaleOffset - 0.5")
 	)
 
@@ -451,7 +456,7 @@
 		(var enemyCollection:gfx = "avatarCollection ? avatarCollection.getChildByPath('team.enemy.sortedAlive') : null" (event "avatarCollection.evChildAdded") (event "collection.evChildRemoved"))
 		(var enemyItems:array = "enemyCollection ? enemyCollection.items : null" (event "enemyCollection.evAdded") (event "enemyCollection.evRemoved") (event "enemyCollection.evUpdated"))
 		(var enemyCount:number = "enemyItems.length")
-		(macro SP_GET_PREF_NUMBER "'scaleOffset'" "SP_USERPREFS_KEY.SCALE_OFFSET" _modifier="0.1" _default="0.0")
+		(macro SP_GET_PREF_NUMBER "'scaleOffset'" "SP_USERPREFS_KEY.SCALE_OFFSET" _modifier="0.1" _default="0.5")
 		(var sizeScale:number = "1 + scaleOffset - 0.5")
 	)
 
@@ -1196,7 +1201,7 @@
 			(bind visible "isSurfaceMobilityVisible")
 		)
 		(element SP_ShipConfigTextItem _value="underwaterSpeed" _unit="'kts'" _userPrefsNum="_userPrefsNum"
-			(bind visible "isUnderwaterMobilityVisible && underwaterSpeed")
+			(bind visible "isUnderwaterMobilityVisible")
 		)
 	)
 )
@@ -1296,7 +1301,7 @@
 	)
 
 	(style
-		(marginBottom = 2px)
+		(bind marginBottom "isValueVisible ? 2px : 0")
 		#(width = 45px)
 		(bind width "isUnitVisible ? SP_SHIPCONFIG_ELEMENT_WIDTH.WITH_UNIT : SP_SHIPCONFIG_ELEMENT_WIDTH.NO_UNIT")
 		(align = "right")
