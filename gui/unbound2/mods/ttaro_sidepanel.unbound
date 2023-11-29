@@ -38,6 +38,7 @@
 	SCALE_OFFSET: 'ttSidePanelScaleOffset',
 	#NAMES
 	CLAN_NAME: 'ttSidePanelClanNameVisible',
+	CLAN_ICON: 'ttSidePanelClanIconVisible',
 	PLAYER_NAME: 'ttSidePanelPlayerNameVisible',
 	KILL_COUNT: 'ttSidePanelPlayerKillsVisible',
 	SHIP_NAME: 'ttSidePanelShipNameVisible',
@@ -527,6 +528,7 @@
 		#For margin
 		(element SP_PlayerDivisionItem "_entity")
 		(element SP_PlayerInfoItem "_entity" "_isAlly" _userPrefsNum="_userPrefsNum")
+		(element SP_PlayerClanIconItem "_entity" "_isAlly" _userPrefsNum="_userPrefsNum")
 		(element SP_ShipWeightItem "_entity" _userPrefsNum="_userPrefsNum") #For tournament
 		(element SP_ShipTierItem "_entity" _userPrefsNum="_userPrefsNum")
 		(element SP_ShipIconItem "_entity" "_isAlly" _userPrefsNum="_userPrefsNum")
@@ -536,11 +538,11 @@
 
 		(element SP_ShipConfigImageItem "'url:../crew_commander/skills/detection_visibility_range.png'" _isVisible="isVisibilityEnabled" _userPrefsNum="_userPrefsNum")
 		(element SP_ShipConfigImageItem "'url:../modules/icon_module_Engine_researched.png'" _isVisible="isMobilityEnabled" _userPrefsNum="_userPrefsNum")
+		(element SP_ShipConfigImageItem "'url:../battle_hud/icon_frag/icon_frag_bomb.png'" _isVisible="isAirSupportEnabled" _alpha="0.7" _userPrefsNum="_userPrefsNum")
 		(element SP_ShipConfigImageItem "'url:../battle_hud/lower_log_modifiers/AAAuraDamage.png'" _isVisible="isAntiAirEnabled" _alpha="0.7" _userPrefsNum="_userPrefsNum")
 
 		(element SP_ShipConfigImageItem "'url:../modules/icon_module_Artillery_researched.png'" _isVisible="isArtilleryEnabled" _userPrefsNum="_userPrefsNum")
 		(element SP_ShipConfigImageItem "'url:../modules/icon_module_Torpedoes_researched.png'" _isVisible="isTorpedoEnabled" _alpha="0.8" _userPrefsNum="_userPrefsNum")
-		(element SP_ShipConfigImageItem "'url:../battle_hud/icon_frag/icon_frag_bomb.png'" _isVisible="isAirSupportEnabled" _alpha="0.7" _userPrefsNum="_userPrefsNum")
 		
 		#(element SP_ShipConfigImageItem "'url:../battle_hud/crosshair/indicators/crosshair_indicator_energy_white.png'") #TODO FIX
 		
@@ -590,6 +592,7 @@
 			)
 			(element SP_PlayerDivisionItem "_entity")
 			(element SP_PlayerInfoItem "_entity" "_isAlly" _userPrefsNum="_userPrefsNum")
+			(element SP_PlayerClanIconItem "_entity" "_isAlly" _userPrefsNum="_userPrefsNum")
 			(element SP_ShipWeightItem "_entity" _userPrefsNum="_userPrefsNum") #For tournament
 			(element SP_ShipTierItem "_entity" _userPrefsNum="_userPrefsNum")
 			(element SP_ShipIconItem "_entity" "_isAlly" _userPrefsNum="_userPrefsNum")
@@ -637,7 +640,7 @@
 			#(bind align "_isAlly ? left : right")
 			#(width = "100%")
 		)
-		(element SP_PlayerClanItem "_entity" _userPrefsNum="_userPrefsNum")
+		(element SP_PlayerClanNameItem "_entity" _userPrefsNum="_userPrefsNum")
 		(element SP_PlayerNameItem "_entity" _userPrefsNum="_userPrefsNum")
 	)
 	(block
@@ -668,15 +671,13 @@
 	)
 )
 
-(def element SP_PlayerClanItem (_entity:gfx, _userPrefsNum:dict=null)
+(def element SP_PlayerClanNameItem (_entity:gfx, _userPrefsNum:dict=null)
 	(scope
 		(var isInClan:bool = "_entity.hasComponent(CC.clanman)")
 		(var clanId:number = "_entity.clanman.clanId" (event "_entity.clanman.evClanIdChanged"))
 		(var clanEntity:gfx = "$datahub.getPrimaryEntity(CC.clan, clanId)")
 		(var clanName:str = "clanEntity.clan.tag" (event "clanEntity.clan.evTagChanged"))
 		(var clanNameWithBrackets:str = "isInClan ? '[' + clanName + ']' : ''")
-		#(macro SP_GET_ISAFK)
-		#(macro SP_GET_USERPREFS)
 		(macro SP_GET_PREF_BOOL _varName="'isClanNameVisible'" _prefKey="SP_USERPREFS_KEY.CLAN_NAME")
 	)
 	(style
@@ -685,8 +686,30 @@
 	(bind visible "isClanNameVisible")
 	(tf
 		(class $TextDefault13NM)
-		#(bind class "isAFK ? '$FontColorUnready' : tkStatus ? '$FontColorTeamkiller' : '$None'")
 		(bind text "clanNameWithBrackets")
+	)
+)
+
+(def element SP_PlayerClanIconItem (_entity:gfx, _isAlly:bool=false, _userPrefsNum:dict=null)
+	(scope
+		(var isInClan:bool = "_entity.hasComponent(CC.clanman)")
+		(var clanId:number = "_entity.clanman.clanId" (event "_entity.clanman.evClanIdChanged"))
+		(var clanEntity:gfx = "$datahub.getPrimaryEntity(CC.clan, clanId)")
+		(var clanName:str = "clanEntity.clan.tag" (event "clanEntity.clan.evTagChanged"))
+		(var clanIcon:str = "'url:../clan_icons/' + clanName + '.png'")
+		(macro SP_GET_PREF_BOOL _varName="'isClanIconVisible'" _prefKey="SP_USERPREFS_KEY.CLAN_ICON" _default="false")
+	)
+	(style
+		(align = "middle|center")
+	)
+	(bind visible "isClanIconVisible")
+	(block
+		(style
+			(bind backgroundImage "clanIcon")
+			(width = 24)
+			(height = 24)
+			#(backgroundSize = "fill")
+		)
 	)
 )
 
@@ -825,7 +848,7 @@
 		(macro SP_GET_PREF_BOOL _varName="'isShipTierVisible'" _prefKey="SP_USERPREFS_KEY.SHIP_TIER")
 	)
 	(style
-		(width = 20px)
+		(width = 22px)
 		(align = "center")
 	)
 	(bind visible "isShipTierVisible")
@@ -991,10 +1014,10 @@
 		)
 		(element SP_ShipConfigVisibilityItem "ttxEntity" _userPrefsNum="_userPrefsNum")
 		(element SP_ShipConfigMobilityItem "ttxEntity" _userPrefsNum="_userPrefsNum")
+		(element SP_ShipConfigAirSupportItem "ttxEntity" _userPrefsNum="_userPrefsNum")
 		(element SP_ShipConfigAirDefenseItem "ttxEntity" _userPrefsNum="_userPrefsNum")
 		(element SP_ShipConfigArtilleryItem "ttxEntity" _userPrefsNum="_userPrefsNum")
 		(element SP_ShipConfigTorpedoItem "ttxEntity" _userPrefsNum="_userPrefsNum")
-		(element SP_ShipConfigAirSupportItem "ttxEntity" _userPrefsNum="_userPrefsNum")
 		#(element SP_ShipConfigBatteryItem "ttxEntity")
 		(element SP_ShipConfigConsumableItem "ttxEntity" _userPrefsNum="_userPrefsNum")
 	)
@@ -1400,9 +1423,11 @@
 		(var numBarrels3:number = "mainGunTTX.length > 2 ? mainGunTTX[2].numBarrels.value * mainGunTTX[2].numGuns.value : 0")
 		(var numBarrels4:number = "mainGunTTX.length > 3 ? mainGunTTX[3].numBarrels.value * mainGunTTX[3].numGuns.value : 0")
 		(var totalBarrelsCount:number = "numBarrels1 + numBarrels2 + numBarrels3 + numBarrels4")
+		(var shellsPerMin:number = "totalBarrelsCount * (60 / reload) * 0.33")
 
 		(var altFire:gfx = "artilleryTTX ? artilleryTTX.altFireMode : null")
-		(var altFireShots:number = "altFire ? altFire.numShots : null")
+		(var altFireShots:number = "altFire ? altFire.numShots.value : null")
+		(var altFireReload:number = "altFire ? altFire.reloadTime.value : null")
 
 		(var ammoHE:gfx = "artilleryTTX ? artilleryTTX.ammoHE : null")
 		(var ammoCS:gfx = "artilleryTTX ? artilleryTTX.ammoCS : null")
@@ -1416,9 +1441,9 @@
 		(var damageCS:number = "ammoCS ? ammoCS.damage.value : 0")
 		(var damageAP:number = "ammoAP ? ammoAP.damage.value : 0")
 
-		(var damagePerMinHE:number = "damageHE * totalBarrelsCount * (60 / reload) * 0.33")
-		(var damagePerMinCS:number = "damageCS * totalBarrelsCount * (60 / reload) * 0.33")
-		(var damagePerMinAP:number = "damageAP * totalBarrelsCount * (60 / reload) * 0.33")
+		(var damagePerMinHE:number = "damageHE * shellsPerMin")
+		(var damagePerMinCS:number = "damageCS * shellsPerMin")
+		(var damagePerMinAP:number = "damageAP * shellsPerMin")
 	)
 
 	(style
@@ -1437,6 +1462,12 @@
 		(block
 			(element SP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_MAX_DIST'" _value="range" _unit="'km'" _userPrefsNum="_userPrefsNum")
 			(element SP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_SHOT_DELAY'" _value="reload" _unit="'s'" _userPrefsNum="_userPrefsNum")
+		)
+
+		(block
+			(bind visible "altFire")
+			(element SP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_BURST_FIRE_SALVO_COUNT'" _value="altFireShots" _roundDigit=0 _unit=null _userPrefsNum="_userPrefsNum")
+			(element SP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_BURST_FIRE_RELOAD_TIME'" _value="altFireReload" _unit="'s'" _userPrefsNum="_userPrefsNum")
 		)
 
 		(block
@@ -1460,12 +1491,16 @@
 		#normal torps
 		(var torpedoTTX:gfx = "torpedoesTTX ? torpedoesTTX.torpedo : null")
 		(var torpedoRange:number = "torpedoTTX ? torpedoTTX.maxDist.value : null")
+		(var torpedoDamage:number = "torpedoTTX ? torpedoTTX.damage.value : null")
 		#deepwater torps
 		(var torpedoDeepwaterTTX:gfx = "torpedoesTTX ? torpedoesTTX.torpedoDeepwater : null")
 		(var torpedoDeepwaterRange:number = "torpedoDeepwaterTTX ? torpedoDeepwaterTTX.maxDist.value : null")
+		(var torpedoDeepwaterDamage:number = "torpedoDeepwaterTTX ? torpedoDeepwaterTTX.damage.value : null")
+		#(var torpedoDeepwaterDamage:array = "torpedoDeepwaterTTX ? torpedoDeepwaterTTX.canHitClasses : null")
 		#alt torps
 		(var torpedoAltTTX:gfx = "torpedoesTTX ? torpedoesTTX.torpedoAlt : null")
 		(var torpedoAltRange:number = "torpedoAltTTX ? torpedoAltTTX.maxDist.value : null")
+		(var torpedoAltDamage:number = "torpedoAltTTX ? torpedoAltTTX.damage.value : null")
 		#reload
 		(var torpdoReload:number = "torpedoesTTX ? torpedoesTTX.reloadTime.value : null")
 
@@ -1474,16 +1509,21 @@
 		#normal torps
 		(var subTorpedoTTX:gfx = "torpedoGroupsTTX ? torpedoGroupsTTX.torpedo : null")
 		(var subTorpedoRange:number = "subTorpedoTTX ? subTorpedoTTX.maxDist.value : null")
+		(var subTorpedoDamage:number = "subTorpedoTTX ? subTorpedoTTX.damage.value : null")
 		#deepwater torps
 		(var subTorpedoDeepwaterTTX:gfx = "torpedoGroupsTTX ? torpedoGroupsTTX.torpedoDeepwater : null")
 		(var subTorpedoDeepwaterRange:number = "subTorpedoDeepwaterTTX ? subTorpedoDeepwaterTTX.maxDist.value : null")
+		(var subTorpedoDeepwaterDamage:number = "subTorpedoDeepwaterTTX ? subTorpedoDeepwaterTTX.damage.value : null")
 		#alt torps
 		(var subTorpedoAltTTX:gfx = "torpedoGroupsTTX ? torpedoGroupsTTX.torpedoAlt : null")
 		(var subTorpedoAltRange:number = "subTorpedoAltTTX ? subTorpedoAltTTX.maxDist.value : null")
+		(var subTorpedoAltDamage:number = "subTorpedoAltTTX ? subTorpedoAltTTX.damage.value : null")
 		#forward reload
 		(var torpdoBowReload:number = "(torpedoGroupsTTX && torpedoGroupsTTX.bowGroup) ? torpedoGroupsTTX.bowGroup.reloadTime.value : null")
+		(var torpdoBowLoaders:number = "(torpedoGroupsTTX && torpedoGroupsTTX.bowGroup) ? torpedoGroupsTTX.bowGroup.numLoaders.value : null")
 		#stern reload
 		(var torpdoSternReload:number = "(torpedoGroupsTTX && torpedoGroupsTTX.sternGroup) ? torpedoGroupsTTX.sternGroup.reloadTime.value : null")
+		(var torpdoSternLoaders:number = "(torpedoGroupsTTX && torpedoGroupsTTX.sternGroup) ? torpedoGroupsTTX.sternGroup.numLoaders.value : null")
 	)
 
 	(style
@@ -1507,6 +1547,13 @@
 		)
 
 		(block
+			(bind visible "torpedoesTTX")
+			(element SP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_TORPEDO_AMMO'" _value="torpedoDamage" _roundDigit=0 _userPrefsNum="_userPrefsNum")
+			(element SP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_TORPEDO_DEEPWATER_AMMO'" _value="torpedoDeepwaterDamage" _roundDigit=0 _userPrefsNum="_userPrefsNum")
+			(element SP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_TORPEDO_ALTERNATIVE_AMMO'" _value="torpedoAltDamage" _roundDigit=0 _userPrefsNum="_userPrefsNum")
+		)
+
+		(block
 			(bind visible "torpedoGroupsTTX")
 			(element SP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_TORPEDO_AMMO'" _value="subTorpedoRange" _unit="'km'" _userPrefsNum="_userPrefsNum")
 			(element SP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_TORPEDO_DEEPWATER_AMMO'" _value="subTorpedoDeepwaterRange" _unit="'km'" _userPrefsNum="_userPrefsNum")
@@ -1514,9 +1561,22 @@
 		)
 
 		(block
+			(bind visible "torpedoGroupsTTX")
+			(element SP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_TORPEDO_AMMO'" _value="subTorpedoDamage" _roundDigit=0 _userPrefsNum="_userPrefsNum")
+			(element SP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_TORPEDO_DEEPWATER_AMMO'" _value="subTorpedoDeepwaterDamage" _roundDigit=0 _userPrefsNum="_userPrefsNum")
+			(element SP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_TORPEDO_ALTERNATIVE_AMMO'" _value="subTorpedoAltDamage" _roundDigit=0 _userPrefsNum="_userPrefsNum")
+		)
+
+		(block
 			(element SP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_SHOT_DELAY'" _value="torpdoReload" _unit="'s'" _userPrefsNum="_userPrefsNum")
 			(element SP_TooltipShipConfigTextItem _title="'Bow Group Reload'" _value="torpdoBowReload" _unit="'s'" _userPrefsNum="_userPrefsNum")
 			(element SP_TooltipShipConfigTextItem _title="'Stern Group Reload'" _value="torpdoSternReload" _unit="'s'" _userPrefsNum="_userPrefsNum")
+		)
+
+		(block
+			(bind visible "torpedoGroupsTTX")
+			(element SP_TooltipShipConfigTextItem _title="'Bow Group Loaders'" _value="torpdoBowLoaders" _roundDigit=0 _userPrefsNum="_userPrefsNum")
+			(element SP_TooltipShipConfigTextItem _title="'Stern Group Loaders'" _value="torpdoSternLoaders" _roundDigit=0 _userPrefsNum="_userPrefsNum")
 		)
 	)
 )
@@ -1524,7 +1584,8 @@
 (def element SP_TooltipAntiAirItem(_ttxEntity:gfx, _userPrefsNum:dict=null)
 	(scope
 		(var airDefenseTTX:gfx = "_ttxEntity.mods_ShipParamsInBattle.shipTTX.airDefense")
-		(var airDefenseRange:number = "airDefenseTTX ? airDefenseTTX.averageAura.maxDist.value : null")
+		(var maxRange:number = "airDefenseTTX ? airDefenseTTX.averageAura.maxDist.value : null")
+		(var bubble:number = "(airDefenseTTX && airDefenseTTX.bubble)  ? airDefenseTTX.bubble.numBubbles.value : null")
 	)
 
 	(style
@@ -1541,7 +1602,8 @@
 		(element SP_TooltipShipConfigTitleItem _title="'IDS_SHIP_PARAM_AIR_DEFENSE'")
 
 		(block
-			(element SP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_MAX_DIST'" _value="airDefenseRange" _unit="'km'" _userPrefsNum="_userPrefsNum")
+			(element SP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_MAX_DIST'" _value="maxRange" _unit="'km'" _userPrefsNum="_userPrefsNum")
+			(element SP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_AA_EXPL_COUNT'" _value="bubble" _roundDigit=0 _userPrefsNum="_userPrefsNum")
 		)
 	)
 )
