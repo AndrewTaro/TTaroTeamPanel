@@ -554,11 +554,14 @@
 (def element TP_PlayerItem (_entity:gfx, _isAlly:bool=false, _userPrefsNum:dict=null)
 	(scope
 		(var healthComponent:gfx = "_entity.hasComponent(CC.health) ? _entity.health : null")
-		(var isAlive:bool = "healthComponent ? healthComponent.isAlive : false")
+		(var isAlive:bool = "healthComponent ? healthComponent.isAlive : false" (event "healthComponent.evIsAliveChanged"))
 		#For tooltip
 		(event evHideInfotip)
 		(event evMenuItemClicked) #maybe unnecessary?
-		(var selfPlayer:gfx = "$datahub.getSingleEntity(CC.accountSelf)")
+		(var selfPlayer:gfx = "$datahub.getSingleEntity(CC.playerAvatar)")
+		(var isSelf:bool = "selfPlayer.id == _entity.id")
+		(var isBot:bool = "_entity && _entity.avatar.isBot")
+		(var isContextMenuAvailable:bool = "!(isSelf || isBot)")
 		(var mouse:gfx = "$datahub.getSingleComponent(CC.mouse)")
 		(var isMouseActive:bool = "mouse.active" (event "mouse.evActiveChanged"))
 	)
@@ -611,6 +614,7 @@
 
 	#Context Menu for Report/Compliment/Division
 	(controller $Tooltip (renderer = 'ContextMenuPlayer')
+		(bind enabled "isContextMenuAvailable")
 		(args _playerEntity="_entity" _selfPlayer="selfPlayer")
 		(macro DEFAULT_MENU_BEHAVIOUR "evHideInfotip" "1")
 		(cache=false)
@@ -674,9 +678,10 @@
 (def element TP_PlayerClanNameItem (_entity:gfx, _userPrefsNum:dict=null)
 	(scope
 		(var isInClan:bool = "_entity.hasComponent(CC.clanman)")
-		(var clanId:number = "_entity.clanman.clanId" (event "_entity.clanman.evClanIdChanged"))
+		(var clanComponent:gfx = "isInClan ? _entity.clanman : null")
+		(var clanId:number = "clanComponent ? clanComponent.clanId : null" (event "clanComponent.evClanIdChanged"))
 		(var clanEntity:gfx = "$datahub.getPrimaryEntity(CC.clan, clanId)")
-		(var clanName:str = "clanEntity.clan.tag" (event "clanEntity.clan.evTagChanged"))
+		(var clanName:str = "clanEntity ? clanEntity.clan.tag : null" (event "clanEntity.clan.evTagChanged"))
 		(var clanNameWithBrackets:str = "isInClan ? '[' + clanName + ']' : ''")
 		(macro TP_GET_PREF_BOOL _varName="'isClanNameVisible'" _prefKey="TP_USERPREFS_KEY.CLAN_NAME")
 	)
@@ -692,10 +697,10 @@
 
 (def element TP_PlayerClanIconItem (_entity:gfx, _isAlly:bool=false, _userPrefsNum:dict=null)
 	(scope
-		(var isInClan:bool = "_entity.hasComponent(CC.clanman)")
-		(var clanId:number = "_entity.clanman.clanId" (event "_entity.clanman.evClanIdChanged"))
+		(var clanComponent:gfx = "_entity.hasComponent(CC.clanman) ? _entity.clanman : null")
+		(var clanId:number = "clanComponent ? clanComponent.clanId : null" (event "clanComponent.evClanIdChanged"))
 		(var clanEntity:gfx = "$datahub.getPrimaryEntity(CC.clan, clanId)")
-		(var clanName:str = "clanEntity.clan.tag" (event "clanEntity.clan.evTagChanged"))
+		(var clanName:str = "clanEntity ? clanEntity.clan.tag : null" (event "clanEntity.clan.evTagChanged"))
 		(var clanIcon:str = "'url:../clan_icons/' + clanName + '.png'")
 		(macro TP_GET_PREF_BOOL _varName="'isClanIconVisible'" _prefKey="TP_USERPREFS_KEY.CLAN_ICON" _default="false")
 	)
@@ -865,11 +870,11 @@
 	(scope
 		(var _markerEntity:gfx = "_entity")
 		(macro GET_MARKER_ENTITY_COMPONENT 'vehicle')
-		(var isDetected:bool = "vehicleComponent.visibilityFlags" (event "vehicleComponent.evVisibilityFlagsChanged"))
+		(var isDetected:bool = "vehicleComponent ? vehicleComponent.visibilityFlags : false" (event "vehicleComponent.evVisibilityFlagsChanged"))
 		(var wasDetected:bool = "false" watch=false)
 		(bind wasDetected "true" watch=false init=false (bind enabled "!(wasDetected) && isDetected") (event "vehicleComponent.evVisibilityFlagsChanged"))
 		(macro GET_MARKER_ENTITY_COMPONENT 'health')
-		(var isAlive:bool = "healthComponent ? healthComponent.isAlive : false")
+		(var isAlive:bool = "healthComponent ? healthComponent.isAlive : false" (event "healthComponent.evIsAliveChanged"))
 		(macro TP_GET_PREF_BOOL _varName="'isShipDetectionVisible'" _prefKey="TP_USERPREFS_KEY.SHIP_DETECTION")
 		(var iconColorTransform:dict = "isDetected  ? {redMultiplier:0,greenMultiplier:0,blueMultiplier:0,alphaMultiplier:1.0,redOffset:0xFF,greenOffset:0x99,blueOffset:0x33,alphaOffset:0 }
 													: {redMultiplier:0,greenMultiplier:0,blueMultiplier:0,alphaMultiplier:0.6,redOffset:0xFF,greenOffset:0xFF,blueOffset:0xFF,alphaOffset:0 }")
@@ -906,7 +911,7 @@
 		(var healthValue:number = "healthComponent ? healthComponent.value : 0" (event "healthComponent.evValueChanged"))
 		(var healthMax:number = "healthComponent ? healthComponent.max : 0" (event "healthComponent.evMaxChanged"))
 		(var healthRatio:number = "healthMax ? healthValue / healthMax : 1")
-		(var isAlive:bool = "healthComponent ? healthComponent.isAlive : false")
+		(var isAlive:bool = "healthComponent ? healthComponent.isAlive : false" (event "healthComponent.evIsAliveChanged"))
 
 		#regeneration
 		(macro GET_MARKER_ENTITY_COMPONENT 'dataComponent')
