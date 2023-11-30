@@ -36,6 +36,8 @@
 	UNITS_VISIBLE: 'ttTeamPanelShipStatsUnitsVisible',
 	POS_OFFSET: 'ttTeamPanelPosOffset',
 	SCALE_OFFSET: 'ttTeamPanelScaleOffset',
+	BLUR_ALT_VISIBLE: 'ttTeamPanelBlurVisibleOnAlt',
+	BLUR_ALPHA: 'ttTeamPanelBlurOpacity',
 	#NAMES
 	CLAN_NAME: 'ttTeamPanelClanNameVisible',
 	CLAN_ICON: 'ttTeamPanelClanIconVisible',
@@ -393,7 +395,15 @@
     '3730749392': {sonar: 5.0, },
     '4075730768': {sonar: 5.0, },
 })
-
+(def constant TP_CONCEALMENT_SKILL_ID {
+	'AirCarrier': 45,
+	#'Auxiliary': null,
+	'Battleship': 12,
+	'Cruiser': 12,
+	'Destroyer': 12,
+	#'Submarine': null
+})
+(def constant TP_CONCEALMENT_CREW_ID "-1") #Works until WG introduces the EPIC CONCEALMENT SKILL (hope that never happens)
 #--------------------------------------------------------------------------------
 #Main Elements
 #--------------------------------------------------------------------------------
@@ -564,14 +574,17 @@
 		(var isContextMenuAvailable:bool = "!(isSelf || isBot)")
 		(var mouse:gfx = "$datahub.getSingleComponent(CC.mouse)")
 		(var isMouseActive:bool = "mouse.active" (event "mouse.evActiveChanged"))
+
+		(macro TP_GET_PREF_BOOL _varName="'isBlurVisibleOnlyAlt'" _prefKey="TP_USERPREFS_KEY.BLUR_ALT_VISIBLE")
+		(macro TP_GET_PREF_NUMBER "'blurAlpha'" "TP_USERPREFS_KEY.BLUR_ALPHA" _modifier="0.1" _default="0.0")
+		(var camera:gfx = "$datahub.getSingleComponent(CC.camera)")
+		(var altVision:bool = "camera ? camera.altVision : false" (event "camera.evAltVisionChanged"))
 	)
 	#For tooltip
 	(dispatch evHideInfotip args="{}" (bind trigger "isMouseActive") (event "evMenuItemClicked"))
 
 	(style
-		#(marginTop = 1px)
-		#(margin = "[3,3,3,3]")
-		#(height = "TP_PLAYER_ROW_SIZE.HEIGHT")
+		(backgroundColor = 0x01000000) #For seamless hittest
 	)
 
 	(element HorizontalDividerTwoPx
@@ -584,6 +597,12 @@
 	(block
 		(style
 			(height = "TP_PLAYER_ROW_SIZE.HEIGHT")
+		)
+
+		(mc hud_bar_bg_sliced
+			(class $FullsizeAbsolute)
+			(bind visible "isBlurVisibleOnlyAlt ? altVision : true")
+			(bind alpha "blurAlpha")
 		)
 
 		(element TP_ShipHealthBarItem "_entity" "_isAlly" _userPrefsNum="_userPrefsNum")
@@ -1250,9 +1269,40 @@
 
 (def element TP_ShipConfigVisibilityItem(_ttxEntity:gfx, _userPrefsNum:dict=null)
 	(scope
+		#fix for skill---------------------
+		(var selfPlayer:gfx = "$datahub.getSingleEntity(CC.playerAvatar)")
+		(var avatarId:number = "_ttxEntity.mods_ShipParamsInBattle.avatarId")
+		(var avatarEntity:gfx = "$datahub.getPrimaryEntity(CC.avatar, avatarId)")
+		(var avatarComponent:gfx = "avatarEntity ? avatarEntity.avatar : null")
+
+		#shipId -> ownShip (ship in port) -> crewId (crew on board) -> crewSkill (check crew has skill)
+		(var isSelf:bool = "selfPlayer.avatar.id == avatarId")
+		(var shipId:number = "avatarComponent ? avatarComponent.ship.ref.ship.id : null" (event "avatarComponent.evShipRefChanged"))
+		(var shipType:str = "avatarComponent ? avatarComponent.shipType : null" (event "avatarComponent.evShipTypeChanged"))
+		(var ownShipEntity:gfx = "$datahub.getPrimaryEntity(CC.ownShip, shipId)")
+
+		(var skillId:number = "shipType in TP_CONCEALMENT_SKILL_ID ? TP_CONCEALMENT_SKILL_ID[shipType] : null")
+		(var skillEntity:gfx = "$datahub.getPrimaryCompositeEntity(CC.skill, skillId, shipType, TP_CONCEALMENT_CREW_ID)")
+		
+		(var crewId:number = "ownShipEntity ? ownShipEntity.ownShip.crewId : null" (event "ownShipEntity.ownShip.evCrewChanged"))
+		(var crewSkillEntity:gfx = "$datahub.getPrimaryCompositeEntity(CC.crewSkill, crewId, skillEntity.id)")
+		#(crewId, skill) -> rutrns crewSkill if the crew is onboard and has skill
+
+		(var isCorrectionNeeded:bool = "!(crewSkillEntity || isSelf)")
+
+		(var modifiers:dict = "skillEntity ? skillEntity.attributes.modifiers : null")
+		(var visibilityModifier:number = "isCorrectionNeeded && modifiers ? (1 + modifiers.visibilityDistCoeff * 0.01) : 1.0") #value is negative and %
+		#---------------------
+
+		#ttx
 		(var visibilityTTX:gfx = "_ttxEntity.mods_ShipParamsInBattle.shipTTX.visibility")
 		(var visibilityByShip:number = "visibilityTTX ? visibilityTTX.visibilityByShip.normal.value : null") #CAPTAIN SKILL FIX
 		(var visibilityByPlane:number = "visibilityTTX ? visibilityTTX.visibilityByPlane.normal.value : null") #CAPTAIN SKILL FIX
+
+		#fix------------------
+		(var modifiedVisibilityByShip:number = "visibilityByShip * visibilityModifier") #CAPTAIN SKILL FIX
+		(var modifiedVisibilityByPlane:number = "visibilityByPlane * visibilityModifier") #CAPTAIN SKILL FIX
+		#---------------------
 
 		#(macro TP_GET_USERPREFS)
 		(macro TP_GET_PREF_BOOL _varName="'isVisibilityByShipVisible'" _prefKey="TP_USERPREFS_KEY.VISIBILITY_SURFACE")
@@ -1270,10 +1320,10 @@
 		(align = "middle|center")
 	)
 	(block
-		(element TP_ShipConfigTextItem _value="visibilityByShip" _unit="'km'" _userPrefsNum="_userPrefsNum"
+		(element TP_ShipConfigTextItem _value="modifiedVisibilityByShip" _unit="'km'" _userPrefsNum="_userPrefsNum"
 			(bind visible "isVisibilityByShipVisible")
 		)
-		(element TP_ShipConfigTextItem _value="visibilityByPlane" _unit="'km'" _userPrefsNum="_userPrefsNum"
+		(element TP_ShipConfigTextItem _value="modifiedVisibilityByPlane" _unit="'km'" _userPrefsNum="_userPrefsNum"
 			(bind visible "isVisibilityByPlaneVisible")
 		)
 	)
@@ -1684,9 +1734,39 @@
 
 (def element TP_TooltipVisibilityItem(_ttxEntity:gfx, _userPrefsNum:dict=null)
 	(scope
+		#fix for skill---------------------
+		(var selfPlayer:gfx = "$datahub.getSingleEntity(CC.playerAvatar)")
+		(var avatarId:number = "_ttxEntity.mods_ShipParamsInBattle.avatarId")
+		(var avatarEntity:gfx = "$datahub.getPrimaryEntity(CC.avatar, avatarId)")
+		(var avatarComponent:gfx = "avatarEntity ? avatarEntity.avatar : null")
+
+		#shipId -> ownShip (ship in port) -> crewId (crew on board) -> crewSkill (check crew has skill)
+		(var isSelf:bool = "selfPlayer.avatar.id == avatarId")
+		(var shipId:number = "avatarComponent ? avatarComponent.ship.ref.ship.id : null" (event "avatarComponent.evShipRefChanged"))
+		(var shipType:str = "avatarComponent ? avatarComponent.shipType : null" (event "avatarComponent.evShipTypeChanged"))
+		(var ownShipEntity:gfx = "$datahub.getPrimaryEntity(CC.ownShip, shipId)")
+
+		(var skillId:number = "shipType in TP_CONCEALMENT_SKILL_ID ? TP_CONCEALMENT_SKILL_ID[shipType] : null")
+		(var skillEntity:gfx = "$datahub.getPrimaryCompositeEntity(CC.skill, skillId, shipType, TP_CONCEALMENT_CREW_ID)")
+		
+		(var crewId:number = "ownShipEntity ? ownShipEntity.ownShip.crewId : null" (event "ownShipEntity.ownShip.evCrewChanged"))
+		(var crewSkillEntity:gfx = "$datahub.getPrimaryCompositeEntity(CC.crewSkill, crewId, skillEntity.id)")
+		#(crewId, skill) -> rutrns crewSkill if the crew is onboard and has skill
+
+		(var isCorrectionNeeded:bool = "!(crewSkillEntity || isSelf)")
+
+		(var modifiers:dict = "skillEntity ? skillEntity.attributes.modifiers : null")
+		(var visibilityModifier:number = "isCorrectionNeeded && modifiers ? (1 + modifiers.visibilityDistCoeff * 0.01) : 1.0") #value is negative and %
+		#---------------------
+
 		(var visibilityTTX:gfx = "_ttxEntity.mods_ShipParamsInBattle.shipTTX.visibility")
 		(var visibilityByShip:number = "visibilityTTX ? visibilityTTX.visibilityByShip.normal.value : null") #CAPTAIN SKILL FIX
 		(var visibilityByPlane:number = "visibilityTTX ? visibilityTTX.visibilityByPlane.normal.value : null") #CAPTAIN SKILL FIX
+
+		#fix------------------
+		(var modifiedVisibilityByShip:number = "visibilityByShip * visibilityModifier") #CAPTAIN SKILL FIX
+		(var modifiedVisibilityByPlane:number = "visibilityByPlane * visibilityModifier") #CAPTAIN SKILL FIX
+		#---------------------
 	)
 
 	(style
@@ -1703,8 +1783,8 @@
 		(element TP_TooltipShipConfigTitleItem _title="'IDS_SHIP_PARAM_DETECTION'")
 
 		(block
-			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_VISIBILITY_DIST_BY_SHIP'" _value="visibilityByShip" _unit="'km'" _userPrefsNum="_userPrefsNum")
-			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_VISIBILITY_DIST_BY_PLANE'" _value="visibilityByPlane" _unit="'km'" _userPrefsNum="_userPrefsNum")
+			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_VISIBILITY_DIST_BY_SHIP'" _value="modifiedVisibilityByShip" _unit="'km'" _userPrefsNum="_userPrefsNum")
+			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_VISIBILITY_DIST_BY_PLANE'" _value="modifiedVisibilityByPlane" _unit="'km'" _userPrefsNum="_userPrefsNum")
 		)
 	)
 )
