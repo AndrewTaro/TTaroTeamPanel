@@ -20,4 +20,4 @@ You can personalize it to be the simplest team panel, or the most info-flooded o
 4. Done!
 
 # Config
-[TTaro Mod Config](../../../TTaroModConfig) supports this mod.  You can adjust the color of the smoke marker on minimap.
+[TTaro Mod Config](../../../TTaroModConfig) supports this mod.  You can adjust many features from that menu.
