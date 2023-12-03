@@ -32,7 +32,7 @@
 
 (def constant TP_USERPREFS_KEY {
 	#GENERAL
-	ALT_VISIBLE: 'ttTeamPanelShipStatsVisibleOnAlt',
+	STATS_ALT_VISIBLE: 'ttTeamPanelShipStatsVisibleOnAlt',
 	UNITS_VISIBLE: 'ttTeamPanelShipStatsUnitsVisible',
 	POS_OFFSET: 'ttTeamPanelPosOffset',
 	SCALE_OFFSET: 'ttTeamPanelScaleOffset',
@@ -456,7 +456,7 @@
 	(controller $Repeat renderer='TP_PlayerItem'
 		(bind enabled "allyCount > 0")
 		(bind count "allyCount")
-		(args "allyItems[$index]" _isAlly="true" _userPrefsNum="_userPrefsNum")
+		(args "allyItems" _isAlly="true" _userPrefsNum="_userPrefsNum")
 	)
 )
 
@@ -484,7 +484,7 @@
 	(controller $Repeat renderer='TP_PlayerItem'
 		(bind enabled "enemyCount > 0")
 		(bind count "enemyCount")
-		(args "enemyItems[$index]" _isAlly="false" _userPrefsNum="_userPrefsNum")
+		(args "enemyItems" _isAlly="false" _userPrefsNum="_userPrefsNum")
 	)
 )
 
@@ -519,7 +519,7 @@
 		(macro TP_GET_PREF_BOOL _varName="'isHydroRangeVisible'" _prefKey="TP_USERPREFS_KEY.HYDRO_RANGE")
 		(var isConsumableEnabled:bool = "isRadarRangeVisible || isHydroRangeVisible")
 		#ALT
-		(macro TP_GET_PREF_BOOL _varName="'isVisibleOnlyAlt'" _prefKey="TP_USERPREFS_KEY.ALT_VISIBLE" _default="false")
+		(macro TP_GET_PREF_BOOL _varName="'isVisibleOnlyAlt'" _prefKey="TP_USERPREFS_KEY.STATS_ALT_VISIBLE" _default="false")
 		(var camera:gfx = "$datahub.getSingleComponent(CC.camera)")
 		(var altVision:bool = "camera ? camera.altVision : false" (event "camera.evAltVisionChanged"))
 	)
@@ -561,8 +561,10 @@
 )
 
 #Player
-(def element TP_PlayerItem (_entity:gfx, _isAlly:bool=false, _userPrefsNum:dict=null)
+(def element TP_PlayerItem (_items:array, _isAlly:bool=false, _userPrefsNum:dict=null)
 	(scope
+		(var _entity:gfx = "_items[$index]" watch=false)
+		(var _index:number = "indexOf(_entity, _items)")
 		(var healthComponent:gfx = "_entity.hasComponent(CC.health) ? _entity.health : null")
 		(var isAlive:bool = "healthComponent ? healthComponent.isAlive : false" (event "healthComponent.evIsAliveChanged"))
 		#For tooltip
@@ -584,11 +586,19 @@
 	(dispatch evHideInfotip args="{}" (bind trigger "isMouseActive") (event "evMenuItemClicked"))
 
 	(style
-		(backgroundColor = 0x01000000) #For seamless hittest
+		(backgroundColor = 0x00FFFFFF) #For seamless hittest. Do not use 0x01000000 because it will have a visible dark color!
+
+		#(position = absolute) is required to separate the argument entity and the position of this element within parent layout.
+		#With auto positioning, the layout of elements remains the same - but the argument entities change.
+		#In that case, the spotted indicator or any element that uses (watch=false) variable within their scope can break.
+		(position = absolute)
+		(bind left "_isAlly ? 0 : auto")
+		(bind right "_isAlly ? auto : 0")
+		(bind top "_index == 0 ? 0 : (_index * (TP_PLAYER_ROW_SIZE.HEIGHT + 2)) + 2")
 	)
 
 	(element HorizontalDividerTwoPx
-		(bind visible "$index == 0")
+		(bind visible "_index == 0")
 		(style
 			(alpha = 2.0)
 		)
@@ -1024,7 +1034,7 @@
 		(var ttxCollection:gfx = "$datahub.getCollection(CC.mods_ShipParamsInBattle)")
 		(var ttxEntity:gfx = "$datahub.getPrimaryEntity(CC.mods_ShipParamsInBattle, _entity.avatar.id)" (event "ttxCollection.evAdded"))
 		#(macro TP_GET_USERPREFS)
-		(macro TP_GET_PREF_BOOL _varName="'isVisibleOnlyAlt'" _prefKey="TP_USERPREFS_KEY.ALT_VISIBLE" _default="false")
+		(macro TP_GET_PREF_BOOL _varName="'isVisibleOnlyAlt'" _prefKey="TP_USERPREFS_KEY.STATS_ALT_VISIBLE" _default="false")
 		(var camera:gfx = "$datahub.getSingleComponent(CC.camera)")
 		(var altVision:bool = "camera ? camera.altVision : false" (event "camera.evAltVisionChanged"))
 	)
