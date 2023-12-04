@@ -8,7 +8,7 @@
 	WITH_UNIT: 48,
 	NO_UNIT: 32
 })
-
+(def constant TP_TOOLTIP_ELEMENTS_VGAP "5px")
 #--------------------------------------------------------------------------------
 #For Masters Tournament and the ship-weight rules:
 #
@@ -47,6 +47,7 @@
 	SHIP_NAME: 'ttTeamPanelShipNameVisible',
 	SHIP_TIER: 'ttTeamPanelShipTierVisible',
 	SHIP_ICON: 'ttTeamPanelShipIconVisible',
+	SHIP_ICON_COLOR: 'ttTeamPanelShipIconColorPreset',
 	SHIP_DETECTION: 'ttTeamPanelShipDetectionVisible',
 	HEALTHBAR_OPACITY: 'ttTeamPanelHealthBarOpacity',
 	#SHIPCONFIGS
@@ -58,6 +59,7 @@
 	TORPEDO_RELOAD: 'ttTeamPanelTorpedoReloadVisible',
 	#AntiAir
 	ANTIAIR_RANGE: 'ttTeamPanelAntiAirRangeVisible',
+	ANTIAIR_RATE: 'ttTeamPanelAntiAirRateVisible',
 	#AirSupport
 	AIRSUPPORT_RANGE: 'ttTeamPanelAirSupportRangeVisible',
 	AIRSUPPORT_RELOAD: 'ttTeamPanelAirSupportReloadVisible',
@@ -72,6 +74,45 @@
 	HYDRO_RANGE: 'ttTeamPanelHydroRangeVisible',
 })
 
+(def constant TP_SHIP_ICON_COLOR_PRESET [
+	#Use (234-0x??)
+	#None
+	{
+		Auxiliary:	{},
+		AirCarrier:	{},
+		Battleship:	{},
+		Cruiser:	{},
+		Destroyer: 	{},
+		Submarine:	{},
+	},
+	#Aslain
+	{
+		Auxiliary:	{redOffset: -184, greenOffset: -134, blueOffset: -234, alphaOffset:    0},
+		AirCarrier:	{redOffset:  -56, greenOffset:  -30, blueOffset:   21, alphaOffset:    0},
+		Battleship:	{redOffset:   21, greenOffset:  -56, blueOffset:  -56, alphaOffset:    0},
+		Cruiser:	{redOffset:	  21, greenOffset: 	  8, blueOffset:  -56, alphaOffset:    0},
+		Destroyer: 	{redOffset:	 -30, greenOffset: 	 21, blueOffset:  -56, alphaOffset:    0},
+		Submarine:	{redOffset: -157, greenOffset:    5, blueOffset:   11, alphaOffset:    0},
+	},
+	#AutoSpy
+	{
+		Auxiliary:	{redOffset: -184, greenOffset: -134, blueOffset: -234, alphaOffset: -128},
+		AirCarrier:	{redOffset: -134, greenOffset: -134, blueOffset: -134, alphaOffset: -128},
+		Battleship:	{redOffset: -234, greenOffset: -184, blueOffset: -154, alphaOffset: -128},
+		Cruiser:	{redOffset: -89,  greenOffset: -159, blueOffset: -234, alphaOffset: -128},
+		Destroyer: 	{redOffset: -184, greenOffset: -134, blueOffset: -184, alphaOffset: -128},
+		Submarine:	{redOffset: -224, greenOffset: -224, blueOffset: -224, alphaOffset: -128},
+	},
+	#Roslich
+	{
+		Auxiliary:	{redOffset:   21, greenOffset: -234, blueOffset:   21, alphaOffset:    0},
+		AirCarrier:	{redOffset:   21, greenOffset:   21, blueOffset: -234, alphaOffset:    0},
+		Battleship:	{redOffset:   21, greenOffset: -234, blueOffset: -234, alphaOffset:    0},
+		Cruiser:	{redOffset: -234, greenOffset: -234, blueOffset:   21, alphaOffset:    0},
+		Destroyer: 	{redOffset: -234, greenOffset:    0, blueOffset: -234, alphaOffset:    0},
+		Submarine:	{redOffset: -234, greenOffset:   21, blueOffset:   21, alphaOffset:    0},
+	},
+])
 (def constant TP_CONSUMABLES_DATA {
     '4181112272': {rls: 9.0, sonar: 7.0, },
     '3764303664': {sonar: 5.5, },
@@ -502,7 +543,8 @@
 		(var isTorpedoEnabled:bool = "isTorpedoRangeVisible")
 		#AntiAir
 		(macro TP_GET_PREF_BOOL _varName="'isAntiAirRangeVisible'" _prefKey="TP_USERPREFS_KEY.ANTIAIR_RANGE")
-		(var isAntiAirEnabled:bool = "isAntiAirRangeVisible")
+		(macro TP_GET_PREF_BOOL _varName="'isAntiAirRatingVisible'" _prefKey="TP_USERPREFS_KEY.ANTIAIR_RATE")
+		(var isAntiAirEnabled:bool = "isAntiAirRangeVisible || isAntiAirRatingVisible")
 		#AirSupport
 		(macro TP_GET_PREF_BOOL _varName="'isAirSupportRangeVisible'" _prefKey="TP_USERPREFS_KEY.AIRSUPPORT_RANGE")
 		(macro TP_GET_PREF_BOOL _varName="'isAirSupportReloadVisible'" _prefKey="TP_USERPREFS_KEY.AIRSUPPORT_RELOAD")
@@ -820,6 +862,10 @@
 
 		#(macro TP_GET_USERPREFS)
 		(macro TP_GET_PREF_BOOL _varName="'isShipIconVisible'" _prefKey="TP_USERPREFS_KEY.SHIP_ICON")
+		(macro TP_GET_PREF_NUMBER _varName="'shipIconColorIndex'" _prefKey="TP_USERPREFS_KEY.SHIP_ICON_COLOR" _modifier="1" _default="0")
+		(var isColorAvailable:bool = "!(isInSameDivision || tkStatus)")
+		(var colorPreset:dict = "(TP_SHIP_ICON_COLOR_PRESET.length > shipIconColorIndex) ? TP_SHIP_ICON_COLOR_PRESET[shipIconColorIndex] : null")
+		(var colorDict:dict = "(isColorAvailable && colorPreset) ? colorPreset[subType] : {}")
 	)
 
 	(style
@@ -831,6 +877,12 @@
 	(bind visible "isShipIconVisible")
 
 	(block
+		(style
+			(bind backgroundImage "'url:../battle_hud/markers/ship/' + iconName + '.png'")
+		)
+	)
+	(block
+		(bind colorTransform "colorDict")
 		(style
 			(bind backgroundImage "'url:../battle_hud/markers/ship/' + iconName + '.png'")
 		)
@@ -1191,8 +1243,10 @@
 	(scope
 		(var airDefenseTTX:gfx = "_ttxEntity.mods_ShipParamsInBattle.shipTTX.airDefense")
 		(var range:number = "airDefenseTTX ? airDefenseTTX.averageAura.maxDist.value : null")
+		(var integralValue:number = "airDefenseTTX ? airDefenseTTX.integralValue.value : 0")
 		(macro TP_GET_PREF_BOOL _varName="'isAntiAirRangeVisible'" _prefKey="TP_USERPREFS_KEY.ANTIAIR_RANGE")
-		(var isEnabled:bool = "isAntiAirRangeVisible")
+		(macro TP_GET_PREF_BOOL _varName="'isAntiAirRatingVisible'" _prefKey="TP_USERPREFS_KEY.ANTIAIR_RATE")
+		(var isEnabled:bool = "isAntiAirRangeVisible || isAntiAirRatingVisible")
 	)
 
 	(bind visible "isEnabled")
@@ -1207,6 +1261,9 @@
 	(block
 		(element TP_ShipConfigTextItem _value="range" _unit="'km'" _userPrefsNum="_userPrefsNum"
 			(bind visible "isAntiAirRangeVisible")
+		)
+		(element TP_ShipConfigTextItem _value="integralValue" _unit="'AA'" _roundDigit=0 _userPrefsNum="_userPrefsNum"
+			(bind visible "isAntiAirRatingVisible")
 		)
 	)
 )
@@ -1414,7 +1471,7 @@
 )
 
 #Text Item
-(def element TP_ShipConfigTextItem (_value:number, _unit:str=null, _showZero:bool=false, _userPrefsNum:dict=null)
+(def element TP_ShipConfigTextItem (_value:number, _unit:str=null, _showZero:bool=false, _roundDigit:number="1.0", _userPrefsNum:dict=null)
 	(scope
 		(var isValueVisible:bool = "_value || _showZero")
 		#(macro TP_GET_USERPREFS)
@@ -1437,7 +1494,7 @@
 			(style
 				(marginRight = "XS")
 			)
-			(bind text "isValueVisible ? formatFloatingPoint(_value, 1) : ''")
+			(bind text "isValueVisible ? formatFloatingPoint(_value, _roundDigit) : ''")
 		)
 		(tf
 			(bind visible "isUnitVisible")
@@ -1465,27 +1522,17 @@
 		(marginTop = 10px)
 		(marginLeft = 10px)
 	)
-	(vtile
-		(element InfotipSystemBlur
-			(style
-				(marginLeft = -5px)
-				(marginTop = -5px)
-			)
-		)
-		(mc contrast_panel
-			(class $FullsizeAbsolute)
-			(style
-				(marginLeft = -5px)
-				(marginTop = -5px)
-			)
-		)
 
+	(macro TOOLTIP_SYSTEM_DEFAULT_BACKGROUND)
+
+	(element TOOLTIP_SYSTEM_DEFAULT_CONTAINER
 		(style
 			(vgap = 10px)
+			(width = 300px)
 		)
 		(element TP_TooltipArtilleryItem "_ttxEntity")
 		(element TP_TooltipTorpedoItem "_ttxEntity")
-		(element TP_TooltipAntiAirItem "_ttxEntity")
+		(element TP_TooltipAirDefenseItem "_ttxEntity")
 		(element TP_TooltipAirSupportItem "_ttxEntity")
 		(element TP_TooltipDepthChargeItem "_ttxEntity")
 		(element TP_TooltipVisibilityItem "_ttxEntity")
@@ -1537,8 +1584,7 @@
 
 	(vtile
 		(style
-			#(marginBottom = 3px)
-			(vgap = 5px)
+			(vgap = "TP_TOOLTIP_ELEMENTS_VGAP")
 		)
 
 		(element TP_TooltipShipConfigTitleItem _title="'IDS_SHIP_PARAM_MAIN_GUN'")
@@ -1618,7 +1664,7 @@
 
 	(vtile
 		(style
-			(vgap = 5px)
+			(vgap = "TP_TOOLTIP_ELEMENTS_VGAP")
 		)
 
 		(element TP_TooltipShipConfigTitleItem _title="'IDS_SHIP_PARAM_TORPEDOES'")
@@ -1665,11 +1711,15 @@
 	)
 )
 
-(def element TP_TooltipAntiAirItem(_ttxEntity:gfx, _userPrefsNum:dict=null)
+(def element TP_TooltipAirDefenseItem(_ttxEntity:gfx, _userPrefsNum:dict=null)
 	(scope
 		(var airDefenseTTX:gfx = "_ttxEntity.mods_ShipParamsInBattle.shipTTX.airDefense")
+
+		(var integralValue:number = "airDefenseTTX ? airDefenseTTX.integralValue.value : 0")
 		(var maxRange:number = "airDefenseTTX ? airDefenseTTX.averageAura.maxDist.value : null")
 		(var bubble:number = "(airDefenseTTX && airDefenseTTX.bubble)  ? airDefenseTTX.bubble.numBubbles.value : null")
+
+		(var auras:array = "airDefenseTTX ? airDefenseTTX.auras : []")
 	)
 
 	(style
@@ -1680,14 +1730,26 @@
 
 	(vtile
 		(style
-			(vgap = 5px)
+			(vgap = "TP_TOOLTIP_ELEMENTS_VGAP")
 		)
 
 		(element TP_TooltipShipConfigTitleItem _title="'IDS_SHIP_PARAM_AIR_DEFENSE'")
 
 		(block
+			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_AIR_DEFENSE'" _value="integralValue" _roundDigit=0 _userPrefsNum="_userPrefsNum")
+		)
+
+		(block
 			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_MAX_DIST'" _value="maxRange" _unit="'km'" _userPrefsNum="_userPrefsNum")
 			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_AA_EXPL_COUNT'" _value="bubble" _roundDigit=0 _userPrefsNum="_userPrefsNum")
+		)
+
+		(reverse
+			(controller $Repeat renderer='TP_TooltipShipConfigTextItem'
+				(bind enabled "auras.length > 0")
+				(bind count "auras.length")
+				(args _title="'IDS_SHIP_PARAM_AA_AVERAGE_DAMAGE_' + toUpper(auras[$index].type)" _value="auras[$index].damage.value" _roundDigit=0 _userPrefsNum="_userPrefsNum")
+			)
 		)
 	)
 )
@@ -1713,7 +1775,7 @@
 
 	(vtile
 		(style
-			(vgap = 5px)
+			(vgap = "TP_TOOLTIP_ELEMENTS_VGAP")
 		)
 
 		(element TP_TooltipShipConfigTitleItem _title="'IDS_SHIP_PARAM_AIR_SUPPORT'")
@@ -1747,7 +1809,7 @@
 
 	(vtile
 		(style
-			(vgap = 5px)
+			(vgap = "TP_TOOLTIP_ELEMENTS_VGAP")
 		)
 
 		(element TP_TooltipShipConfigTitleItem _title="'IDS_SHIP_PARAM_DEPTH_CHARGE'")
@@ -1806,7 +1868,7 @@
 
 	(vtile
 		(style
-			(vgap = 5px)
+			(vgap = "TP_TOOLTIP_ELEMENTS_VGAP")
 		)
 
 		(element TP_TooltipShipConfigTitleItem _title="'IDS_SHIP_PARAM_DETECTION'")
@@ -1849,7 +1911,7 @@
 	)
 
 	(style
-		(marginBottom = 2px)
+		(marginBottom = 5px)
 		(marginLeft = 20px)
 	)
 	(bind visible "isValueVisible")
