@@ -902,8 +902,23 @@
 (def element TP_ShipDetectionItem(_entity:gfx, _userPrefsNum:dict=null)
 	(scope
 		(var _markerEntity:gfx = "_entity")
+
+		#map visible		
+		(macro GET_MARKER_ENTITY_COMPONENT 'visibility')
+		(var mapVisible:bool = "visibilityComponent ? visibilityComponent.mapVisible : false" (event "visibilityComponent.evChanged"))
+
+		#relation
+		(var playerAvatar:gfx = "$datahub.getSingleEntity(CC.playerAvatar)")
+		(var isObserver:bool = "!playerAvatar")
+		(macro GET_MARKER_ENTITY_COMPONENT 'relation')
+		(var isAlly:bool = "relationComponent && isIn(relationComponent.value, [SC.Battle.PLAYER_RELATION.ALLY, SC.Battle.PLAYER_RELATION.SELF])" (event "relationComponent.evChanged"))
+
+		#visibility flag
 		(macro GET_MARKER_ENTITY_COMPONENT 'vehicle')
-		(var isDetected:bool = "vehicleComponent ? vehicleComponent.visibilityFlags : false" (event "vehicleComponent.evVisibilityFlagsChanged"))
+		(var visibilityFlag:bool = "vehicleComponent ? vehicleComponent.visibilityFlags : false" (event "vehicleComponent.evVisibilityFlagsChanged"))
+
+		(var isMapVisibleEnabled:bool = "!(isAlly || isObserver)")
+		(var isDetected:bool = "visibilityFlag || (isMapVisibleEnabled && mapVisible)")
 		(var wasDetected:bool = "false" watch=false)
 		(bind wasDetected "true" watch=false init=false (bind enabled "!(wasDetected) && isDetected") (event "vehicleComponent.evVisibilityFlagsChanged"))
 		(macro GET_MARKER_ENTITY_COMPONENT 'health')
