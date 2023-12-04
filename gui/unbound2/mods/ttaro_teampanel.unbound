@@ -38,6 +38,7 @@
 	SCALE_OFFSET: 'ttTeamPanelScaleOffset',
 	BLUR_ALT_VISIBLE: 'ttTeamPanelBlurVisibleOnAlt',
 	BLUR_ALPHA: 'ttTeamPanelBlurOpacity',
+	DEAD_PLAYER_VISIBLE: 'ttTeamPanelDeadPlayerVisible',
 	#NAMES
 	CLAN_NAME: 'ttTeamPanelClanNameVisible',
 	CLAN_ICON: 'ttTeamPanelClanIconVisible',
@@ -578,6 +579,7 @@
 		(var isMouseActive:bool = "mouse.active" (event "mouse.evActiveChanged"))
 
 		(macro TP_GET_PREF_BOOL _varName="'isBlurVisibleOnlyAlt'" _prefKey="TP_USERPREFS_KEY.BLUR_ALT_VISIBLE")
+		(macro TP_GET_PREF_BOOL _varName="'isDeadPlayersVisible'" _prefKey="TP_USERPREFS_KEY.DEAD_PLAYER_VISIBLE")
 		(macro TP_GET_PREF_NUMBER "'blurAlpha'" "TP_USERPREFS_KEY.BLUR_ALPHA" _modifier="0.1" _default="0.0")
 		(var camera:gfx = "$datahub.getSingleComponent(CC.camera)")
 		(var altVision:bool = "camera ? camera.altVision : false" (event "camera.evAltVisionChanged"))
@@ -596,6 +598,8 @@
 		(bind right "_isAlly ? auto : 0")
 		(bind top "_index == 0 ? 0 : (_index * (TP_PLAYER_ROW_SIZE.HEIGHT + 2)) + 2")
 	)
+
+	(bind visible "isDeadPlayersVisible ? true : isAlive")
 
 	(element HorizontalDividerTwoPx
 		(bind visible "_index == 0")
