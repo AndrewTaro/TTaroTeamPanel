@@ -75,7 +75,7 @@
 })
 
 (def constant TP_SHIP_ICON_COLOR_PRESET [
-	#Use -abs(234-0x??)
+	#Use -(234-0x??)
 	#None
 	{
 		Auxiliary:	{},
