@@ -1603,6 +1603,9 @@
 		(var damagePerMinHE:number = "damageHE * shellsPerMin")
 		(var damagePerMinCS:number = "damageCS * shellsPerMin")
 		(var damagePerMinAP:number = "damageAP * shellsPerMin")
+
+		(var caliber:number = "hasMainGun ? mainGunTTX[0].caliber.value : 0")
+		(var overmatch:number = "hasMainGun ? round(caliber / 14.3) : 0")
 	)
 
 	(style
@@ -1620,6 +1623,11 @@
 		(block
 			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_MAX_DIST'" _value="range" _unit="'km'" _userPrefsNum="_userPrefsNum")
 			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_SHOT_DELAY'" _value="reload" _unit="'s'" _userPrefsNum="_userPrefsNum")
+		)
+
+		(block
+			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_ARTILLERY_CALIBER'" _value="caliber" _roundDigit=0 _unit="'mm'" _userPrefsNum="_userPrefsNum")
+			(element TP_TooltipShipConfigTextItem _title="'Overmatch'" _value="overmatch" _roundDigit=0 _unit="'mm'" _userPrefsNum="_userPrefsNum")
 		)
 
 		(block
@@ -1654,7 +1662,7 @@
 		(var torpedoDeepwaterTTX:gfx = "torpedoesTTX ? torpedoesTTX.torpedoDeepwater : null")
 		(var torpedoDeepwaterRange:number = "torpedoDeepwaterTTX ? torpedoDeepwaterTTX.maxDist.value : null")
 		(var torpedoDeepwaterDamage:number = "torpedoDeepwaterTTX ? torpedoDeepwaterTTX.damage.value : null")
-		#(var torpedoDeepwaterDamage:array = "torpedoDeepwaterTTX ? torpedoDeepwaterTTX.canHitClasses : null")
+		(var torpedoDeepwaterCanHitClasses:array = "torpedoDeepwaterTTX ? torpedoDeepwaterTTX.canHitClasses : null")
 		#alt torps
 		(var torpedoAltTTX:gfx = "torpedoesTTX ? torpedoesTTX.torpedoAlt : null")
 		(var torpedoAltRange:number = "torpedoAltTTX ? torpedoAltTTX.maxDist.value : null")
@@ -1672,6 +1680,7 @@
 		(var subTorpedoDeepwaterTTX:gfx = "torpedoGroupsTTX ? torpedoGroupsTTX.torpedoDeepwater : null")
 		(var subTorpedoDeepwaterRange:number = "subTorpedoDeepwaterTTX ? subTorpedoDeepwaterTTX.maxDist.value : null")
 		(var subTorpedoDeepwaterDamage:number = "subTorpedoDeepwaterTTX ? subTorpedoDeepwaterTTX.damage.value : null")
+		(var subTorpedoDeepwaterCanHitClasses:number = "subTorpedoDeepwaterTTX ? subTorpedoDeepwaterTTX.canHitClasses : null")
 		#alt torps
 		(var subTorpedoAltTTX:gfx = "torpedoGroupsTTX ? torpedoGroupsTTX.torpedoAlt : null")
 		(var subTorpedoAltRange:number = "subTorpedoAltTTX ? subTorpedoAltTTX.maxDist.value : null")
@@ -1735,6 +1744,12 @@
 			(bind visible "torpedoGroupsTTX")
 			(element TP_TooltipShipConfigTextItem _title="'Bow Group Loaders'" _value="torpdoBowLoaders" _roundDigit=0 _userPrefsNum="_userPrefsNum")
 			(element TP_TooltipShipConfigTextItem _title="'Stern Group Loaders'" _value="torpdoSternLoaders" _roundDigit=0 _userPrefsNum="_userPrefsNum")
+		)
+
+		(hblock
+			(bind visible "torpedoDeepwaterTTX || subTorpedoDeepwaterTTX")
+			(element TP_TooltipShipConfigClassIconsItem _title="'IDS_SHIP_PARAM_TORPEDOES_AFFECTED_SHIPS'" _canHitClasses="torpedoDeepwaterCanHitClasses" _userPrefsNum="_userPrefsNum")
+			(element TP_TooltipShipConfigClassIconsItem _title="'IDS_SHIP_PARAM_TORPEDOES_AFFECTED_SHIPS'" _canHitClasses="subTorpedoDeepwaterCanHitClasses" _userPrefsNum="_userPrefsNum")
 		)
 	)
 )
@@ -1946,11 +1961,14 @@
 	(hblock
 		(style
 			(marginRight = "XS")
+			(align = "middle|center")
 		)
 		(tf
 			(class $TextDefaultNM)
 			(style
 				(marginRight = "XS")
+				(width = 200)
+				(leading = -4px)
 			)
 			(bind text "tr(_title) + ': '")
 		)
@@ -1970,6 +1988,44 @@
 				(width = "30px")
 			)
 		)
+	)
+)
+
+(def element TP_TooltipShipConfigClassIconsItem (_title:str, _canHitClasses:array, _userPrefsNum:dict=null)
+	(scope
+		(var isVisible:bool = "_canHitClasses && _canHitClasses.length > 0")
+	)
+
+	(style
+		(marginBottom = 5px)
+		(marginLeft = 20px)
+	)
+	(bind visible "isVisible")
+	(hblock
+		(style
+			(align = "middle|center")
+		)
+		(tf
+			(class $TextDefaultNM)
+			(style
+				(marginRight = "XS")
+				(width = 180px)
+				(leading = -4px)
+			)
+			(bind text "tr(_title) + ': '")
+		)
+		(controller $Repeat renderer='TP_ClassIconItem'
+			(bind enabled "isVisible")
+			(bind count "_canHitClasses.length")
+			(args _className="_canHitClasses[$index]")
+		)
+	)
+)
+
+(def element TP_ClassIconItem (_className:str) layout=true
+	(style
+		(width = 27px) (height = 0px) (marginTop = -25px)
+		(bind backgroundImage "'url:../service_kit/ship_classes/icon_default_' + toLower(_className) + '.png'")
 	)
 )
 
