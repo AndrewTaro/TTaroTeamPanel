@@ -528,8 +528,8 @@
 		(bind count "allyCount")
 		(args "allyItems" _isAlly="true" _userPrefsNum="_userPrefsNum")
 
-		(bindcall removeChildAt "$event[1]" (event "enemyCollection.evRemoved"))
-		(bindcall addChildAt "$event[1]" (event "enemyCollection.evAdded"))
+		(bindcall removeChildAt "$event[1]" (event "allyCollection.evRemoved"))
+		(bindcall addChildAt "$event[1]" (event "allyCollection.evAdded"))
 	)
 )
 
