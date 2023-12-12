@@ -527,6 +527,9 @@
 		(bind enabled "allyCount > 0")
 		(bind count "allyCount")
 		(args "allyItems" _isAlly="true" _userPrefsNum="_userPrefsNum")
+
+		(bindcall removeChildAt "$event[1]" (event "enemyCollection.evRemoved"))
+		(bindcall addChildAt "$event[1]" (event "enemyCollection.evAdded"))
 	)
 )
 
@@ -555,6 +558,9 @@
 		(bind enabled "enemyCount > 0")
 		(bind count "enemyCount")
 		(args "enemyItems" _isAlly="false" _userPrefsNum="_userPrefsNum")
+
+		(bindcall removeChildAt "$event[1]" (event "enemyCollection.evRemoved"))
+		(bindcall addChildAt "$event[1]" (event "enemyCollection.evAdded"))
 	)
 )
 
@@ -712,7 +718,7 @@
 	(controller $Tooltip
 		(renderer = 'TP_TooltipShipConfigurationsItem')
 		(args "_entity")
-		(macro DEFAULT_TOOLTIP_BEHAVIOUR "0")
+		(macro TP_TOOLTIP_BEHAVIOUR "0")
 	)
 
 	#Context Menu for Report/Compliment/Division
@@ -1563,6 +1569,7 @@
 		(element TP_TooltipAirDefenseItem "_ttxEntity")
 		(element TP_TooltipAirSupportItem "_ttxEntity")
 		(element TP_TooltipDepthChargeItem "_ttxEntity")
+		(element TP_TooltipMobilityItem "_ttxEntity")
 		(element TP_TooltipVisibilityItem "_ttxEntity")
 	)
 )
@@ -1605,7 +1612,7 @@
 		(var damagePerMinAP:number = "damageAP * shellsPerMin")
 
 		(var caliber:number = "hasMainGun ? mainGunTTX[0].caliber.value : 0")
-		(var overmatch:number = "hasMainGun ? round(caliber / 14.3) : 0")
+		(var overmatch:number = "hasMainGun ? floor(caliber / 14.3) : 0")
 	)
 
 	(style
@@ -1866,6 +1873,37 @@
 	)
 )
 
+(def element TP_TooltipMobilityItem(_ttxEntity:gfx, _userPrefsNum:dict=null)
+	(scope
+		#surface speed
+		(var mobilityTTX:gfx = "_ttxEntity.mods_ShipParamsInBattle.shipTTX.mobility")
+		(var surfaceSpeed:number = "mobilityTTX ? mobilityTTX.speed.value : null")
+
+		#underwater speed
+		(var underwaterMobilityTTX:gfx = "_ttxEntity.mods_ShipParamsInBattle.shipTTX.underwaterMobility")
+		(var underwaterSpeed:number = "underwaterMobilityTTX ? underwaterMobilityTTX.speed.value : null")
+	)
+
+	(style
+		(align = "middle|center")
+	)
+
+	(bind visible "mobilityTTX || underwaterMobilityTTX")
+
+	(vtile
+		(style
+			(vgap = "TP_TOOLTIP_ELEMENTS_VGAP")
+		)
+
+		(element TP_TooltipShipConfigTitleItem _title="'IDS_SHIP_PARAM_MAXSPEED'")
+
+		(block
+			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_MOBILITY'" _value="surfaceSpeed" _unit="'kts'" _userPrefsNum="_userPrefsNum")
+			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_UNDERWATER_MOBILITY'" _value="underwaterSpeed" _unit="'kts'" _userPrefsNum="_userPrefsNum")
+		)
+	)
+)
+
 (def element TP_TooltipVisibilityItem(_ttxEntity:gfx, _userPrefsNum:dict=null)
 	(scope
 		#fix for skill---------------------
@@ -2071,4 +2109,37 @@
 (def macro TP_GET_PREF_BOOL (_varName:expression, _prefKey:expression, _default:expression="true")
 	(var name="_varName" type=bool value="(_userPrefsNum && _prefKey in _userPrefsNum) ? round(_userPrefsNum[_prefKey]) : _default")
 	#(var name="_varName" type=bool value="_default")
+)
+
+(def macro TP_TOOLTIP_BEHAVIOUR (_priority:expression = "0")
+
+	(bindcall show animation =	{	duration:	"0.3",
+									delay:		"0.3",
+									easing:		"Easing.cubic_out",
+									from:		{ alpha: 0, top: 5 },
+									to:			{ alpha: 1, top: 0 }
+								}
+								on = 'rollOver'
+	)
+
+	(bindcall hide animation = {	duration:	"0.05",
+									delay:		"0",
+									easing:		"Easing.cubic_out",
+									from:		{ alpha: 1, top: 0 },
+									to:			{ alpha: 0, top: -5}
+								}
+								on = 'rollOut'
+	)
+
+	(offset = {	x: 15, y: 15})
+
+	(screenBoundsOffset = {			left:	10,
+									top:	10,
+									right:	10,
+									bottom:	10 })
+	
+	(priority = "_priority")
+
+	(align="left|middle")
+	(position="trackMouse")
 )
