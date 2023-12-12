@@ -510,6 +510,7 @@
 		(var avatarCollection:gfx = "$datahub.getCollection(CC.avatar)")
 		(var allyCollection:gfx = "avatarCollection ? avatarCollection.getChildByPath('team.ally.sortedAlive') : null" (event "avatarCollection.evChildAdded") (event "collection.evChildRemoved"))
 		(var allyItems:array = "allyCollection ? allyCollection.items : null" (event "allyCollection.evAdded") (event "allyCollection.evRemoved")  (event "allyCollection.evUpdated"))
+		(var isEnabled:bool = "allyItems && allyItems.length > 0")
 		(macro TP_GET_PREF_NUMBER "'scaleOffset'" "TP_USERPREFS_KEY.SCALE_OFFSET" _modifier="0.1" _default="0.5")
 		(var sizeScale:number = "1 + scaleOffset - 0.5")
 	)
@@ -519,6 +520,8 @@
 		(left = 0)
 	)
 	(macro BIND_FAIR_SCALE "sizeScale")
+
+	(bind visible "isEnabled")
 
 	(element TP_HeaderItem _isAlly="true" _userPrefsNum="_userPrefsNum")
 
@@ -537,6 +540,7 @@
 		(var avatarCollection:gfx = "$datahub.getCollection(CC.avatar)")
 		(var enemyCollection:gfx = "avatarCollection ? avatarCollection.getChildByPath('team.enemy.sortedAlive') : null" (event "avatarCollection.evChildAdded") (event "collection.evChildRemoved"))
 		(var enemyItems:array = "enemyCollection ? enemyCollection.items : null" (event "enemyCollection.evAdded") (event "enemyCollection.evRemoved") (event "enemyCollection.evUpdated"))
+		(var isEnabled:bool = "enemyItems && enemyItems.length > 0")
 		(macro TP_GET_PREF_NUMBER "'scaleOffset'" "TP_USERPREFS_KEY.SCALE_OFFSET" _modifier="0.1" _default="0.5")
 		(var sizeScale:number = "1 + scaleOffset - 0.5")
 	)
@@ -548,6 +552,8 @@
 		(pivotX = 100%)
 	)
 	(macro BIND_FAIR_SCALE "sizeScale")
+
+	(bind visible "isEnabled")
 
 	(element TP_HeaderItem _isAlly="false" _userPrefsNum="_userPrefsNum")
 
