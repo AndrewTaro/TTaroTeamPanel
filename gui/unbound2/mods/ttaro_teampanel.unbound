@@ -718,7 +718,7 @@
 	(controller $Tooltip
 		(renderer = 'TP_TooltipShipConfigurationsItem')
 		(args "_entity")
-		(macro TP_TOOLTIP_BEHAVIOUR "0")
+		(macro TP_TOOLTIP_BEHAVIOUR "_isAlly")
 	)
 
 	#Context Menu for Report/Compliment/Division
@@ -1082,11 +1082,10 @@
 		(bind right "_isAlly ? auto : 0")
 		(pivotX = "0")
 		(pivotY = "0")
-	)
-	(style
 		(width = "TP_PLAYER_ROW_SIZE.WIDTH")
 		(height = "TP_PLAYER_ROW_SIZE.HEIGHT")
 		(align = "center|middle")
+		(hitTest = false)
 	)
 
 	(block
@@ -1553,8 +1552,7 @@
 
 	(style
 		(align = "middle|center")
-		(marginTop = 10px)
-		(marginLeft = 10px)
+		(hitTest = false)
 	)
 
 	(macro TOOLTIP_SYSTEM_DEFAULT_BACKGROUND)
@@ -2111,7 +2109,7 @@
 	#(var name="_varName" type=bool value="_default")
 )
 
-(def macro TP_TOOLTIP_BEHAVIOUR (_priority:expression = "0")
+(def macro TP_TOOLTIP_BEHAVIOUR (_isAlly:expression = false)
 
 	(bindcall show animation =	{	duration:	"0.3",
 									delay:		"0.3",
@@ -2138,8 +2136,8 @@
 									right:	10,
 									bottom:	10 })
 	
-	(priority = "_priority")
+	(priority = "0")
 
-	(align="left|middle")
+	(bind align "_isAlly ? right|middle : left|middle")
 	(position="trackMouse")
 )
