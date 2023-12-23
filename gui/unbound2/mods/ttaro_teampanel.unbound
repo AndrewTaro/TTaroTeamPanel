@@ -1151,6 +1151,7 @@
 		(style
 			(align = "middle|center")
 			(bind flow "_isAlly ? Flow.HORIZONTAL : Flow.REVERSE_HORIZONTAL")
+			(height = "TP_PLAYER_ROW_SIZE.HEIGHT")
 		)
 		(element TP_ShipConfigVisibilityItem "ttxEntity" _userPrefsNum="_userPrefsNum")
 		(element TP_ShipConfigMobilityItem "ttxEntity" _userPrefsNum="_userPrefsNum")
@@ -1473,10 +1474,10 @@
 		(align = "middle|center")
 	)
 	(block
-		(element TP_ShipConfigTextItem _value="hydroRange" _unit="'km'" _userPrefsNum="_userPrefsNum"
+		(element TP_ShipConfigTextItem _value="hydroRange" _unit="'km'" _userPrefsNum="_userPrefsNum" _showNull=true
 			(bind visible "isHydroRangeVisible")
 		)
-		(element TP_ShipConfigTextItem _value="radarRange" _unit="'km'" _userPrefsNum="_userPrefsNum"
+		(element TP_ShipConfigTextItem _value="radarRange" _unit="'km'" _userPrefsNum="_userPrefsNum" _showNull=true
 			(bind visible "isRadarRangeVisible")
 		)
 	)
@@ -1506,9 +1507,11 @@
 )
 
 #Text Item
-(def element TP_ShipConfigTextItem (_value:number, _unit:str=null, _showZero:bool=false, _roundDigit:number="1.0", _userPrefsNum:dict=null)
+(def element TP_ShipConfigTextItem (_value:number, _unit:str=null, _showZero:bool=false, _showNull:bool=false, _roundDigit:number="1.0", _userPrefsNum:dict=null)
 	(scope
-		(var isValueVisible:bool = "_value || _showZero")
+		(var isNull:bool = "_value == null")
+		(var isZero:bool = "_value == 0")
+		(var isValueVisible:bool = "(isNull && _showNull) || (isZero && _showZero) || _value")
 		#(macro TP_GET_USERPREFS)
 		(macro TP_GET_PREF_BOOL _varName="'isUnitVisible'" _prefKey="TP_USERPREFS_KEY.UNITS_VISIBLE")
 	)
@@ -1529,12 +1532,12 @@
 			(style
 				(marginRight = "XS")
 			)
-			(bind text "isValueVisible ? formatFloatingPoint(_value, _roundDigit) : ''")
+			(bind text "isNull ? ' ' : formatFloatingPoint(_value, _roundDigit)")
 		)
 		(tf
 			(bind visible "isUnitVisible")
 			(class $TextDefault13NM)
-			(bind text "_unit")
+			(bind text "isNull ? ' ' : _unit")
 			(alpha = "TC")
 			(style
 				(width = "20px")
