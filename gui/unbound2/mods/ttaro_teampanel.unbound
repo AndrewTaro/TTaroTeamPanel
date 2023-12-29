@@ -667,7 +667,6 @@
 		(var camera:gfx = "$datahub.getSingleComponent(CC.camera)")
 		(var altVision:bool = "camera ? camera.altVision : false" (event "camera.evAltVisionChanged"))
 		(var isBlurVisible:bool = "isBlurVisibleOnlyAlt ? altVision : true")
-		(var blurElement:str = "isBlurMode ? 'TP_ContrastPanelBlur' : 'TP_ContrastPanelNormal'")
 	)
 	#For tooltip
 	(dispatch evHideInfotip args="{}" (bind trigger "isMouseActive") (event "evMenuItemClicked"))
@@ -825,7 +824,7 @@
 		(var clanNameWithBrackets:str = "isInClan && isClanNameVisible ? '[' + clanName + ']' : ''")
 
 		(macro TP_GET_PREF_BOOL _varName="'isPlayerNameVisible'" _prefKey="TP_USERPREFS_KEY.PLAYER_NAME")
-		(var pureName:str = "isPlayerNameVisible ? _entity.avatar.pureName : ''" (event "_entity.avatar.pureName"))
+		(var pureName:str = "isPlayerNameVisible ? _entity.avatar.pureName : ' '" (event "_entity.avatar.pureName"))
 	)
 	
 	(style
