@@ -685,6 +685,10 @@
 
 	(bind visible "isDeadPlayersVisible ? true : isAlive")
 
+	(element TP_ContrastPanel _isBlur="isBlurMode" _intensity="blurAlpha"
+		(bind visible "isBlurVisible")
+	)
+
 	(element HorizontalDividerTwoPx
 		(bind visible "_index == 0")
 		(style
@@ -695,10 +699,6 @@
 	(block
 		(style
 			(height = "TP_PLAYER_ROW_SIZE.HEIGHT")
-		)
-
-		(element TP_ContrastPanel _isBlur="isBlurMode" _intensity="blurAlpha"
-			(bind visible "isBlurVisible")
 		)
 
 		(element TP_ShipHealthBarItem "_entity" "_isAlly" _userPrefsNum="_userPrefsNum")
