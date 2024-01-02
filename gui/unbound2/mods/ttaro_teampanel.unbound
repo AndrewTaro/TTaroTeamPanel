@@ -9,6 +9,7 @@
 	NO_UNIT: 32
 })
 (def constant TP_TOOLTIP_ELEMENTS_VGAP "5px")
+(def constant TP_DIVISION_ELEMENT_WIDTH "20px")
 #--------------------------------------------------------------------------------
 #For Masters Tournament and the ship-weight rules:
 #
@@ -36,6 +37,7 @@
 	UNITS_VISIBLE: 'ttTeamPanelShipStatsUnitsVisible',
 	POS_OFFSET: 'ttTeamPanelPosOffset',
 	SCALE_OFFSET: 'ttTeamPanelScaleOffset',
+	BLUR_MODE: 'ttTeamPanelBlurMode',
 	BLUR_ALT_VISIBLE: 'ttTeamPanelBlurVisibleOnAlt',
 	BLUR_ALPHA: 'ttTeamPanelBlurOpacity',
 	DEAD_PLAYER_VISIBLE: 'ttTeamPanelDeadPlayerVisible',
@@ -50,6 +52,7 @@
 	SHIP_ICON_COLOR: 'ttTeamPanelShipIconColorPreset',
 	SHIP_DETECTION: 'ttTeamPanelShipDetectionVisible',
 	HEALTHBAR_OPACITY: 'ttTeamPanelHealthBarOpacity',
+	HEALTHBAR_WIDTH: 'ttTeamPanelHealthBarWidth',
 	#SHIPCONFIGS
 	#Artillery
 	ARTILLERY_RANGE: 'ttTeamPanelArtilleryRangeVisible',
@@ -656,11 +659,14 @@
 		(var mouse:gfx = "$datahub.getSingleComponent(CC.mouse)")
 		(var isMouseActive:bool = "mouse.active" (event "mouse.evActiveChanged"))
 
-		(macro TP_GET_PREF_BOOL _varName="'isBlurVisibleOnlyAlt'" _prefKey="TP_USERPREFS_KEY.BLUR_ALT_VISIBLE")
 		(macro TP_GET_PREF_BOOL _varName="'isDeadPlayersVisible'" _prefKey="TP_USERPREFS_KEY.DEAD_PLAYER_VISIBLE")
+
 		(macro TP_GET_PREF_NUMBER "'blurAlpha'" "TP_USERPREFS_KEY.BLUR_ALPHA" _modifier="0.1" _default="0.0")
+		(macro TP_GET_PREF_BOOL _varName="'isBlurMode'" _prefKey="TP_USERPREFS_KEY.BLUR_MODE")
+		(macro TP_GET_PREF_BOOL _varName="'isBlurVisibleOnlyAlt'" _prefKey="TP_USERPREFS_KEY.BLUR_ALT_VISIBLE")
 		(var camera:gfx = "$datahub.getSingleComponent(CC.camera)")
 		(var altVision:bool = "camera ? camera.altVision : false" (event "camera.evAltVisionChanged"))
+		(var isBlurVisible:bool = "isBlurVisibleOnlyAlt ? altVision : true")
 	)
 	#For tooltip
 	(dispatch evHideInfotip args="{}" (bind trigger "isMouseActive") (event "evMenuItemClicked"))
@@ -679,6 +685,10 @@
 
 	(bind visible "isDeadPlayersVisible ? true : isAlive")
 
+	(element TP_ContrastPanel _isBlur="isBlurMode" _intensity="blurAlpha"
+		(bind visible "isBlurVisible")
+	)
+
 	(element HorizontalDividerTwoPx
 		(bind visible "_index == 0")
 		(style
@@ -689,12 +699,6 @@
 	(block
 		(style
 			(height = "TP_PLAYER_ROW_SIZE.HEIGHT")
-		)
-
-		(mc hud_bar_bg_sliced
-			(class $FullsizeAbsolute)
-			(bind visible "isBlurVisibleOnlyAlt ? altVision : true")
-			(bind alpha "blurAlpha")
 		)
 
 		(element TP_ShipHealthBarItem "_entity" "_isAlly" _userPrefsNum="_userPrefsNum")
@@ -741,28 +745,28 @@
 #Player Info
 (def element TP_PlayerInfoItem (_entity:gfx, _isAlly:bool=false, _userPrefsNum:dict=null)
 	(scope
-		
+		#bar width
+		(macro TP_GET_PREF_NUMBER "'widthOffset'" "TP_USERPREFS_KEY.HEALTHBAR_WIDTH" _modifier="0.1" _default="0.5")
+		(var widthScale:number = "1 + widthOffset - 0.5")
+		(var widthSize:number = "TP_PLAYER_ROW_SIZE.WIDTH * widthScale - TP_DIVISION_ELEMENT_WIDTH") # - (division item width - 5). Canbe replaced with margin though
 	)
 	
 	(style
-		(bind align "_isAlly ? left|middle : right|middle")
-		(width = "185") #TODO 
+		(align = "center|middle")
+		(bind marginRight "_isAlly ? 5px : auto")
+		(bind marginLeft "_isAlly ? auto : 5px")
+		
+		(bind width "widthSize")
 		(height = "TP_PLAYER_ROW_SIZE.HEIGHT")
-		(marginTop = -1)
 	)
-	(hblock
+
+	(vtile
 		(style
-			#(bind align "_isAlly ? left : right")
-			#(width = "100%")
+			(width = 100%)
+			(vgap = 2px)
 		)
-		(element TP_PlayerClanNameItem "_entity" _userPrefsNum="_userPrefsNum")
-		(element TP_PlayerNameItem "_entity" _userPrefsNum="_userPrefsNum")
-	)
-	(block
-		(style
-			(marginTop = "2")
-		)
-		(element TP_ShipInfoItem "_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")	
+		(element TP_PlayerNameWithTagItem 	"_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
+		(element TP_ShipNameItem 			"_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
 	)
 )
 
@@ -777,32 +781,12 @@
 		(var divisionIconIndex:number = "isInSameDivision ? (divisionSign + 1) : (divisionSign + 1 + 10)")
 	)
 	(style
-		(width = 20px)
+		(width = "TP_DIVISION_ELEMENT_WIDTH")
 		(align = "middle|center")
 	)
 	(mc division_item
 		(bind visible "isInDivision && !isDivisionHidden")
 		(bindcall gotoAndStop "divisionIconIndex" init=true)
-	)
-)
-
-(def element TP_PlayerClanNameItem (_entity:gfx, _userPrefsNum:dict=null)
-	(scope
-		(var isInClan:bool = "_entity.hasComponent(CC.clanman)")
-		(var clanComponent:gfx = "isInClan ? _entity.clanman : null")
-		(var clanId:number = "clanComponent ? clanComponent.clanId : null" (event "clanComponent.evClanIdChanged"))
-		(var clanEntity:gfx = "$datahub.getPrimaryEntity(CC.clan, clanId)")
-		(var clanName:str = "clanEntity ? clanEntity.clan.tag : null" (event "clanEntity.clan.evTagChanged"))
-		(var clanNameWithBrackets:str = "isInClan ? '[' + clanName + ']' : ''")
-		(macro TP_GET_PREF_BOOL _varName="'isClanNameVisible'" _prefKey="TP_USERPREFS_KEY.CLAN_NAME")
-	)
-	(style
-		(bind marginRight "isInClan ? 3px : 0")
-	)
-	(bind visible "isClanNameVisible")
-	(tf
-		(class $TextDefault13NM)
-		(bind text "clanNameWithBrackets")
 	)
 )
 
@@ -829,26 +813,36 @@
 	)
 )
 
-(def element TP_PlayerNameItem (_entity:gfx, _userPrefsNum:dict=null)
+(def element TP_PlayerNameWithTagItem (_entity:gfx, _isAlly:bool=false _userPrefsNum:dict=null)
 	(scope
-		(var pureName:str = "_entity.avatar.pureName" (event "_entity.avatar.pureName"))
-		#(macro TP_GET_ISAFK)
-		#(macro TP_GET_USERPREFS)
+		(macro TP_GET_PREF_BOOL _varName="'isClanNameVisible'" _prefKey="TP_USERPREFS_KEY.CLAN_NAME")
+		(var isInClan:bool = "_entity.hasComponent(CC.clanman)")
+		(var clanComponent:gfx = "isInClan ? _entity.clanman : null")
+		(var clanId:number = "clanComponent ? clanComponent.clanId : null" (event "clanComponent.evClanIdChanged"))
+		(var clanEntity:gfx = "$datahub.getPrimaryEntity(CC.clan, clanId)")
+		(var clanName:str = "clanEntity ? clanEntity.clan.tag : null" (event "clanEntity.clan.evTagChanged"))
+		(var clanNameWithBrackets:str = "isInClan && isClanNameVisible ? '[' + clanName + ']' : ''")
+
 		(macro TP_GET_PREF_BOOL _varName="'isPlayerNameVisible'" _prefKey="TP_USERPREFS_KEY.PLAYER_NAME")
+		(var pureName:str = "isPlayerNameVisible ? _entity.avatar.pureName : ' '" (event "_entity.avatar.pureName"))
 	)
+	
 	(style
-		#(marginLeft = 3px)
-		#(marginRight = 3px)
+		(width = 100%)
+		(bind align "_isAlly ? left|middle : right|middle")
 	)
-	(bind visible "isPlayerNameVisible")
+
+	(bind visible "isClanNameVisible || isPlayerNameVisible")
+
 	(tf
 		(class $TextDefault13NM)
 		(style
-			(maxWidth = "150")
+			(width = "100%")
 			(elideMode = true)
+			(bind textAlign "_isAlly ? left : right")
 		)
 		#(bind class "isAFK ? '$FontColorUnready' : tkStatus ? '$FontColorTeamkiller' : '$None'")
-		(bind text "pureName")
+		(bind text "clanNameWithBrackets + pureName")
 	)
 )
 
@@ -858,10 +852,9 @@
 		(macro TP_GET_PREF_BOOL _varName="'isPlayerKillCountVisible'" _prefKey="TP_USERPREFS_KEY.KILL_COUNT")
 	)
 	(style
-		#(marginLeft = 3px)
-		#(marginRight = 3px)
-		(width = 10px)
+		(width = 18px)
 		(align = "middle|center")
+		(marginBottom = 2px)
 	)
 	(bind visible "isPlayerKillCountVisible")
 	(tf
@@ -872,18 +865,6 @@
 )
 
 #Ship Info
-(def element TP_ShipInfoItem(_entity:gfx, _isAlly:bool=false, _userPrefsNum:dict=null)
-	(hblock
-		(style
-			#(margin = [3,3,3,3])
-			#(width = "TP_PLAYER_ROW_SIZE.WIDTH")
-			(align = "middle")
-			(bind align "_isAlly ? left : right")
-		)
-		(element TP_ShipNameItem "_entity" _userPrefsNum="_userPrefsNum")
-	)
-)
-
 (def element TP_ShipIconItem(_entity:gfx, _isAlly:bool=false, _userPrefsNum:dict=null)
 	(scope
 		(macro SHIP_MARKER_ICON_DATA "_entity.id")
@@ -925,7 +906,7 @@
 	)
 )
 
-(def element TP_ShipNameItem(_entity:gfx, _userPrefsNum:dict=null)
+(def element TP_ShipNameItem(_entity:gfx, _isAlly:bool=false, _userPrefsNum:dict=null)
 	(scope
 		(var shipEntity:gfx = "_entity.avatar.ship.ref.ship" (event "_entity.avatar.evShipRefChanged"))
 		(var shipName:str = "shipEntity ? shipEntity.nameIDS : ''") #IDS_PASB518
@@ -933,12 +914,22 @@
 		#(macro TP_GET_USERPREFS)
 		(macro TP_GET_PREF_BOOL _varName="'isShipNameVisible'" _prefKey="TP_USERPREFS_KEY.SHIP_NAME")
 	)
+
 	(bind visible "isShipNameVisible")
+
+	(style
+		(bind align "_isAlly ? left|middle : right|middle")
+		(width = 100%)
+	)
+
 	(tf
 		(class $TextDefaultBoldNM)
 		(bind class "isAFK ? '$FontColorUnready' : tkStatus ? '$FontColorTeamkiller' : '$None'")
 		(style
-			#(fontSize = 17)
+			#(marginTop = "2")
+			(width = 100%)
+			(elideMode = true)
+			(bind textAlign "_isAlly ? left : right")
 		)
 		(bind text "shipName")
 	)
@@ -1068,13 +1059,18 @@
 
 		#bar color
 		(macro TP_GET_PREF_NUMBER "'alphaScale'" "TP_USERPREFS_KEY.HEALTHBAR_OPACITY" _modifier="0.1" _default="0.4")
-		(var regenBarColorTransform:dict = "{redMultiplier:0,greenMultiplier:0,blueMultiplier:0,alphaMultiplier:0.4,redOffset:230,greenOffset:230,blueOffset:230,alphaOffset:0 }")
+		(var regenBarColorTransform:dict = "{redMultiplier:0,greenMultiplier:0,blueMultiplier:0,alphaMultiplier:1.0,redOffset:230,greenOffset:230,blueOffset:230,alphaOffset:0 }")
 		(var markerColorTransform:dict = 
 			"	diplomacyRelationComponent	? TWO_TEAMS_COLOR_TRANSFORMS[relationStrByDiplomacy] :
 				isAlly						? TWO_TEAMS_COLOR_TRANSFORMS['ally'] :
 				isMultyTeamEnabled			? MULTI_TEAMS_COLOR_TRANSFORMS[teamId]
-											: TWO_TEAMS_COLOR_TRANSFORMS[relationStr]
-		")
+											: TWO_TEAMS_COLOR_TRANSFORMS[relationStr]"
+		)
+
+		#bar width
+		(macro TP_GET_PREF_NUMBER "'widthOffset'" "TP_USERPREFS_KEY.HEALTHBAR_WIDTH" _modifier="0.1" _default="0.5")
+		(var widthScale:number = "1 + widthOffset - 0.5")
+
 	)
 
 	(style
@@ -1084,7 +1080,7 @@
 		(bind right "_isAlly ? auto : 0")
 		(pivotX = "0")
 		(pivotY = "0")
-		(width = "TP_PLAYER_ROW_SIZE.WIDTH")
+		(bind width "TP_PLAYER_ROW_SIZE.WIDTH * widthScale")
 		(height = "TP_PLAYER_ROW_SIZE.HEIGHT")
 		(align = "center|middle")
 		(hitTest = false)
@@ -1117,6 +1113,7 @@
 			(blendMode = 'layer')
 			(style
 				(bind alpha "alphaScale")
+				(bind scaleX "widthScale")
 			)
 			(bind visible "isAlive")
 		)
@@ -1129,6 +1126,35 @@
 		(macro DRAW_RECT "0" "0" "TP_PLAYER_ROW_SIZE.WIDTH" "TP_PLAYER_ROW_SIZE.HEIGHT")
 		(bind colorTransform "_colorTransform")
 		(bind scaleX "_scaleX")
+	)
+)
+
+(def element TP_ContrastPanel(_isBlur:bool=false, _intensity:number="1.0")
+	(scope
+		(var panelElement:str = "_isBlur ? 'TP_ContrastPanelBlur' : 'TP_ContrastPanelNormal'")
+	)
+	(class $FullsizeAbsolute)
+	(controller $Instance
+		(bind renderer "panelElement")
+		(args "_intensity")
+	)
+)
+
+(def element TP_ContrastPanelNormal(_alpha:number=1.0)
+	(class $FullsizeAbsolute)
+	(mc hud_bar_bg_sliced
+		(class $FullsizeAbsolute)
+		(bind alpha "_alpha")
+	)
+)
+
+(def element TP_ContrastPanelBlur(_blurIntensity:number=0.3)
+	(class $FullsizeAbsolute)
+	(element DeclareBlurLayer)
+	(mc mc_blurmap_medium
+		(class $FullsizeAbsolute)
+		(rendererString = blurMeBaby)
+		(macro TP_BIND_BLURINTENSITY "_blurIntensity")
 	)
 )
 
@@ -2145,4 +2171,15 @@
 
 	(bind align "_isAlly ? right|middle : left|middle")
 	(position="trackMouse")
+)
+
+(def macro TP_BIND_BLURINTENSITY(_blurIntensity:expression="0.3")
+	(controller $Animation
+		(bindcall play  duration="0.0001"
+						to	 = "{ blurIntensity: _blurIntensity }"
+						watch=false
+						init=true
+						(bind trigger "_blurIntensity")
+		)
+	)
 )
