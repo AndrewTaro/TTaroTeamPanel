@@ -489,6 +489,15 @@
 	#'Submarine': null
 })
 (def constant TP_CONCEALMENT_CREW_ID "-1") #Works until WG introduces the EPIC CONCEALMENT SKILL (hope that never happens)
+(def constant TP_ATBA_SKILL_ID {
+	'AirCarrier': 41,
+	#'Auxiliary': null,
+	'Battleship': 40,
+	'Cruiser': 30,
+	#'Destroyer': null,
+	#'Submarine': null
+})
+(def constant TP_ATBA_CREW_ID "-1") #Works until WG introduces the EPIC CONCEALMENT SKILL (hope that never happens)
 #--------------------------------------------------------------------------------
 #Main Elements
 #--------------------------------------------------------------------------------
@@ -1214,7 +1223,7 @@
 		(element TP_ShipConfigMobilityItem "shipTTX" _userPrefsNum="_userPrefsNum")
 		(element TP_ShipConfigAirSupportItem "shipTTX" _userPrefsNum="_userPrefsNum")
 		(element TP_ShipConfigAirDefenseItem "shipTTX" _userPrefsNum="_userPrefsNum")
-		(element TP_ShipConfigAtbaItem "shipBattleInfo.shipTTX" _userPrefsNum="_userPrefsNum") #Forces shipBattleInfoTTX so it always shows the max dist for the enemy
+		(element TP_ShipConfigAtbaItem "shipTTX" _avatarEntity="_entity" _isRealParams="isRealParams" _userPrefsNum="_userPrefsNum") #Forces shipBattleInfoTTX so it always shows the max dist for the enemy
 		(element TP_ShipConfigArtilleryItem "shipTTX" _userPrefsNum="_userPrefsNum")
 		(element TP_ShipConfigTorpedoItem "shipTTX" _userPrefsNum="_userPrefsNum")
 		#(element TP_ShipConfigBatteryItem "shipTTX")
@@ -1334,7 +1343,7 @@
 	)
 )
 
-(def element TP_ShipConfigAtbaItem(_shipTTX:gfx, _userPrefsNum:dict=null)
+(def element TP_ShipConfigAtbaItem(_shipTTX:gfx, _avatarEntity:gfx, _isRealParams:bool, _userPrefsNum:dict=null)
 	(scope
 		(var artilleryTTX:gfx = "_shipTTX.artillery")
 		(var hasSecondaryGun:bool = "artilleryTTX ? artilleryTTX.atba.length > 0 : false")
@@ -1342,6 +1351,33 @@
 		#(macro TP_GET_USERPREFS)
 		(macro TP_GET_PREF_BOOL _varName="'isAtbaRangeVisible'" _prefKey="TP_USERPREFS_KEY.ATBA_RANGE")
 		(var isEnabled:bool = "isAtbaRangeVisible")
+		
+		#fix for skill---------------------
+		(var selfPlayer:gfx = "$datahub.getSingleEntity(CC.playerAvatar)")
+		(var avatarComponent:gfx = "_avatarEntity.avatar")
+
+		#shipId -> ownShip (ship in port) -> crewId (crew on board) -> crewSkill (check crew has skill)
+		(var isSelf:bool = "selfPlayer.avatar.id == avatarComponent.id")
+		(var shipId:number = "avatarComponent ? avatarComponent.ship.ref.ship.id : null" (event "avatarComponent.evShipRefChanged"))
+		(var shipType:str = "avatarComponent ? avatarComponent.shipType : null" (event "avatarComponent.evShipTypeChanged"))
+		(var ownShipEntity:gfx = "$datahub.getPrimaryEntity(CC.ownShip, shipId)")
+
+		(var skillId:number = "shipType in TP_ATBA_SKILL_ID ? TP_ATBA_SKILL_ID[shipType] : null")
+		(var skillEntity:gfx = "$datahub.getPrimaryCompositeEntity(CC.skill, skillId, shipType, TP_ATBA_CREW_ID)")
+		
+		(var crewId:number = "ownShipEntity ? ownShipEntity.ownShip.crewId : null" (event "ownShipEntity.ownShip.evCrewChanged"))
+		(var crewSkillEntity:gfx = "$datahub.getPrimaryCompositeEntity(CC.crewSkill, crewId, skillEntity.id)")
+		#(crewId, skill) -> rutrns crewSkill if the crew is onboard and has skill
+
+		(var isCorrectionNeeded:bool = "!(crewSkillEntity || isSelf || _isRealParams)")
+
+		(var modifiers:dict = "skillEntity ? skillEntity.attributes.modifiers : null")
+		(var rangeModifier:number = "isCorrectionNeeded && modifiers ? (1 + modifiers.GSMaxDist * 0.01) : 1.0") #value is negative and %
+		#---------------------
+
+		#fix------------------
+		(var modifiedAtbaRange:number = "range * rangeModifier") #CAPTAIN SKILL FIX
+		#---------------------
 	)
 
 	(bind visible "isEnabled")
@@ -1354,7 +1390,7 @@
 		(align = "middle|center")
 	)
 	(block
-		(element TP_ShipConfigTextItem _value="range" _unit="'km'" _userPrefsNum="_userPrefsNum"
+		(element TP_ShipConfigTextItem _value="modifiedAtbaRange" _unit="'km'" _userPrefsNum="_userPrefsNum"
 			(bind visible "isAtbaRangeVisible")
 		)
 	)
@@ -1690,7 +1726,7 @@
 			(width = 300px)
 		)
 		(element TP_TooltipArtilleryItem "shipTTX")
-		(element TP_TooltipAtbaItem "shipBattleInfo.shipTTX") #Forcing shipBattleInfo TTX to display max possible dist
+		(element TP_TooltipAtbaItem "shipTTX" _avatarEntity="_entity" _isRealParams="isRealParams")
 		(element TP_TooltipTorpedoItem "shipTTX")
 		(element TP_TooltipAirDefenseItem "shipTTX")
 		(element TP_TooltipAirSupportItem "shipTTX")
@@ -1784,11 +1820,38 @@
 	)
 )
 
-(def element TP_TooltipAtbaItem(_shipTTX:gfx, _userPrefsNum:dict=null)
+(def element TP_TooltipAtbaItem(_shipTTX:gfx, _avatarEntity:gfx, _isRealParams:bool, _userPrefsNum:dict=null)
 	(scope
 		(var artilleryTTX:gfx = "_shipTTX.artillery")
 		(var hasSecondaryGun:bool = "artilleryTTX ? artilleryTTX.atba.length > 0 : false")
 		(var range:number = "artilleryTTX ? artilleryTTX.atbaMaxDist.value : null")
+
+		#fix for skill---------------------
+		(var selfPlayer:gfx = "$datahub.getSingleEntity(CC.playerAvatar)")
+		(var avatarComponent:gfx = "_avatarEntity.avatar")
+
+		#shipId -> ownShip (ship in port) -> crewId (crew on board) -> crewSkill (check crew has skill)
+		(var isSelf:bool = "selfPlayer.avatar.id == avatarComponent.id")
+		(var shipId:number = "avatarComponent ? avatarComponent.ship.ref.ship.id : null" (event "avatarComponent.evShipRefChanged"))
+		(var shipType:str = "avatarComponent ? avatarComponent.shipType : null" (event "avatarComponent.evShipTypeChanged"))
+		(var ownShipEntity:gfx = "$datahub.getPrimaryEntity(CC.ownShip, shipId)")
+
+		(var skillId:number = "shipType in TP_ATBA_SKILL_ID ? TP_ATBA_SKILL_ID[shipType] : null")
+		(var skillEntity:gfx = "$datahub.getPrimaryCompositeEntity(CC.skill, skillId, shipType, TP_ATBA_CREW_ID)")
+		
+		(var crewId:number = "ownShipEntity ? ownShipEntity.ownShip.crewId : null" (event "ownShipEntity.ownShip.evCrewChanged"))
+		(var crewSkillEntity:gfx = "$datahub.getPrimaryCompositeEntity(CC.crewSkill, crewId, skillEntity.id)")
+		#(crewId, skill) -> rutrns crewSkill if the crew is onboard and has skill
+
+		(var isCorrectionNeeded:bool = "!(crewSkillEntity || isSelf || _isRealParams)")
+
+		(var modifiers:dict = "skillEntity ? skillEntity.attributes.modifiers : null")
+		(var rangeModifier:number = "isCorrectionNeeded && modifiers ? (1 + modifiers.GSMaxDist * 0.01) : 1.0") #value is negative and %
+		#---------------------
+
+		#fix------------------
+		(var modifiedAtbaRange:number = "range * rangeModifier") #CAPTAIN SKILL FIX
+		#---------------------
 	)
 
 	(style
@@ -1804,7 +1867,7 @@
 		(element TP_TooltipShipConfigTitleItem _title="'IDS_SHIP_PARAM_ATBA'")
 
 		(block
-			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_MAX_DIST'" _value="range" _unit="'km'" _userPrefsNum="_userPrefsNum")
+			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_MAX_DIST'" _value="modifiedAtbaRange" _unit="'km'" _userPrefsNum="_userPrefsNum")
 		)
 	)
 )
