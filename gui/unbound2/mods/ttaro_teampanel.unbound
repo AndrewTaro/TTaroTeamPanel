@@ -497,7 +497,7 @@
 	#'Destroyer': null,
 	#'Submarine': null
 })
-(def constant TP_ATBA_CREW_ID "-1") #Works until WG introduces the EPIC CONCEALMENT SKILL (hope that never happens)
+(def constant TP_ATBA_CREW_ID "-1") #Works until WG introduces the EPIC ATBA SKILL (hope that never happens)
 #--------------------------------------------------------------------------------
 #Main Elements
 #--------------------------------------------------------------------------------
@@ -2361,7 +2361,7 @@
 								on = 'rollOut'
 	)
 
-	(offset = {	x: 15, y: 15})
+	(offset = {	x: 35, y: 15})
 
 	(screenBoundsOffset = {			left:	10,
 									top:	10,
