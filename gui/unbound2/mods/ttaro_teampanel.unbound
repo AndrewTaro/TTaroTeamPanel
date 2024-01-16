@@ -60,6 +60,8 @@
 	#Torpedo
 	TORPEDO_RANGE: 'ttTeamPanelTorpedoRangeVisible',
 	TORPEDO_RELOAD: 'ttTeamPanelTorpedoReloadVisible',
+	#ATBA
+	ATBA_RANGE: 'ttTeamPanelAtbaRangeVisible',
 	#AntiAir
 	ANTIAIR_RANGE: 'ttTeamPanelAntiAirRangeVisible',
 	ANTIAIR_RATE: 'ttTeamPanelAntiAirRateVisible',
@@ -72,9 +74,12 @@
 	#Visibility
 	VISIBILITY_SURFACE: 'ttTeamPanelVisibilitySurfaceVisible',
 	VISIBILITY_AIR: 'ttTeamPanelVisibilityAirVisible',
-	#Consumable
+	#Surface Consumable
 	RADAR_RANGE: 'ttTeamPanelRadarRangeVisible',
 	HYDRO_RANGE: 'ttTeamPanelHydroRangeVisible',
+	#Sub Consumable
+	SUB_RADAR_RANGE: 'ttTeamPanelSubRadarRangeVisible',
+	SUB_HYDRO_RANGE: 'ttTeamPanelSubHydroRangeVisible',
 })
 
 (def constant TP_SHIP_ICON_COLOR_PRESET [
@@ -144,9 +149,9 @@
 	},
 ])
 (def constant TP_CONSUMABLES_DATA {
-    '4181112272': {rls: 9.0, sonar: 7.0, },
+    '4181112272': {submarineLocator: 9.0, hydrophone: 7.0, },
     '3764303664': {sonar: 5.5, },
-    '3751196368': {sonar: 7.0, },
+    '3751196368': {hydrophone: 7.0, },
     '4183734064': {sonar: 5.5, },
     '3752769232': {sonar: 5.0, },
     '3741235152': {rls: 9.0, sonar: 5.0, },
@@ -197,7 +202,7 @@
     '3731830736': {sonar: 4.0, },
     '3761157488': {sonar: 3.0, },
     '4182652880': {sonar: 3.0, },
-    '3761681872': {rls: 9.0, sonar: 7.0, },
+    '3761681872': {submarineLocator: 9.0, hydrophone: 7.0, },
     '4181604304': {sonar: 3.0, },
     '3730749424': {sonar: 5.0, },
     '4280203248': {rls: 10.0, sonar: 5.0, },
@@ -207,7 +212,7 @@
     '3764303216': {sonar: 4.0, },
     '4278106096': {rls: 10.0, sonar: 5.0, },
     '4259231440': {sonar: 5.0, },
-    '4181112816': {rls: 6.0, sonar: 8.0, },
+    '4181112816': {submarineLocator: 6.0, hydrophone: 8.0, },
     '4289640432': {sonar: 4.0, },
     '3760109264': {sonar: 5.0, },
     '3763255024': {sonar: 4.0, },
@@ -217,14 +222,14 @@
     '3741267408': {rls: 12.0, },
     '3763221872': {sonar: 3.5, },
     '4182652720': {sonar: 4.0, },
-    '3759585072': {rls: 6.0, sonar: 8.0, },
+    '3759585072': {submarineLocator: 6.0, hydrophone: 8.0, },
     '3754866128': {sonar: 4.0, },
     '4182685008': {sonar: 3.0, },
     '3667801296': {sonar: 5.5, },
     '3551442640': {sonar: 4.0, },
     '4074682192': {sonar: 5.0, },
     '3655251408': {sonar: 5.0, },
-    '4179015120': {rls: 10.0, sonar: 7.0, },
+    '4179015120': {submarineLocator: 10.0, hydrophone: 7.0, },
     '4285445392': {rls: 15.0, },
     '4185831376': {sonar: 4.0, },
     '4180587952': {sonar: 5.0, },
@@ -246,24 +251,24 @@
     '3331241680': {sonar: 4.0, },
     '3762173232': {rls: 7.5, },
     '3763255248': {rls: 8.5, sonar: 4.0, },
-    '3761682384': {rls: 6.0, sonar: 6.0, },
+    '3761682384': {submarineLocator: 6.0, hydrophone: 6.0, },
     '4076779344': {sonar: 5.0, },
     '3764303696': {sonar: 4.0, },
     '4183701456': {sonar: 3.0, },
     '3666818864': {sonar: 6.0, },
     '3256792528': {rls: 12.0, sonar: 5.0, },
-    '4179015472': {rls: 9.0, sonar: 8.0, },
+    '4179015472': {submarineLocator: 9.0, hydrophone: 8.0, },
     '3760109008': {rls: 12.0, },
     '4180621104': {sonar: 6.0, },
-    '4179015632': {rls: 6.0, sonar: 6.0, },
+    '4179015632': {submarineLocator: 6.0, hydrophone: 6.0, },
     '3542005552': {sonar: 6.0, },
     '3763255280': {rls: 10.0, sonar: 4.0, },
     '3332290256': {sonar: 4.0, },
     '3763255120': {sonar: 4.0, },
-    '4078352176': {rls: 9.0, sonar: 7.0, },
+    '4078352176': {submarineLocator: 9.0, hydrophone: 7.0, },
     '4248745968': {sonar: 4.0, },
     '4281218320': {sonar: 5.0, },
-    '4276008304': {rls: 7.0, sonar: 5.0, },
+    '4276008304': {submarineLocator: 7.0, sonar: 5.0, },
     '4078876624': {sonar: 4.0, },
     '3749623504': {sonar: 5.0, },
     '3751720752': {sonar: 6.0, },
@@ -278,7 +283,7 @@
     '4184782256': {sonar: 4.0, },
     '4282300112': {sonar: 5.0, },
     '4178523952': {sonar: 6.0, },
-    '4181112624': {rls: 9.0, sonar: 7.0, },
+    '4181112624': {submarineLocator: 9.0, hydrophone: 7.0, },
     '3740153840': {rls: 7.5, },
     '4291736848': {rls: 15.0, },
     '3655284688': {sonar: 3.0, },
@@ -290,7 +295,7 @@
     '4074714928': {sonar: 5.5, },
     '3761190192': {sonar: 5.0, },
     '4182685488': {sonar: 5.5, },
-    '4074157872': {rls: 9.0, sonar: 8.0, },
+    '4074157872': {submarineLocator: 9.0, hydrophone: 8.0, },
     '4277056880': {sonar: 4.0, },
     '3659445712': {sonar: 4.0, },
     '3751687984': {sonar: 5.5, },
@@ -309,12 +314,12 @@
     '4075730640': {sonar: 5.0, },
     '4077828080': {sonar: 4.0, },
     '4180587856': {sonar: 3.0, rls: 9.0, },
-    '4183209936': {rls: 6.0, sonar: 6.0, },
+    '4183209936': {submarineLocator: 6.0, hydrophone: 6.0, },
     '3750672080': {sonar: 5.0, },
     '4180588304': {sonar: 5.0, },
     '4181636560': {rls: 12.0, sonar: 5.0, },
     '4181636432': {sonar: 3.0, rls: 9.0, },
-    '4179015664': {rls: 6.0, sonar: 9.0, },
+    '4179015664': {submarineLocator: 6.0, hydrophone: 9.0, },
     '3760109552': {rls: 10.0, sonar: 5.0, },
     '3764303600': {sonar: 4.0, },
     '4179539408': {rls: 12.0, sonar: 5.0, },
@@ -340,8 +345,8 @@
     '4074681808': {rls: 12.0, sonar: 5.0, },
     '3445536592': {sonar: 5.0, },
     '3445536208': {sonar: 5.0, },
-    '4074158064': {rls: 6.0, sonar: 9.0, },
-    '4076255024': {rls: 9.0, sonar: 7.0, },
+    '4074158064': {submarineLocator: 6.0, hydrophone: 9.0, },
+    '4076255024': {submarineLocator: 9.0, hydrophone: 7.0, },
     '3340678608': {rls: 12.0, sonar: 5.0, },
     '4285445840': {sonar: 5.0, },
     '4273911760': {sonar: 5.0, },
@@ -368,12 +373,12 @@
     '4183733680': {sonar: 4.0, },
     '4178491376': {rls: 10.0, sonar: 5.0, },
     '4183734256': {sonar: 4.0, },
-    '4183209776': {rls: 9.0, sonar: 7.0, },
+    '4183209776': {submarineLocator: 9.0, hydrophone: 7.0, },
     '4283348240': {rls: 15.0, },
     '3761157968': {sonar: 5.0, },
     '3247388464': {sonar: 6.0, },
     '4180554960': {rls: 7.5, },
-    '4284396912': {rls: 8.0, sonar: 5.0, },
+    '4284396912': {submarineLocator: 8.0, sonar: 5.0, },
     '3751720400': {sonar: 4.0, },
     '3445536464': {sonar: 5.0, },
     '4076812080': {sonar: 5.5, },
@@ -381,7 +386,7 @@
     '3753818064': {sonar: 3.0, },
     '4181604144': {sonar: 5.0, },
     '4074648880': {rls: 9.0, },
-    '4076255216': {rls: 6.0, sonar: 8.0, },
+    '4076255216': {submarineLocator: 6.0, hydrophone: 8.0, },
     '3709777360': {sonar: 5.0, },
     '3730782192': {rls: 10.0, },
     '4282300400': {sonar: 4.0, },
@@ -411,20 +416,20 @@
     '3761157584': {rls: 12.0, },
     '4280202608': {sonar: 4.0, },
     '3761157904': {sonar: 5.0, },
-    '4181112784': {rls: 6.0, sonar: 6.0, },
+    '4181112784': {submarineLocator: 6.0, hydrophone: 6.0, },
     '4079924944': {sonar: 4.0, },
     '3550360880': {rls: 7.5, },
-    '4278105456': {rls: 6.0, sonar: 4.0, },
+    '4278105456': {submarineLocator: 6.0, sonar: 4.0, },
     '3730748880': {sonar: 5.0, },
     '3553539792': {sonar: 4.0, },
     '4269717488': {sonar: 4.0, },
     '3763254608': {sonar: 4.0, },
     '3762173136': {sonar: 5.5, },
     '3742316496': {sonar: 4.0, },
-    '4274959728': {rls: 8.0, sonar: 5.0, },
+    '4274959728': {submarineLocator: 8.0, sonar: 5.0, },
     '3543021520': {sonar: 3.0, },
     '3969857328': {sonar: 6.0, },
-    '4183209968': {rls: 6.0, sonar: 8.0, },
+    '4183209968': {submarineLocator: 6.0, hydrophone: 8.0, },
     '3764303152': {sonar: 4.0, },
     '4180588528': {rls: 10.0, sonar: 5.0, },
     '4076745936': {sonar: 5.5, },
@@ -450,7 +455,7 @@
     '3760108912': {sonar: 5.0, rls: 12.0, },
     '4182685104': {sonar: 4.0, },
     '4182685648': {sonar: 4.0, },
-    '4183209424': {rls: 7.0, sonar: 7.0, },
+    '4183209424': {submarineLocator: 7.0, hydrophone: 7.0, },
     '3667802064': {sonar: 3.0, },
     '3655219184': {sonar: 5.0, },
     '4180555728': {sonar: 3.0, },
@@ -461,10 +466,10 @@
     '3750672112': {sonar: 5.0, },
     '4179539376': {sonar: 5.0, },
     '3752769328': {sonar: 5.5, },
-    '3759585264': {rls: 6.0, sonar: 9.0, },
+    '3759585264': {submarineLocator: 6.0, hydrophone: 9.0, },
     '4278072592': {sonar: 5.0, },
     '3709777872': {sonar: 5.0, },
-    '4078352368': {rls: 6.0, sonar: 8.0, },
+    '4078352368': {submarineLocator: 6.0, hydrophone: 8.0, },
     '3750672176': {sonar: 6.0, },
     '4181636528': {sonar: 5.0, },
     '4288591856': {rls: 8.5, sonar: 4.0, },
@@ -484,6 +489,15 @@
 	#'Submarine': null
 })
 (def constant TP_CONCEALMENT_CREW_ID "-1") #Works until WG introduces the EPIC CONCEALMENT SKILL (hope that never happens)
+(def constant TP_ATBA_SKILL_ID {
+	'AirCarrier': 41,
+	#'Auxiliary': null,
+	'Battleship': 40,
+	'Cruiser': 30,
+	#'Destroyer': null,
+	#'Submarine': null
+})
+(def constant TP_ATBA_CREW_ID "-1") #Works until WG introduces the EPIC ATBA SKILL (hope that never happens)
 #--------------------------------------------------------------------------------
 #Main Elements
 #--------------------------------------------------------------------------------
@@ -583,6 +597,9 @@
 		(macro TP_GET_PREF_BOOL _varName="'isArtilleryRangeVisible'" _prefKey="TP_USERPREFS_KEY.ARTILLERY_RANGE")
 		(macro TP_GET_PREF_BOOL _varName="'isArtilleryReloadVisible'" _prefKey="TP_USERPREFS_KEY.ARTILLERY_RELOAD")
 		(var isArtilleryEnabled:bool = "isArtilleryRangeVisible || isArtilleryReloadVisible")
+		#ATBA
+		(macro TP_GET_PREF_BOOL _varName="'isAtbaRangeVisible'" _prefKey="TP_USERPREFS_KEY.ATBA_RANGE")
+		(var isAtbaEnabled:bool = "isAtbaRangeVisible")
 		#Torpedo
 		(macro TP_GET_PREF_BOOL _varName="'isTorpedoRangeVisible'" _prefKey="TP_USERPREFS_KEY.TORPEDO_RANGE")
 		#(macro TP_GET_PREF_BOOL _varName="'isTorpedoReloadVisible'" _prefKey="TP_USERPREFS_KEY.TORPEDO_RELOAD")
@@ -603,17 +620,21 @@
 		(macro TP_GET_PREF_BOOL _varName="'isVisibilityByShipVisible'" _prefKey="TP_USERPREFS_KEY.VISIBILITY_SURFACE")
 		(macro TP_GET_PREF_BOOL _varName="'isVisibilityByPlaneVisible'" _prefKey="TP_USERPREFS_KEY.VISIBILITY_AIR")
 		(var isVisibilityEnabled:bool = "isVisibilityByShipVisible || isVisibilityByPlaneVisible")
-		#Consumable
+		#Surface Consumable
 		(macro TP_GET_PREF_BOOL _varName="'isRadarRangeVisible'" _prefKey="TP_USERPREFS_KEY.RADAR_RANGE")
 		(macro TP_GET_PREF_BOOL _varName="'isHydroRangeVisible'" _prefKey="TP_USERPREFS_KEY.HYDRO_RANGE")
-		(var isConsumableEnabled:bool = "isRadarRangeVisible || isHydroRangeVisible")
+		(var isSurfaceConsumableEnabled:bool = "isRadarRangeVisible || isHydroRangeVisible")
+		#Sub Consumables
+		(macro TP_GET_PREF_BOOL _varName="'isSubRadarRangeVisible'" _prefKey="TP_USERPREFS_KEY.SUB_RADAR_RANGE")
+		(macro TP_GET_PREF_BOOL _varName="'isSubHydroRangeVisible'" _prefKey="TP_USERPREFS_KEY.SUB_HYDRO_RANGE")
+		(var isSubmarineConsumableEnabled:bool = "isSubRadarRangeVisible || isSubHydroRangeVisible")
 		#ALT
 		(macro TP_GET_PREF_BOOL _varName="'isVisibleOnlyAlt'" _prefKey="TP_USERPREFS_KEY.STATS_ALT_VISIBLE" _default="false")
 		(var camera:gfx = "$datahub.getSingleComponent(CC.camera)")
 		(var altVision:bool = "camera ? camera.altVision : false" (event "camera.evAltVisionChanged"))
 	)
 	(style
-		(hitTest = false)
+		(hitTest = true)
 	)
 	(bind visible "isVisibleOnlyAlt ? altVision : true")
 
@@ -635,17 +656,31 @@
 		(element TP_PlayerKillCountItem "_entity" _userPrefsNum="_userPrefsNum")
 		#
 
-		(element TP_ShipConfigImageItem "'url:../crew_commander/skills/detection_visibility_range.png'" _isVisible="isVisibilityEnabled" _userPrefsNum="_userPrefsNum")
-		(element TP_ShipConfigImageItem "'url:../modules/icon_module_Engine_researched.png'" _isVisible="isMobilityEnabled" _userPrefsNum="_userPrefsNum")
-		(element TP_ShipConfigImageItem "'url:../battle_hud/icon_frag/icon_frag_bomb.png'" _isVisible="isAirSupportEnabled" _alpha="0.7" _userPrefsNum="_userPrefsNum")
-		(element TP_ShipConfigImageItem "'url:../battle_hud/lower_log_modifiers/AAAuraDamage.png'" _isVisible="isAntiAirEnabled" _alpha="0.7" _userPrefsNum="_userPrefsNum")
+		#TODO
+		#I really should move all these strings to constant
+		#Maybe repace with repeat as well
+		#
 
-		(element TP_ShipConfigImageItem "'url:../modules/icon_module_Artillery_researched.png'" _isVisible="isArtilleryEnabled" _userPrefsNum="_userPrefsNum")
-		(element TP_ShipConfigImageItem "'url:../modules/icon_module_Torpedoes_researched.png'" _isVisible="isTorpedoEnabled" _alpha="0.8" _userPrefsNum="_userPrefsNum")
+		#Visibility
+		(element TP_ShipConfigImageItem "'url:../crew_commander/skills/detection_visibility_range.png'" _isVisible="isVisibilityEnabled" _tooltipTitle='IDS_SHIP_PARAM_DETECTION' _tooltipTexts=['IDS_SHIP_PARAM_VISIBILITY_DIST_BY_SHIP','IDS_SHIP_PARAM_VISIBILITY_DIST_BY_PLANE'] _userPrefsNum="_userPrefsNum")
+		#Speed
+		(element TP_ShipConfigImageItem "'url:../modules/icon_module_Engine_researched.png'" _isVisible="isMobilityEnabled" _tooltipTitle='IDS_SHIP_PARAM_MAXSPEED' _tooltipTexts=['IDS_SHIP_PARAM_MOBILITY','IDS_SHIP_PARAM_UNDERWATER_MOBILITY'] _userPrefsNum="_userPrefsNum")
+		#AirStrike
+		(element TP_ShipConfigImageItem "'url:../battle_hud/icon_frag/icon_frag_bomb.png'" _isVisible="isAirSupportEnabled" _alpha="0.7" _tooltipTitle='IDS_SHIP_PARAM_AIR_SUPPORT' _tooltipTexts=['IDS_SHIP_PARAM_MAX_DIST','IDS_SHIP_PARAM_SHOT_DELAY'] _userPrefsNum="_userPrefsNum")
+		#AA
+		(element TP_ShipConfigImageItem "'url:../battle_hud/lower_log_modifiers/AAAuraDamage.png'" _isVisible="isAntiAirEnabled" _alpha="0.7" _tooltipTitle='IDS_SHIP_PARAM_AIR_DEFENSE' _tooltipTexts=['IDS_SHIP_PARAM_MAX_DIST','IDS_SHIP_PARAM_AIR_DEFENSE'] _userPrefsNum="_userPrefsNum")
+		#ATBA
+		(element TP_ShipConfigImageItem "'url:../battle_hud/icon_frag/icon_frag_atba.png'" _isVisible="isAtbaEnabled" _tooltipTitle='IDS_SHIP_PARAM_ATBA' _tooltipTexts=['IDS_SHIP_PARAM_MAX_DIST'] _userPrefsNum="_userPrefsNum")
+		#Artillery
+		(element TP_ShipConfigImageItem "'url:../modules/icon_module_Artillery_researched.png'" _isVisible="isArtilleryEnabled" _tooltipTitle='IDS_SHIP_PARAM_MAIN_GUN' _tooltipTexts=['IDS_SHIP_PARAM_MAX_DIST','IDS_SHIP_PARAM_SHOT_DELAY'] _userPrefsNum="_userPrefsNum")
+		#Torpedo
+		(element TP_ShipConfigImageItem "'url:../modules/icon_module_Torpedoes_researched.png'" _isVisible="isTorpedoEnabled" _alpha="0.8" _tooltipTitle='IDS_SHIP_PARAM_TORPEDOES' _tooltipTexts=['IDS_SHIP_PARAM_MAX_DIST'] _userPrefsNum="_userPrefsNum")
 		
 		#(element TP_ShipConfigImageItem "'url:../battle_hud/crosshair/indicators/crosshair_indicator_energy_white.png'") #TODO FIX
-		
-		(element TP_ShipConfigImageItem "'url:../battle_hud/icon_frag/icon_frag_wave.png'" _isVisible="isConsumableEnabled" _alpha="0.7" _userPrefsNum="_userPrefsNum")
+		#Hydro/Radar
+		(element TP_ShipConfigImageItem "'url:../battle_hud/icon_frag/icon_frag_wave.png'" _isVisible="isSurfaceConsumableEnabled" _alpha="0.7" _tooltipTitle='IDS_TITLE_CONSUMABLES' _tooltipTexts=['IDS_DOCK_CONSUME_TITLE_PCY008_SONARSEARCH','IDS_DOCK_CONSUME_TITLE_PCY019_RLSSEARCH'] _userPrefsNum="_userPrefsNum")
+		#Hydrophone/SubRadar
+		(element TP_ShipConfigImageItem "'url:../battle_hud/icon_frag/icon_frag_wave.png'" _isVisible="isSubmarineConsumableEnabled" _alpha="0.7" _tooltipTitle='IDS_TITLE_CONSUMABLES' _tooltipTexts=['IDS_DOCK_CONSUME_TITLE_PCY045_HYDROPHONE','IDS_DOCK_CONSUME_TITLE_PCY048_SUBMARINELOCATOR'] _userPrefsNum="_userPrefsNum")
 	)
 )
 
@@ -1170,9 +1205,20 @@
 #--------------------------------------------------------------------------------
 (def element TP_ShipConfigurationsItem(_entity:gfx, _isAlly:bool=false, _userPrefsNum:dict=null)
 	(scope
+		(var avatarId:number = "_entity.avatar.id")
+
+		#Classic TTX
 		(var ttxCollection:gfx = "$datahub.getCollection(CC.mods_ShipParamsInBattle)")
-		(var ttxEntity:gfx = "$datahub.getPrimaryEntity(CC.mods_ShipParamsInBattle, _entity.avatar.id)" (event "ttxCollection.evAdded"))
-		#(macro TP_GET_USERPREFS)
+		(var ttxEntity:gfx = "$datahub.getPrimaryEntity(CC.mods_ShipParamsInBattle, avatarId)" (event "ttxCollection.evAdded"))
+
+		#New TTX
+		(var shipBattleInfoCollection:gfx = "$datahub.getCollection(CC.shipBattleInfo)")
+		(var shipBattleInfoEntity:gfx = "$datahub.getPrimaryEntity(CC.shipBattleInfo, avatarId)" (event "shipBattleInfoCollection.evAdded"))
+		(var shipBattleInfo:gfx = "shipBattleInfoEntity ? shipBattleInfoEntity.shipBattleInfo : null" (event "shipBattleInfoEntity.shipBattleInfo.evChanged"))
+
+		(var isRealParams:bool = "shipBattleInfo ? shipBattleInfo.isRealParams : false")
+		(var shipTTX:gfx = "isRealParams ? shipBattleInfo.shipTTX : ttxEntity.mods_ShipParamsInBattle.shipTTX")
+
 		(macro TP_GET_PREF_BOOL _varName="'isVisibleOnlyAlt'" _prefKey="TP_USERPREFS_KEY.STATS_ALT_VISIBLE" _default="false")
 		(var camera:gfx = "$datahub.getSingleComponent(CC.camera)")
 		(var altVision:bool = "camera ? camera.altVision : false" (event "camera.evAltVisionChanged"))
@@ -1186,20 +1232,22 @@
 			(bind flow "_isAlly ? Flow.HORIZONTAL : Flow.REVERSE_HORIZONTAL")
 			(height = "TP_PLAYER_ROW_SIZE.HEIGHT")
 		)
-		(element TP_ShipConfigVisibilityItem "ttxEntity" _userPrefsNum="_userPrefsNum")
-		(element TP_ShipConfigMobilityItem "ttxEntity" _userPrefsNum="_userPrefsNum")
-		(element TP_ShipConfigAirSupportItem "ttxEntity" _userPrefsNum="_userPrefsNum")
-		(element TP_ShipConfigAirDefenseItem "ttxEntity" _userPrefsNum="_userPrefsNum")
-		(element TP_ShipConfigArtilleryItem "ttxEntity" _userPrefsNum="_userPrefsNum")
-		(element TP_ShipConfigTorpedoItem "ttxEntity" _userPrefsNum="_userPrefsNum")
-		#(element TP_ShipConfigBatteryItem "ttxEntity")
-		(element TP_ShipConfigConsumableItem "ttxEntity" _userPrefsNum="_userPrefsNum")
+		(element TP_ShipConfigVisibilityItem "shipTTX" _avatarEntity="_entity" _isRealParams="isRealParams" _userPrefsNum="_userPrefsNum")
+		(element TP_ShipConfigMobilityItem "shipTTX" _userPrefsNum="_userPrefsNum")
+		(element TP_ShipConfigAirSupportItem "shipTTX" _userPrefsNum="_userPrefsNum")
+		(element TP_ShipConfigAirDefenseItem "shipTTX" _userPrefsNum="_userPrefsNum")
+		(element TP_ShipConfigAtbaItem "shipTTX" _avatarEntity="_entity" _isRealParams="isRealParams" _userPrefsNum="_userPrefsNum") #Forces shipBattleInfoTTX so it always shows the max dist for the enemy
+		(element TP_ShipConfigArtilleryItem "shipTTX" _userPrefsNum="_userPrefsNum")
+		(element TP_ShipConfigTorpedoItem "shipTTX" _userPrefsNum="_userPrefsNum")
+		#(element TP_ShipConfigBatteryItem "shipTTX")
+		(element TP_ShipConfigSurfaceConsumableItem "shipTTX" _avatarEntity="_entity" _userPrefsNum="_userPrefsNum")
+		(element TP_ShipConfigSubmarineConsumableItem "shipTTX" _avatarEntity="_entity" _userPrefsNum="_userPrefsNum")
 	)
 )
 
-(def element TP_ShipConfigArtilleryItem(_ttxEntity:gfx, _userPrefsNum:dict=null)
+(def element TP_ShipConfigArtilleryItem(_shipTTX:gfx, _userPrefsNum:dict=null)
 	(scope
-		(var artilleryTTX:gfx = "_ttxEntity.mods_ShipParamsInBattle.shipTTX.artillery")
+		(var artilleryTTX:gfx = "_shipTTX.artillery")
 		(var hasMainGun:bool = "artilleryTTX ? artilleryTTX.mainGun.length > 0 : false")
 		(var range:number = "artilleryTTX ? artilleryTTX.mgMaxDist.value : null")
 		(var reload:number = "artilleryTTX ? artilleryTTX.mgReloadTime.value : null")
@@ -1228,10 +1276,10 @@
 	)
 )
 
-(def element TP_ShipConfigTorpedoItem(_ttxEntity:gfx, _userPrefsNum:dict=null)
+(def element TP_ShipConfigTorpedoItem(_shipTTX:gfx, _userPrefsNum:dict=null)
 	(scope
 		#Surface Torps
-		(var torpedoesTTX:gfx = "_ttxEntity.mods_ShipParamsInBattle.shipTTX.torpedoes")
+		(var torpedoesTTX:gfx = "_shipTTX.torpedoes")
 		#normal torps
 		(var torpedoTTX:gfx = "torpedoesTTX ? torpedoesTTX.torpedo : null")
 		(var torpedoRange:number = "torpedoTTX ? torpedoTTX.maxDist.value : null")
@@ -1254,7 +1302,7 @@
 
 
 		#Submarine torps
-		(var torpedoGroupsTTX:gfx = "_ttxEntity.mods_ShipParamsInBattle.shipTTX.torpedoGroups")
+		(var torpedoGroupsTTX:gfx = "_shipTTX.torpedoGroups")
 		#normal torps
 		(var subTorpedoTTX:gfx = "torpedoGroupsTTX ? torpedoGroupsTTX.torpedo : null")
 		(var subTorpedoRange:number = "subTorpedoTTX ? subTorpedoTTX.maxDist.value : null")
@@ -1308,9 +1356,62 @@
 	)
 )
 
-(def element TP_ShipConfigAirDefenseItem(_ttxEntity:gfx, _userPrefsNum:dict=null)
+(def element TP_ShipConfigAtbaItem(_shipTTX:gfx, _avatarEntity:gfx, _isRealParams:bool, _userPrefsNum:dict=null)
 	(scope
-		(var airDefenseTTX:gfx = "_ttxEntity.mods_ShipParamsInBattle.shipTTX.airDefense")
+		(var artilleryTTX:gfx = "_shipTTX.artillery")
+		(var hasSecondaryGun:bool = "artilleryTTX ? artilleryTTX.atba.length > 0 : false")
+		(var range:number = "artilleryTTX ? artilleryTTX.atbaMaxDist.value : null")
+		#(macro TP_GET_USERPREFS)
+		(macro TP_GET_PREF_BOOL _varName="'isAtbaRangeVisible'" _prefKey="TP_USERPREFS_KEY.ATBA_RANGE")
+		(var isEnabled:bool = "isAtbaRangeVisible")
+		
+		#fix for skill---------------------
+		(var selfPlayer:gfx = "$datahub.getSingleEntity(CC.playerAvatar)")
+		(var avatarComponent:gfx = "_avatarEntity.avatar")
+
+		#shipId -> ownShip (ship in port) -> crewId (crew on board) -> crewSkill (check crew has skill)
+		(var isSelf:bool = "selfPlayer.avatar.id == avatarComponent.id")
+		(var shipId:number = "avatarComponent ? avatarComponent.ship.ref.ship.id : null" (event "avatarComponent.evShipRefChanged"))
+		(var shipType:str = "avatarComponent ? avatarComponent.shipType : null" (event "avatarComponent.evShipTypeChanged"))
+		(var ownShipEntity:gfx = "$datahub.getPrimaryEntity(CC.ownShip, shipId)")
+
+		(var skillId:number = "shipType in TP_ATBA_SKILL_ID ? TP_ATBA_SKILL_ID[shipType] : null")
+		(var skillEntity:gfx = "$datahub.getPrimaryCompositeEntity(CC.skill, skillId, shipType, TP_ATBA_CREW_ID)")
+		
+		(var crewId:number = "ownShipEntity ? ownShipEntity.ownShip.crewId : null" (event "ownShipEntity.ownShip.evCrewChanged"))
+		(var crewSkillEntity:gfx = "$datahub.getPrimaryCompositeEntity(CC.crewSkill, crewId, skillEntity.id)")
+		#(crewId, skill) -> rutrns crewSkill if the crew is onboard and has skill
+
+		(var isCorrectionNeeded:bool = "!(crewSkillEntity || isSelf || _isRealParams)")
+
+		(var modifiers:dict = "skillEntity ? skillEntity.attributes.modifiers : null")
+		(var rangeModifier:number = "isCorrectionNeeded && modifiers ? (1 + modifiers.GSMaxDist * 0.01) : 1.0") #value is negative and %
+		#---------------------
+
+		#fix------------------
+		(var modifiedAtbaRange:number = "range * rangeModifier") #CAPTAIN SKILL FIX
+		#---------------------
+	)
+
+	(bind visible "isEnabled")
+	(style
+		(bind alpha "hasSecondaryGun ? 1.0 : 0.0")
+		#(width = "TP_SHIPCONFIG_ELEMENT_WIDTH.WITH_UNIT")
+	)
+
+	(style
+		(align = "middle|center")
+	)
+	(block
+		(element TP_ShipConfigTextItem _value="modifiedAtbaRange" _unit="'km'" _userPrefsNum="_userPrefsNum"
+			(bind visible "isAtbaRangeVisible")
+		)
+	)
+)
+
+(def element TP_ShipConfigAirDefenseItem(_shipTTX:gfx, _userPrefsNum:dict=null)
+	(scope
+		(var airDefenseTTX:gfx = "_shipTTX.airDefense")
 		(var range:number = "airDefenseTTX ? airDefenseTTX.averageAura.maxDist.value : null")
 		(var integralValue:number = "airDefenseTTX ? airDefenseTTX.integralValue.value : 0")
 		(macro TP_GET_PREF_BOOL _varName="'isAntiAirRangeVisible'" _prefKey="TP_USERPREFS_KEY.ANTIAIR_RANGE")
@@ -1337,9 +1438,9 @@
 	)
 )
 
-(def element TP_ShipConfigAirSupportItem(_ttxEntity:gfx, _userPrefsNum:dict=null)
+(def element TP_ShipConfigAirSupportItem(_shipTTX:gfx, _userPrefsNum:dict=null)
 	(scope
-		(var airSupportTTX:gfx = "_ttxEntity.mods_ShipParamsInBattle.shipTTX.airSupport")
+		(var airSupportTTX:gfx = "_shipTTX.airSupport")
 		(var range:number = "airSupportTTX ? airSupportTTX.maxDist.value : null")
 		(var reload:number = "airSupportTTX ? airSupportTTX.reloadTime.value : null")
 		#(macro TP_GET_USERPREFS)
@@ -1367,9 +1468,9 @@
 	)
 )
 
-(def element TP_ShipConfigBatteryItem(_ttxEntity:gfx)
+(def element TP_ShipConfigBatteryItem(_shipTTX:gfx)
 	(scope
-		(var batteryTTX:gfx = "_ttxEntity.mods_ShipParamsInBattle.shipTTX.battery")
+		(var batteryTTX:gfx = "_shipTTX.mods_ShipParamsInBattle.shipTTX.battery")
 		(var capacity:number = "batteryTTX ? batteryTTX.capacity.value : null")
 	)
 
@@ -1387,14 +1488,14 @@
 	)
 )
 
-(def element TP_ShipConfigMobilityItem(_ttxEntity:gfx, _userPrefsNum:dict=null)
+(def element TP_ShipConfigMobilityItem(_shipTTX:gfx, _userPrefsNum:dict=null)
 	(scope
 		#surface speed
-		(var mobilityTTX:gfx = "_ttxEntity.mods_ShipParamsInBattle.shipTTX.mobility")
+		(var mobilityTTX:gfx = "_shipTTX.mobility")
 		(var surfaceSpeed:number = "mobilityTTX ? mobilityTTX.speed.value : null")
 
 		#underwater speed
-		(var underwaterMobilityTTX:gfx = "_ttxEntity.mods_ShipParamsInBattle.shipTTX.underwaterMobility")
+		(var underwaterMobilityTTX:gfx = "_shipTTX.underwaterMobility")
 		(var underwaterSpeed:number = "underwaterMobilityTTX ? underwaterMobilityTTX.speed.value : null")
 
 		#(macro TP_GET_USERPREFS)
@@ -1422,16 +1523,14 @@
 	)
 )
 
-(def element TP_ShipConfigVisibilityItem(_ttxEntity:gfx, _userPrefsNum:dict=null)
+(def element TP_ShipConfigVisibilityItem(_shipTTX:gfx, _avatarEntity:gfx, _isRealParams:bool, _userPrefsNum:dict=null)
 	(scope
 		#fix for skill---------------------
 		(var selfPlayer:gfx = "$datahub.getSingleEntity(CC.playerAvatar)")
-		(var avatarId:number = "_ttxEntity.mods_ShipParamsInBattle.avatarId")
-		(var avatarEntity:gfx = "$datahub.getPrimaryEntity(CC.avatar, avatarId)")
-		(var avatarComponent:gfx = "avatarEntity ? avatarEntity.avatar : null")
+		(var avatarComponent:gfx = "_avatarEntity.avatar")
 
 		#shipId -> ownShip (ship in port) -> crewId (crew on board) -> crewSkill (check crew has skill)
-		(var isSelf:bool = "selfPlayer.avatar.id == avatarId")
+		(var isSelf:bool = "selfPlayer.avatar.id == avatarComponent.id")
 		(var shipId:number = "avatarComponent ? avatarComponent.ship.ref.ship.id : null" (event "avatarComponent.evShipRefChanged"))
 		(var shipType:str = "avatarComponent ? avatarComponent.shipType : null" (event "avatarComponent.evShipTypeChanged"))
 		(var ownShipEntity:gfx = "$datahub.getPrimaryEntity(CC.ownShip, shipId)")
@@ -1443,14 +1542,14 @@
 		(var crewSkillEntity:gfx = "$datahub.getPrimaryCompositeEntity(CC.crewSkill, crewId, skillEntity.id)")
 		#(crewId, skill) -> rutrns crewSkill if the crew is onboard and has skill
 
-		(var isCorrectionNeeded:bool = "!(crewSkillEntity || isSelf)")
+		(var isCorrectionNeeded:bool = "!(crewSkillEntity || isSelf || _isRealParams)")
 
 		(var modifiers:dict = "skillEntity ? skillEntity.attributes.modifiers : null")
 		(var visibilityModifier:number = "isCorrectionNeeded && modifiers ? (1 + modifiers.visibilityDistCoeff * 0.01) : 1.0") #value is negative and %
 		#---------------------
 
 		#ttx
-		(var visibilityTTX:gfx = "_ttxEntity.mods_ShipParamsInBattle.shipTTX.visibility")
+		(var visibilityTTX:gfx = "_shipTTX.visibility")
 		(var visibilityByShip:number = "visibilityTTX ? visibilityTTX.visibilityByShip.normal.value : null") #CAPTAIN SKILL FIX
 		(var visibilityByPlane:number = "visibilityTTX ? visibilityTTX.visibilityByPlane.normal.value : null") #CAPTAIN SKILL FIX
 
@@ -1484,11 +1583,9 @@
 	)
 )
 
-(def element TP_ShipConfigConsumableItem(_ttxEntity:gfx, _userPrefsNum:dict=null)
+(def element TP_ShipConfigSurfaceConsumableItem(_shipTTX:gfx, _avatarEntity:gfx, _userPrefsNum:dict=null)
 	(scope
-		(var avatarId:number = "_ttxEntity.mods_ShipParamsInBattle.avatarId")
-		(var avatarEntity:gfx = "$datahub.getPrimaryEntity(CC.avatar, avatarId)")
-		(var shipId:str = "avatarEntity ? toString(avatarEntity.avatar.ship.ref.ship.id) : null" (event "avatarEntity.avatar.evShipRefChanged"))
+		(var shipId:str = "_avatarEntity ? toString(_avatarEntity.avatar.ship.ref.ship.id) : null" (event "_avatarEntity.avatar.evShipRefChanged"))
 		(var consumables:dict = "shipId in TP_CONSUMABLES_DATA ? TP_CONSUMABLES_DATA[shipId] : null")
 		(var radarRange:number = "consumables && 'rls' in consumables ? consumables['rls'] : null")
 		(var hydroRange:number = "consumables && 'sonar' in consumables ? consumables['sonar'] : null")
@@ -1516,8 +1613,38 @@
 	)
 )
 
+(def element TP_ShipConfigSubmarineConsumableItem(_shipTTX:gfx, _avatarEntity:gfx, _userPrefsNum:dict=null)
+	(scope
+		(var shipId:str = "_avatarEntity ? toString(_avatarEntity.avatar.ship.ref.ship.id) : null" (event "_avatarEntity.avatar.evShipRefChanged"))
+		(var consumables:dict = "shipId in TP_CONSUMABLES_DATA ? TP_CONSUMABLES_DATA[shipId] : null")
+		(var radarRange:number = "consumables && 'submarineLocator' in consumables ? consumables['submarineLocator'] : null")
+		(var hydroRange:number = "consumables && 'hydrophone' in consumables ? consumables['hydrophone'] : null")
+
+		(macro TP_GET_PREF_BOOL _varName="'isSubRadarRangeVisible'" _prefKey="TP_USERPREFS_KEY.SUB_RADAR_RANGE")
+		(macro TP_GET_PREF_BOOL _varName="'isSubHydroRangeVisible'" _prefKey="TP_USERPREFS_KEY.SUB_HYDRO_RANGE")
+		(var isEnabled:bool = "isSubRadarRangeVisible || isSubHydroRangeVisible")
+	)
+
+	(bind visible "isEnabled")
+	(style
+		(bind alpha "consumables ? 1.0 : 0.0")
+	)
+
+	(style
+		(align = "middle|center")
+	)
+	(block
+		(element TP_ShipConfigTextItem _value="hydroRange" _unit="'km'" _userPrefsNum="_userPrefsNum" _showNull=true
+			(bind visible "isSubHydroRangeVisible")
+		)
+		(element TP_ShipConfigTextItem _value="radarRange" _unit="'km'" _userPrefsNum="_userPrefsNum" _showNull=true
+			(bind visible "isSubRadarRangeVisible")
+		)
+	)
+)
+
 #Image Item
-(def element TP_ShipConfigImageItem (_iconPath:str, _alpha:number="1.0", _isVisible:bool=true, _userPrefsNum:dict=null)
+(def element TP_ShipConfigImageItem (_iconPath:str, _alpha:number="1.0", _isVisible:bool=true, _tooltipTitle:str='', _tooltipTexts:array=[], _userPrefsNum:dict=null)
 	(scope
 		#(var isValueVisible:bool = "_value || _showZero")
 		#(macro TP_GET_USERPREFS)
@@ -1535,6 +1662,46 @@
 			(width = 20)
 			(bind backgroundImage "_iconPath")
 			(backgroundSize = "fill")
+		)
+	)
+
+	(controller $Tooltip layout=true
+		(renderer='TP_ShipConfigTooltipHint')
+		(args
+			_tooltipTitle="_tooltipTitle"
+			_tooltipTexts="_tooltipTexts"
+		)
+		(align="top|center")
+		(position="border")
+		(offset=[0, 10])
+		(screenBoundsOffset={left:10, top:10, right:10, bottom:10})
+		(macro SIMPLE_TOOLTIP_ANIMATION)
+	)
+)
+
+(def element TP_ShipConfigTooltipHint(_tooltipTitle:str, _tooltipTexts:array=[]) layout=true
+	(style (width = "200px") (hitTest = false))
+
+	(macro TOOLTIP_SYSTEM_DEFAULT_BACKGROUND)
+
+	(element TOOLTIP_SYSTEM_DEFAULT_CONTAINER
+		(element TooltipSystemHeaderSubheaderText
+			_headerText="_tooltipTitle"
+		)
+
+		(element TooltipSystemHorizontalDivider)
+
+		(controller $Repeat #layout=true
+			(renderer='TooltipSystemStatusLine')
+			(bind count "_tooltipTexts.length")
+			(args
+				_text="_tooltipTexts[$index]"
+			)
+			(exprs
+				(style
+					(bind marginTop "$index == 0 ? 0 : 5px")
+				)
+			)
 		)
 	)
 )
@@ -1584,8 +1751,19 @@
 #--------------------------------------------------------------------------------
 (def element TP_TooltipShipConfigurationsItem(_entity:gfx, _userPrefsNum:dict=null)
 	(scope
+		(var avatarId:number = "_entity.avatar.id")
+
+		#Classic TTX
 		(var ttxCollection:gfx = "$datahub.getCollection(CC.mods_ShipParamsInBattle)")
-		(var _ttxEntity:gfx = "$datahub.getPrimaryEntity(CC.mods_ShipParamsInBattle, _entity.avatar.id)" (event "ttxCollection.evAdded"))
+		(var ttxEntity:gfx = "$datahub.getPrimaryEntity(CC.mods_ShipParamsInBattle, avatarId)" (event "ttxCollection.evAdded"))
+
+		#New TTX
+		(var shipBattleInfoCollection:gfx = "$datahub.getCollection(CC.shipBattleInfo)")
+		(var shipBattleInfoEntity:gfx = "$datahub.getPrimaryEntity(CC.shipBattleInfo, avatarId)" (event "shipBattleInfoCollection.evAdded"))
+		(var shipBattleInfo:gfx = "shipBattleInfoEntity ? shipBattleInfoEntity.shipBattleInfo : null" (event "shipBattleInfoEntity.shipBattleInfo.evChanged"))
+
+		(var isRealParams:bool = "shipBattleInfo ? shipBattleInfo.isRealParams : false")
+		(var shipTTX:gfx = "isRealParams ? shipBattleInfo.shipTTX : ttxEntity.mods_ShipParamsInBattle.shipTTX")
 	)
 
 	(style
@@ -1600,19 +1778,21 @@
 			(vgap = 10px)
 			(width = 300px)
 		)
-		(element TP_TooltipArtilleryItem "_ttxEntity")
-		(element TP_TooltipTorpedoItem "_ttxEntity")
-		(element TP_TooltipAirDefenseItem "_ttxEntity")
-		(element TP_TooltipAirSupportItem "_ttxEntity")
-		(element TP_TooltipDepthChargeItem "_ttxEntity")
-		(element TP_TooltipMobilityItem "_ttxEntity")
-		(element TP_TooltipVisibilityItem "_ttxEntity")
+		(element TP_TooltipArtilleryItem "shipTTX")
+		(element TP_TooltipAtbaItem "shipTTX" _avatarEntity="_entity" _isRealParams="isRealParams")
+		(element TP_TooltipTorpedoItem "shipTTX")
+		(element TP_TooltipAirDefenseItem "shipTTX")
+		(element TP_TooltipAirSupportItem "shipTTX")
+		(element TP_TooltipDepthChargeItem "shipTTX")
+		(element TP_TooltipMobilityItem "shipTTX")
+		(element TP_TooltipVisibilityItem "shipTTX" _avatarEntity="_entity" _isRealParams="isRealParams")
+		(element TP_TooltipConsumableItem "shipBattleInfo")
 	)
 )
 
-(def element TP_TooltipArtilleryItem(_ttxEntity:gfx, _userPrefsNum:dict=null)
+(def element TP_TooltipArtilleryItem(_shipTTX:gfx, _userPrefsNum:dict=null)
 	(scope
-		(var artilleryTTX:gfx = "_ttxEntity.mods_ShipParamsInBattle.shipTTX.artillery")
+		(var artilleryTTX:gfx = "_shipTTX.artillery")
 		(var mainGunTTX:array = "artilleryTTX ? artilleryTTX.mainGun : null")
 		(var hasMainGun:bool = "mainGunTTX.length > 0")
 		(var range:number = "artilleryTTX ? artilleryTTX.mgMaxDist.value : null")
@@ -1693,10 +1873,62 @@
 	)
 )
 
-(def element TP_TooltipTorpedoItem(_ttxEntity:gfx, _userPrefsNum:dict=null)
+(def element TP_TooltipAtbaItem(_shipTTX:gfx, _avatarEntity:gfx, _isRealParams:bool, _userPrefsNum:dict=null)
+	(scope
+		(var artilleryTTX:gfx = "_shipTTX.artillery")
+		(var hasSecondaryGun:bool = "artilleryTTX ? artilleryTTX.atba.length > 0 : false")
+		(var range:number = "artilleryTTX ? artilleryTTX.atbaMaxDist.value : null")
+
+		#fix for skill---------------------
+		(var selfPlayer:gfx = "$datahub.getSingleEntity(CC.playerAvatar)")
+		(var avatarComponent:gfx = "_avatarEntity.avatar")
+
+		#shipId -> ownShip (ship in port) -> crewId (crew on board) -> crewSkill (check crew has skill)
+		(var isSelf:bool = "selfPlayer.avatar.id == avatarComponent.id")
+		(var shipId:number = "avatarComponent ? avatarComponent.ship.ref.ship.id : null" (event "avatarComponent.evShipRefChanged"))
+		(var shipType:str = "avatarComponent ? avatarComponent.shipType : null" (event "avatarComponent.evShipTypeChanged"))
+		(var ownShipEntity:gfx = "$datahub.getPrimaryEntity(CC.ownShip, shipId)")
+
+		(var skillId:number = "shipType in TP_ATBA_SKILL_ID ? TP_ATBA_SKILL_ID[shipType] : null")
+		(var skillEntity:gfx = "$datahub.getPrimaryCompositeEntity(CC.skill, skillId, shipType, TP_ATBA_CREW_ID)")
+		
+		(var crewId:number = "ownShipEntity ? ownShipEntity.ownShip.crewId : null" (event "ownShipEntity.ownShip.evCrewChanged"))
+		(var crewSkillEntity:gfx = "$datahub.getPrimaryCompositeEntity(CC.crewSkill, crewId, skillEntity.id)")
+		#(crewId, skill) -> rutrns crewSkill if the crew is onboard and has skill
+
+		(var isCorrectionNeeded:bool = "!(crewSkillEntity || isSelf || _isRealParams)")
+
+		(var modifiers:dict = "skillEntity ? skillEntity.attributes.modifiers : null")
+		(var rangeModifier:number = "isCorrectionNeeded && modifiers ? (1 + modifiers.GSMaxDist * 0.01) : 1.0") #value is negative and %
+		#---------------------
+
+		#fix------------------
+		(var modifiedAtbaRange:number = "range * rangeModifier") #CAPTAIN SKILL FIX
+		#---------------------
+	)
+
+	(style
+		(align = "middle|center")
+	)
+	(bind visible "hasSecondaryGun")
+
+	(vtile
+		(style
+			(vgap = "TP_TOOLTIP_ELEMENTS_VGAP")
+		)
+
+		(element TP_TooltipShipConfigTitleItem _title="'IDS_SHIP_PARAM_ATBA'")
+
+		(block
+			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_MAX_DIST'" _value="modifiedAtbaRange" _unit="'km'" _userPrefsNum="_userPrefsNum")
+		)
+	)
+)
+
+(def element TP_TooltipTorpedoItem(_shipTTX:gfx, _userPrefsNum:dict=null)
 	(scope
 		#Surface Torps
-		(var torpedoesTTX:gfx = "_ttxEntity.mods_ShipParamsInBattle.shipTTX.torpedoes")
+		(var torpedoesTTX:gfx = "_shipTTX.torpedoes")
 		#normal torps
 		(var torpedoTTX:gfx = "torpedoesTTX ? torpedoesTTX.torpedo : null")
 		(var torpedoRange:number = "torpedoTTX ? torpedoTTX.maxDist.value : null")
@@ -1714,7 +1946,7 @@
 		(var torpdoReload:number = "torpedoesTTX ? torpedoesTTX.reloadTime.value : null")
 
 		#Submarine torps
-		(var torpedoGroupsTTX:gfx = "_ttxEntity.mods_ShipParamsInBattle.shipTTX.torpedoGroups")
+		(var torpedoGroupsTTX:gfx = "_shipTTX.torpedoGroups")
 		#normal torps
 		(var subTorpedoTTX:gfx = "torpedoGroupsTTX ? torpedoGroupsTTX.torpedo : null")
 		(var subTorpedoRange:number = "subTorpedoTTX ? subTorpedoTTX.maxDist.value : null")
@@ -1797,9 +2029,9 @@
 	)
 )
 
-(def element TP_TooltipAirDefenseItem(_ttxEntity:gfx, _userPrefsNum:dict=null)
+(def element TP_TooltipAirDefenseItem(_shipTTX:gfx, _userPrefsNum:dict=null)
 	(scope
-		(var airDefenseTTX:gfx = "_ttxEntity.mods_ShipParamsInBattle.shipTTX.airDefense")
+		(var airDefenseTTX:gfx = "_shipTTX.airDefense")
 
 		(var integralValue:number = "airDefenseTTX ? airDefenseTTX.integralValue.value : 0")
 		(var maxRange:number = "airDefenseTTX ? airDefenseTTX.averageAura.maxDist.value : null")
@@ -1840,10 +2072,10 @@
 	)
 )
 
-(def element TP_TooltipAirSupportItem(_ttxEntity:gfx, _userPrefsNum:dict=null)
+(def element TP_TooltipAirSupportItem(_shipTTX:gfx, _userPrefsNum:dict=null)
 	(scope
 		#AirSupport
-		(var airSupportTTX:gfx = "_ttxEntity.mods_ShipParamsInBattle.shipTTX.airSupport")
+		(var airSupportTTX:gfx = "_shipTTX.airSupport")
 		(var range:number = "airSupportTTX ? airSupportTTX.maxDist.value : null")
 		(var reload:number = "airSupportTTX ? airSupportTTX.reloadTime.value : null")
 		(var numSquadrons:number = "airSupportTTX ? airSupportTTX.numSquadrons.value : null")
@@ -1877,10 +2109,10 @@
 	)
 )
 
-(def element TP_TooltipDepthChargeItem(_ttxEntity:gfx, _userPrefsNum:dict=null)
+(def element TP_TooltipDepthChargeItem(_shipTTX:gfx, _userPrefsNum:dict=null)
 	(scope
 		#AirSupport
-		(var depthChargesTTX:gfx = "_ttxEntity.mods_ShipParamsInBattle.shipTTX.depthCharges")
+		(var depthChargesTTX:gfx = "_shipTTX.depthCharges")
 		(var numCharges:number = "depthChargesTTX ? depthChargesTTX.numCharges.value : null")
 		(var numBombs:number = "depthChargesTTX ? depthChargesTTX.numBombs.value : null")
 		(var reload:number = "depthChargesTTX ? depthChargesTTX.reloadTime.value : null")
@@ -1909,14 +2141,14 @@
 	)
 )
 
-(def element TP_TooltipMobilityItem(_ttxEntity:gfx, _userPrefsNum:dict=null)
+(def element TP_TooltipMobilityItem(_shipTTX:gfx, _userPrefsNum:dict=null)
 	(scope
 		#surface speed
-		(var mobilityTTX:gfx = "_ttxEntity.mods_ShipParamsInBattle.shipTTX.mobility")
+		(var mobilityTTX:gfx = "_shipTTX.mobility")
 		(var surfaceSpeed:number = "mobilityTTX ? mobilityTTX.speed.value : null")
 
 		#underwater speed
-		(var underwaterMobilityTTX:gfx = "_ttxEntity.mods_ShipParamsInBattle.shipTTX.underwaterMobility")
+		(var underwaterMobilityTTX:gfx = "_shipTTX.underwaterMobility")
 		(var underwaterSpeed:number = "underwaterMobilityTTX ? underwaterMobilityTTX.speed.value : null")
 	)
 
@@ -1940,16 +2172,13 @@
 	)
 )
 
-(def element TP_TooltipVisibilityItem(_ttxEntity:gfx, _userPrefsNum:dict=null)
+(def element TP_TooltipVisibilityItem(_shipTTX:gfx, _avatarEntity:gfx, _isRealParams:bool, _userPrefsNum:dict=null)
 	(scope
 		#fix for skill---------------------
-		(var selfPlayer:gfx = "$datahub.getSingleEntity(CC.playerAvatar)")
-		(var avatarId:number = "_ttxEntity.mods_ShipParamsInBattle.avatarId")
-		(var avatarEntity:gfx = "$datahub.getPrimaryEntity(CC.avatar, avatarId)")
-		(var avatarComponent:gfx = "avatarEntity ? avatarEntity.avatar : null")
+		(var avatarComponent:gfx = "_avatarEntity ? _avatarEntity.avatar : null")
 
 		#shipId -> ownShip (ship in port) -> crewId (crew on board) -> crewSkill (check crew has skill)
-		(var isSelf:bool = "selfPlayer.avatar.id == avatarId")
+		(var isSelf:bool = "selfPlayer.avatar.id == avatarComponent.id")
 		(var shipId:number = "avatarComponent ? avatarComponent.ship.ref.ship.id : null" (event "avatarComponent.evShipRefChanged"))
 		(var shipType:str = "avatarComponent ? avatarComponent.shipType : null" (event "avatarComponent.evShipTypeChanged"))
 		(var ownShipEntity:gfx = "$datahub.getPrimaryEntity(CC.ownShip, shipId)")
@@ -1961,13 +2190,13 @@
 		(var crewSkillEntity:gfx = "$datahub.getPrimaryCompositeEntity(CC.crewSkill, crewId, skillEntity.id)")
 		#(crewId, skill) -> rutrns crewSkill if the crew is onboard and has skill
 
-		(var isCorrectionNeeded:bool = "!(crewSkillEntity || isSelf)")
+		(var isCorrectionNeeded:bool = "!(crewSkillEntity || isSelf || _isRealParams)")
 
 		(var modifiers:dict = "skillEntity ? skillEntity.attributes.modifiers : null")
 		(var visibilityModifier:number = "isCorrectionNeeded && modifiers ? (1 + modifiers.visibilityDistCoeff * 0.01) : 1.0") #value is negative and %
 		#---------------------
 
-		(var visibilityTTX:gfx = "_ttxEntity.mods_ShipParamsInBattle.shipTTX.visibility")
+		(var visibilityTTX:gfx = "_shipTTX.visibility")
 		(var visibilityByShip:number = "visibilityTTX ? visibilityTTX.visibilityByShip.normal.value : null") #CAPTAIN SKILL FIX
 		(var visibilityByPlane:number = "visibilityTTX ? visibilityTTX.visibilityByPlane.normal.value : null") #CAPTAIN SKILL FIX
 
@@ -1994,6 +2223,24 @@
 			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_VISIBILITY_DIST_BY_SHIP'" _value="modifiedVisibilityByShip" _unit="'km'" _userPrefsNum="_userPrefsNum")
 			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_VISIBILITY_DIST_BY_PLANE'" _value="modifiedVisibilityByPlane" _unit="'km'" _userPrefsNum="_userPrefsNum")
 		)
+	)
+)
+
+(def element TP_TooltipConsumableItem(_shipBattleInfo:gfx, _userPrefsNum:dict=null)
+	(scope
+		(var mainConsumables:array = "_shipBattleInfo.mainConsumables")
+		(var altConsumables:array = "_shipBattleInfo.altConsumables")
+	)
+	(style
+		(width = 100%)
+	)
+	(element ShipInfoConsumables
+		_title = "altConsumables.length > 0 ? 'IDS_SHIP_INFO_MAIN_CONSUMABLES_OPTIONAL' : 'IDS_SHIP_INFO_MAIN_CONSUMABLES'"
+		_items = "mainConsumables"
+		_extraItems = "altConsumables"
+		_iconSize = "45"
+		_isSimple = true
+		(bind visible "mainConsumables.length != 0 || altConsumables.length != 0")
 	)
 )
 
@@ -2167,7 +2414,7 @@
 								on = 'rollOut'
 	)
 
-	(offset = {	x: 15, y: 15})
+	(offset = {	x: 35, y: 15})
 
 	(screenBoundsOffset = {			left:	10,
 									top:	10,
