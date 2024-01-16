@@ -634,7 +634,7 @@
 		(var altVision:bool = "camera ? camera.altVision : false" (event "camera.evAltVisionChanged"))
 	)
 	(style
-		(hitTest = false)
+		(hitTest = true)
 	)
 	(bind visible "isVisibleOnlyAlt ? altVision : true")
 
@@ -656,26 +656,31 @@
 		(element TP_PlayerKillCountItem "_entity" _userPrefsNum="_userPrefsNum")
 		#
 
+		#TODO
+		#I really should move all these strings to constant
+		#Maybe repace with repeat as well
+		#
+
 		#Visibility
-		(element TP_ShipConfigImageItem "'url:../crew_commander/skills/detection_visibility_range.png'" _isVisible="isVisibilityEnabled" _userPrefsNum="_userPrefsNum")
+		(element TP_ShipConfigImageItem "'url:../crew_commander/skills/detection_visibility_range.png'" _isVisible="isVisibilityEnabled" _tooltipTitle='IDS_SHIP_PARAM_DETECTION' _tooltipTexts=['IDS_SHIP_PARAM_VISIBILITY_DIST_BY_SHIP','IDS_SHIP_PARAM_VISIBILITY_DIST_BY_PLANE'] _userPrefsNum="_userPrefsNum")
 		#Speed
-		(element TP_ShipConfigImageItem "'url:../modules/icon_module_Engine_researched.png'" _isVisible="isMobilityEnabled" _userPrefsNum="_userPrefsNum")
+		(element TP_ShipConfigImageItem "'url:../modules/icon_module_Engine_researched.png'" _isVisible="isMobilityEnabled" _tooltipTitle='IDS_SHIP_PARAM_MAXSPEED' _tooltipTexts=['IDS_SHIP_PARAM_MOBILITY','IDS_SHIP_PARAM_UNDERWATER_MOBILITY'] _userPrefsNum="_userPrefsNum")
 		#AirStrike
-		(element TP_ShipConfigImageItem "'url:../battle_hud/icon_frag/icon_frag_bomb.png'" _isVisible="isAirSupportEnabled" _alpha="0.7" _userPrefsNum="_userPrefsNum")
+		(element TP_ShipConfigImageItem "'url:../battle_hud/icon_frag/icon_frag_bomb.png'" _isVisible="isAirSupportEnabled" _alpha="0.7" _tooltipTitle='IDS_SHIP_PARAM_AIR_SUPPORT' _tooltipTexts=['IDS_SHIP_PARAM_MAX_DIST','IDS_SHIP_PARAM_SHOT_DELAY'] _userPrefsNum="_userPrefsNum")
 		#AA
-		(element TP_ShipConfigImageItem "'url:../battle_hud/lower_log_modifiers/AAAuraDamage.png'" _isVisible="isAntiAirEnabled" _alpha="0.7" _userPrefsNum="_userPrefsNum")
+		(element TP_ShipConfigImageItem "'url:../battle_hud/lower_log_modifiers/AAAuraDamage.png'" _isVisible="isAntiAirEnabled" _alpha="0.7" _tooltipTitle='IDS_SHIP_PARAM_AIR_DEFENSE' _tooltipTexts=['IDS_SHIP_PARAM_MAX_DIST','IDS_SHIP_PARAM_AIR_DEFENSE'] _userPrefsNum="_userPrefsNum")
 		#ATBA
-		(element TP_ShipConfigImageItem "'url:../battle_hud/icon_frag/icon_frag_atba.png'" _isVisible="isAtbaEnabled" _userPrefsNum="_userPrefsNum")
+		(element TP_ShipConfigImageItem "'url:../battle_hud/icon_frag/icon_frag_atba.png'" _isVisible="isAtbaEnabled" _tooltipTitle='IDS_SHIP_PARAM_ATBA' _tooltipTexts=['IDS_SHIP_PARAM_MAX_DIST'] _userPrefsNum="_userPrefsNum")
 		#Artillery
-		(element TP_ShipConfigImageItem "'url:../modules/icon_module_Artillery_researched.png'" _isVisible="isArtilleryEnabled" _userPrefsNum="_userPrefsNum")
+		(element TP_ShipConfigImageItem "'url:../modules/icon_module_Artillery_researched.png'" _isVisible="isArtilleryEnabled" _tooltipTitle='IDS_SHIP_PARAM_MAIN_GUN' _tooltipTexts=['IDS_SHIP_PARAM_MAX_DIST','IDS_SHIP_PARAM_SHOT_DELAY'] _userPrefsNum="_userPrefsNum")
 		#Torpedo
-		(element TP_ShipConfigImageItem "'url:../modules/icon_module_Torpedoes_researched.png'" _isVisible="isTorpedoEnabled" _alpha="0.8" _userPrefsNum="_userPrefsNum")
+		(element TP_ShipConfigImageItem "'url:../modules/icon_module_Torpedoes_researched.png'" _isVisible="isTorpedoEnabled" _alpha="0.8" _tooltipTitle='IDS_SHIP_PARAM_TORPEDOES' _tooltipTexts=['IDS_SHIP_PARAM_MAX_DIST'] _userPrefsNum="_userPrefsNum")
 		
 		#(element TP_ShipConfigImageItem "'url:../battle_hud/crosshair/indicators/crosshair_indicator_energy_white.png'") #TODO FIX
 		#Hydro/Radar
-		(element TP_ShipConfigImageItem "'url:../battle_hud/icon_frag/icon_frag_wave.png'" _isVisible="isSurfaceConsumableEnabled" _alpha="0.7" _userPrefsNum="_userPrefsNum")
+		(element TP_ShipConfigImageItem "'url:../battle_hud/icon_frag/icon_frag_wave.png'" _isVisible="isSurfaceConsumableEnabled" _alpha="0.7" _tooltipTitle='IDS_TITLE_CONSUMABLES' _tooltipTexts=['IDS_DOCK_CONSUME_TITLE_PCY008_SONARSEARCH','IDS_DOCK_CONSUME_TITLE_PCY019_RLSSEARCH'] _userPrefsNum="_userPrefsNum")
 		#Hydrophone/SubRadar
-		(element TP_ShipConfigImageItem "'url:../battle_hud/icon_frag/icon_frag_wave.png'" _isVisible="isSubmarineConsumableEnabled" _alpha="0.7" _userPrefsNum="_userPrefsNum")
+		(element TP_ShipConfigImageItem "'url:../battle_hud/icon_frag/icon_frag_wave.png'" _isVisible="isSubmarineConsumableEnabled" _alpha="0.7" _tooltipTitle='IDS_TITLE_CONSUMABLES' _tooltipTexts=['IDS_DOCK_CONSUME_TITLE_PCY045_HYDROPHONE','IDS_DOCK_CONSUME_TITLE_PCY048_SUBMARINELOCATOR'] _userPrefsNum="_userPrefsNum")
 	)
 )
 
@@ -1639,7 +1644,7 @@
 )
 
 #Image Item
-(def element TP_ShipConfigImageItem (_iconPath:str, _alpha:number="1.0", _isVisible:bool=true, _userPrefsNum:dict=null)
+(def element TP_ShipConfigImageItem (_iconPath:str, _alpha:number="1.0", _isVisible:bool=true, _tooltipTitle:str='', _tooltipTexts:array=[], _userPrefsNum:dict=null)
 	(scope
 		#(var isValueVisible:bool = "_value || _showZero")
 		#(macro TP_GET_USERPREFS)
@@ -1657,6 +1662,46 @@
 			(width = 20)
 			(bind backgroundImage "_iconPath")
 			(backgroundSize = "fill")
+		)
+	)
+
+	(controller $Tooltip layout=true
+		(renderer='TP_ShipConfigTooltipHint')
+		(args
+			_tooltipTitle="_tooltipTitle"
+			_tooltipTexts="_tooltipTexts"
+		)
+		(align="top|center")
+		(position="border")
+		(offset=[0, 10])
+		(screenBoundsOffset={left:10, top:10, right:10, bottom:10})
+		(macro SIMPLE_TOOLTIP_ANIMATION)
+	)
+)
+
+(def element TP_ShipConfigTooltipHint(_tooltipTitle:str, _tooltipTexts:array=[]) layout=true
+	(style (width = "200px") (hitTest = false))
+
+	(macro TOOLTIP_SYSTEM_DEFAULT_BACKGROUND)
+
+	(element TOOLTIP_SYSTEM_DEFAULT_CONTAINER
+		(element TooltipSystemHeaderSubheaderText
+			_headerText="_tooltipTitle"
+		)
+
+		(element TooltipSystemHorizontalDivider)
+
+		(controller $Repeat #layout=true
+			(renderer='TooltipSystemStatusLine')
+			(bind count "_tooltipTexts.length")
+			(args
+				_text="_tooltipTexts[$index]"
+			)
+			(exprs
+				(style
+					(bind marginTop "$index == 0 ? 0 : 5px")
+				)
+			)
 		)
 	)
 )
