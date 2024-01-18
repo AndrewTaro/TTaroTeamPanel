@@ -519,7 +519,7 @@
 
 	(block
 		(style
-			(position = absolute)
+			(position = "absolute")
 			(bind top "posTop")
 			(width = 100%)
 		)
@@ -540,7 +540,7 @@
 	)
 
 	(style
-		(position = absolute)
+		(position = "absolute")
 		(left = 0)
 	)
 	(macro BIND_FAIR_SCALE "sizeScale")
@@ -570,7 +570,7 @@
 	)
 
 	(style
-		(position = absolute)
+		(position = "absolute")
 		(right = 0)
 		(align="right")
 		(pivotX = 100%)
@@ -716,10 +716,10 @@
 	(style
 		(backgroundColor = 0x00FFFFFF) #For seamless hittest. Do not use 0x01000000 because it will have a visible dark color!
 
-		#(position = absolute) is required to separate the argument entity and the position of this element within parent layout.
+		#(position = "absolute") is required to separate the argument entity and the position of this element within parent layout.
 		#With auto positioning, the layout of elements remains the same - but the argument entities change.
 		#In that case, the spotted indicator or any element that uses (watch=false) variable within their scope can break.
-		(position = absolute)
+		(position = "absolute")
 		(bind left "_isAlly ? 0 : auto")
 		(bind right "_isAlly ? auto : 0")
 		(bind top "_index == 0 ? 0 : (_index * (TP_PLAYER_ROW_SIZE.HEIGHT + 2)) + 2")
@@ -1116,7 +1116,7 @@
 	)
 
 	(style
-		(position = absolute)
+		(position = "absolute")
 		(bind scaleX "_isAlly ? 1.0 : -1.0")
 		(bind left "_isAlly ? 0 : auto")
 		(bind right "_isAlly ? auto : 0")
