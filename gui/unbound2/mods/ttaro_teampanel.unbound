@@ -48,6 +48,7 @@
 	KILL_COUNT: 'ttTeamPanelPlayerKillsVisible',
 	SHIP_NAME: 'ttTeamPanelShipNameVisible',
 	SHIP_TIER: 'ttTeamPanelShipTierVisible',
+	SHIP_NATION: 'ttTeamPanelShipNationVisible',
 	SHIP_ICON: 'ttTeamPanelShipIconVisible',
 	SHIP_ICON_COLOR: 'ttTeamPanelShipIconColorPreset',
 	SHIP_DETECTION: 'ttTeamPanelShipDetectionVisible',
@@ -867,6 +868,8 @@
 
 		(macro TP_GET_PREF_BOOL _varName="'isPlayerNameVisible'" _prefKey="TP_USERPREFS_KEY.PLAYER_NAME")
 		(var pureName:str = "isPlayerNameVisible ? _entity.avatar.pureName : ' '" (event "_entity.avatar.pureName"))
+
+		(macro TP_GET_MARKER_DATA "_entity")
 	)
 	
 	(style
@@ -878,6 +881,7 @@
 
 	(tf
 		(class $TextDefault13NM)
+		(bind class "isGolden ? '$FontColorGolden' : '$None'")
 		(style
 			(width = "100%")
 			(elideMode = true)
@@ -909,11 +913,10 @@
 #Ship Info
 (def element TP_ShipIconItem(_entity:gfx, _isAlly:bool=false, _userPrefsNum:dict=null)
 	(scope
-		(macro SHIP_MARKER_ICON_DATA "_entity.id")
+		(macro TP_GET_MARKER_DATA "_entity")
 		(var markerColorName:str = 
 			"	!isAlive			? 'sunk' :
-				isInSameDivision	? 'division' :
-				isSelf				? 'division' :
+				isGolden			? 'division' :
 				tkStatus			? 'teamkiller' :
 				'white'
 			"
@@ -924,7 +927,7 @@
 		#(macro TP_GET_USERPREFS)
 		(macro TP_GET_PREF_BOOL _varName="'isShipIconVisible'" _prefKey="TP_USERPREFS_KEY.SHIP_ICON")
 		(macro TP_GET_PREF_NUMBER _varName="'shipIconColorIndex'" _prefKey="TP_USERPREFS_KEY.SHIP_ICON_COLOR" _modifier="1" _default="0")
-		(var isColorAvailable:bool = "!(isSelf || isInSameDivision || tkStatus)")
+		(var isColorAvailable:bool = "!(isGolden || tkStatus)")
 		(var colorPreset:dict = "(TP_SHIP_ICON_COLOR_PRESET.length > shipIconColorIndex) ? TP_SHIP_ICON_COLOR_PRESET[shipIconColorIndex] : null")
 		(var colorDict:dict = "(isColorAvailable && colorPreset) ? colorPreset[subType] : {}")
 	)
@@ -2438,4 +2441,19 @@
 						(bind trigger "_blurIntensity")
 		)
 	)
+)
+
+(def macro TP_GET_MARKER_DATA (_entity:expression)
+	(var avatarComponent:gfx = "_entity ? _entity.avatar : null")
+	(var divisionMemberComponent:gfx = "_entity ? _entity.divisionMember : null")
+	(var subType:str = "avatarComponent.shipType" (event "avatarComponent.evShipTypeChanged"))
+	(var shipType:str = "toLower(subType)")
+	(var relationComponent:gfx = "_entity ? _entity.relation : null")
+	(var isSelf:bool = "relationComponent && relationComponent.value == SC.Battle.PLAYER_RELATION.SELF" (event "relationComponent.evChanged"))
+	(var isAlly:bool = "relationComponent && relationComponent.value == SC.Battle.PLAYER_RELATION.ALLY" (event "relationComponent.evChanged"))
+	(var isEnemy:bool = "relationComponent && relationComponent.value == SC.Battle.PLAYER_RELATION.ENEMY" (event "relationComponent.evChanged"))
+	(var isAlive:bool = "_entity && _entity.hasComponent(CC.health) && _entity.health.isAlive" (event "_entity.health.evIsAliveChanged") (event "_entity.evAdded"))
+	(var tkStatus:bool = "avatarComponent && avatarComponent.tkStatus" (event "avatarComponent.evTeamkillStatusChanged"))
+	(var isInSameDivision:bool = "divisionMemberComponent && divisionMemberComponent.isInSameDivision" (event "divisionMemberComponent.evDivisionChanged"))
+	(var isGolden:bool = "isInSameDivision || isSelf")
 )
