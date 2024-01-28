@@ -913,9 +913,11 @@
 		(var markerColorName:str = 
 			"	!isAlive			? 'sunk' :
 				isInSameDivision	? 'division' :
+				isSelf				? 'division' :
 				tkStatus			? 'teamkiller' :
 				'white'
-		")
+			"
+		)
 
 		(var iconName:str = "'icon_' + markerColorName + '_' + shipType")
 
