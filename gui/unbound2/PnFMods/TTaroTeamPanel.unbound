@@ -658,7 +658,7 @@
 		(var flagName:str = "shipEntity ? shipEntity.flagName : ''") #IDS_PASB518
 		(macro TP_GET_ISAFK)
 		#(macro TP_GET_USERPREFS)
-		(macro TP_GET_PREF_BOOL _varName="'isShipNationVisible'" _prefKey="TP_USERPREFS_KEY.SHIP_NATION")
+		(macro TP_GET_PREF_BOOL _varName="'isShipNationVisible'" _prefKey="TP_USERPREFS_KEY.SHIP_NATION" _default="false")
 	)
 
 	(style
