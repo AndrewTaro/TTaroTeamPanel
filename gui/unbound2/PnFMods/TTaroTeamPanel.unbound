@@ -626,7 +626,7 @@
 (def element TP_ShipNameItem(_entity:gfx, _isAlly:bool=false, _userPrefsNum:dict=null)
 	(scope
 		(var shipEntity:gfx = "_entity.avatar.ship.ref.ship" (event "_entity.avatar.evShipRefChanged"))
-		(var shipName:str = "shipEntity ? shipEntity.nameIDS : ''") #IDS_PASB518
+		(var shipName:str = "shipEntity ? tr(shipEntity.nameIDS) : ''") #IDS_PASB518
 		(macro TP_GET_ISAFK)
 		#(macro TP_GET_USERPREFS)
 		(macro TP_GET_PREF_BOOL _varName="'isShipNameVisible'" _prefKey="TP_USERPREFS_KEY.SHIP_NAME")
