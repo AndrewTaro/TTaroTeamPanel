@@ -371,7 +371,12 @@
 		(var mouse:gfx = "$datahub.getSingleComponent(CC.mouse)")
 		(var isMouseActive:bool = "mouse.active" (event "mouse.evActiveChanged"))
 
-		(macro TP_GET_PREF_BOOL _varName="'isDeadPlayersVisible'" _prefKey="TP_USERPREFS_KEY.DEAD_PLAYER_VISIBLE")
+		(macro TP_GET_PREF_BOOL _varName="'isDeadPlayerVisible'" _prefKey="TP_USERPREFS_KEY.DEAD_PLAYER_VISIBLE")
+		(var battleDataEntity:gfx = "$datahub.getSingleEntity(CC.battleData)")
+		(var gameModeId:number = "battleDataEntity.battleInfo.gameModeId")
+		(var isScenarioMode:bool = "SC.Battle.GAME_MODE.PVE == gameModeId")
+		(var isScenarioBot:bool = "isBot && isScenarioMode")
+		(var isVisible:bool = "(isDeadPlayerVisible && !(isBot && isScenarioMode)) ? true : isAlive")
 
 		(macro TP_GET_PREF_NUMBER "'blurAlpha'" "TP_USERPREFS_KEY.BLUR_ALPHA" _modifier="0.1" _default="0.0")
 		(macro TP_GET_PREF_BOOL _varName="'isBlurMode'" _prefKey="TP_USERPREFS_KEY.BLUR_MODE")
@@ -395,7 +400,7 @@
 		(bind top "_index == 0 ? 0 : (_index * (TP_PLAYER_ROW_SIZE.HEIGHT + 2)) + 2")
 	)
 
-	(bind visible "isDeadPlayersVisible ? true : isAlive")
+	(bind visible "isVisible")
 
 	(element TP_ContrastPanel _isBlur="isBlurMode" _intensity="blurAlpha"
 		(bind visible "isBlurVisible")
