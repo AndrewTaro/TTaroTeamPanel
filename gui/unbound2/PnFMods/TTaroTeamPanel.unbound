@@ -739,10 +739,17 @@
 		(macro GET_MARKER_ENTITY_COMPONENT 'vehicle')
 		(var visibilityFlag:bool = "vehicleComponent ? vehicleComponent.visibilityFlags : false" (event "vehicleComponent.evVisibilityFlagsChanged"))
 
+		#fix for hydrophone detection with no visual contact
+		(var hasMapPosition:bool = "_markerEntity.hasComponent(CC.mapPosition)" watch=false)
+		(bind hasMapPosition "!hasMapPosition && $event.classID == CC.mapPosition ? true : false" watch=false init=false (event "_markerEntity.evAdded"))
+		(event evMapPositionAdded)
+		(dispatch evMapPositionAdded watch=false init=false (bind enabled "!hasMapPosition") (bind trigger "hasMapPosition"))
+
 		(var isMapVisibleEnabled:bool = "!(isAlly || isObserver)")
 		(var isDetected:bool = "visibilityFlag || (isMapVisibleEnabled && mapVisible)")
 		(var wasDetected:bool = "false" watch=false)
 		(bind wasDetected "true" watch=false init=false (bind enabled "!(wasDetected) && isDetected") (event "vehicleComponent.evVisibilityFlagsChanged"))
+		(bind wasDetected "true" watch=false init=false (event "evMapPositionAdded"))
 		(macro GET_MARKER_ENTITY_COMPONENT 'health')
 		(var isAlive:bool = "healthComponent ? healthComponent.isAlive : false" (event "healthComponent.evIsAliveChanged"))
 		(macro TP_GET_PREF_BOOL _varName="'isShipDetectionVisible'" _prefKey="TP_USERPREFS_KEY.SHIP_DETECTION")
