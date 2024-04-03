@@ -743,7 +743,7 @@
 		(var hasMapPosition:bool = "_markerEntity.hasComponent(CC.mapPosition)" watch=false)
 		(bind hasMapPosition "!hasMapPosition && $event.classID == CC.mapPosition ? true : false" watch=false init=false (event "_markerEntity.evAdded"))
 		(event evMapPositionAdded)
-		(dispatch evMapPositionAdded watch=false init=false (bind enabled "!hasMapPosition") (bind trigger "hasMapPosition"))
+		(dispatch evMapPositionAdded watch=false init=false (bind enabled "!hasMapPosition && isMapVisibleEnabled") (bind trigger "hasMapPosition"))
 
 		(var isMapVisibleEnabled:bool = "!(isAlly || isObserver)")
 		(var isDetected:bool = "visibilityFlag || (isMapVisibleEnabled && mapVisible)")
