@@ -495,7 +495,7 @@
 		(var isInSameDivision:bool = "divisionMemberComponent ? divisionMemberComponent.isInSameDivision : false" (event "divisionMemberComponent.evDivisionChanged"))
 		(var division:number = "divisionMemberComponent ? divisionMemberComponent.division : 0" (event "divisionMemberComponent.evDivisionChanged"))
 		(var isInDivision:bool = "division > 0")
-		(var isDivisionHidden:bool = "divisionMemberComponent ? divisionMemberComponent.divisionHidden" (event "divisionMemberComponent.evDivisionHiddenChanged"))
+		(var isDivisionHidden:bool = "divisionMemberComponent ? divisionMemberComponent.divisionHidden : false" (event "divisionMemberComponent.evDivisionHiddenChanged"))
 		(var divisionIconIndex:number = "isInSameDivision ? (divisionSign + 1) : (divisionSign + 1 + 10)")
 	)
 	(style
@@ -531,7 +531,7 @@
 	)
 )
 
-(def element TP_PlayerNameWithTagItem (_entity:gfx, _isAlly:bool=false _userPrefsNum:dict=null)
+(def element TP_PlayerNameWithTagItem (_entity:gfx, _isAlly:bool=false, _userPrefsNum:dict=null)
 	(scope
 		(macro TP_GET_PREF_BOOL _varName="'isClanNameVisible'" _prefKey="TP_USERPREFS_KEY.CLAN_NAME")
 		(var isInClan:bool = "_entity.hasComponent(CC.clanman)")
