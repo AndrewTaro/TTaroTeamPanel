@@ -726,6 +726,8 @@
 
 (def element TP_ShipDetectionItem(_entity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
 	(scope
+		# I should really rewrite this section because it's so dented
+
 		(var _markerEntity:gfx = "_entity")
 
 		#map visible		
@@ -751,8 +753,11 @@
 
 		(var isDetected:bool = "visibilityFlag || (isMapVisibleEnabled && mapVisible)")
 		(var wasDetected:bool = "false" watch=false)
-		(bind wasDetected "true" watch=false init=false (bind enabled "!(wasDetected) && isDetected") (event "vehicleComponent.evVisibilityFlagsChanged"))
-		(bind wasDetected "true" watch=false init=false (event "evMapPositionAdded"))
+
+		(event evVisibilityChanged)
+		(dispatch evVisibilityChanged args="{}" watch=false init=false (bind enabled "!(wasDetected) && isDetected") (bind trigger "isDetected"))
+		(bind wasDetected "true" watch=false init=false (event "evMapPositionAdded")(event "evVisibilityChanged"))
+
 		(macro GET_MARKER_ENTITY_COMPONENT 'health')
 		(var isAlive:bool = "healthComponent ? healthComponent.isAlive : false" (event "healthComponent.evIsAliveChanged"))
 		(macro TP_GET_PREF_BOOL _varName="'isShipDetectionVisible'" _prefKey="TP_USERPREFS_KEY.SHIP_DETECTION")
