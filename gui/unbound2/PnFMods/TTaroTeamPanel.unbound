@@ -15,22 +15,30 @@
 #For Masters Tournament and the ship-weight rules:
 #
 #	1. Edit the following constant, or Comment out this and make the same one in another file.
-#		a. File name is your choice. The only requirement is to place that file somewhere in res_mods/gui/unbound2.
-#	2. Create entries like the examples, and replace them. {shipId[str] : shipWeight[number], ...}
-#		a. Set `ENABLE_SHIPWEIHT` to `true`
-#		b. Ship ID can be retrieved from gameparams.
-#   	c. Single-quotation must be used for the keys, not the double.
-#		d. Do not forget the comma at the end of each line.
-#		e. Indent does not matter. But I recommend you putting 4 spaces or 1 tab for the sake of readablity.
-#	3. Done. You don't have to edit anything further and should be able to see the values in the game.
+#		- File name is your choice. The only requirement is to place that file somewhere in res_mods/gui/unbound2.
+#	2. Create entries like the examples, and replace them.
+#		- {SHIP_ID:str : { WEIGHT:number, FLAGSHIP:bool }, ...}
+#		- `FLAGSHIP` field is optional. It will be false by default unless specified.
+#		- If `WEIGHT` field or the entire ship weight data is missing, the weight for that ship becomes 0.
+#		- Set `ENABLE_SHIPWEIHT` to `true`
+#		- Ship ID can be retrieved from gameparams.
+#   	- Single-quotation must be used for the keys, not the double.
+#		- Do not forget the comma at the end of each line.
+#		- Indent does not matter. But I recommend you putting 4 spaces or 1 tab for the sake of readablity.
+#	4. Done. You don't have to edit anything further and should be able to see the values in the game.
 #--------------------------------------------------------------------------------
 (def constant TP_SHIPWEIGHT_DATA {
 	ENABLE_SHIPWEIHT: false,
-	'4179572720': 300,
-	'3760075984': 12,
-	'4178458320': 60,
-	'4074158064': 50,
-	'4074682192': 160,
+	'4179572720': {WEIGHT: 300,	FLAGSHIP: true},
+	'3760075984': {WEIGHT: 12,	FLAGSHIP: false},
+	'4178458320': {WEIGHT: 100},
+	'4074158064': {WEIGHT: 30},
+	'4074682192': {WEIGHT: 160,	FLAGSHIP: true},
+	'4277090288': {WEIGHT: 160,	FLAGSHIP: true},
+})
+(def constant TP_FLAGSHIP_COLOR_TRANSFORM {
+	'ally'	: {redOffset: -256,	greenOffset: -127,	blueOffset: -0},	# blue-ish
+	'enemy'	:{redOffset: -51,	greenOffset: -51,	blueOffset: -256},	# yellow-ish
 })
 #--------------------------------------------------------------------------------
 
@@ -573,7 +581,9 @@
 
 	(tf
 		(class $TextDefault13NM)
+		(class $FontEnableReadability)
 		(bind class "isGolden ? '$FontColorGolden' : '$None'")
+		(alpha = 0.95)
 		(style
 			(width = "100%")
 			(elideMode = true)
@@ -596,6 +606,7 @@
 	(bind visible "isPlayerKillCountVisible")
 	(tf
 		(class $TextDefaultBoldNM)
+		(class $FontEnableReadability)
 		(bind text "killCount ? killCount : ''")
 	)
 )
@@ -661,7 +672,6 @@
 		(class $TextDefaultBoldNM)
 		(bind class "isAFK ? '$FontColorUnready' : tkStatus ? '$FontColorTeamkiller' : '$None'")
 		(style
-			#(marginTop = "2")
 			(width = 100%)
 			(elideMode = true)
 			(bind textAlign "_isAlly ? left : right")
@@ -695,8 +705,16 @@
 	(scope
 		(var shipEntity:gfx = "_entity ? _entity.avatar.ship.ref.ship : null" (event "_entity.avatar.evShipRefChanged"))
 		(var shipId:str = "shipEntity ? toString(shipEntity.id) : ''") #uint long
+
+		# Enabled
 		(var isShipWeightEnabled:bool = "TP_SHIPWEIGHT_DATA.ENABLE_SHIPWEIHT")
-		(var shipWeight:str = "shipId ? (TP_SHIPWEIGHT_DATA && shipId in TP_SHIPWEIGHT_DATA) ? TP_SHIPWEIGHT_DATA[shipId] : '0' : ''") #uint long
+
+		# Data
+		(var shipWeightData:dict = "shipId in TP_SHIPWEIGHT_DATA ? TP_SHIPWEIGHT_DATA[shipId] : {}")
+
+		# Weight
+		(var weight:number = "'WEIGHT' in shipWeightData ? shipWeightData.WEIGHT : 0")
+		(var weightText:str = "_entity ? weight : ''")
 	)
 	(style
 		(width = 20px)
@@ -705,7 +723,8 @@
 	(bind visible "isShipWeightEnabled")
 	(tf
 		(class $TextDefaultBoldNM)
-		(bind text "shipWeight")
+		(class $FontEnableReadability)
+		(bind text "weightText")
 	)
 )
 #
@@ -723,6 +742,7 @@
 	(bind visible "isShipTierVisible")
 	(tf
 		(class $TextDefaultBoldNM)
+		(class $FontEnableReadability)
 		(style
 			#(fontSize = 17)
 		)
@@ -810,7 +830,8 @@
 		(var regenRatio:number = "healthMax ? regenMaxValue / healthMax : 0")
 
 		#relation
-		(var teamId:number = "_markerEntity.avatar ? _markerEntity.avatar.teamId : 0" (event "_markerEntity.avatar.evTeamIdChanged"))
+		(macro GET_MARKER_ENTITY_COMPONENT 'avatar')
+		(var teamId:number = "avatarComponent ? avatarComponent.teamId : 0" (event "avatarComponent.evTeamIdChanged"))
 		(macro GET_MARKER_ENTITY_COMPONENT 'relation')
 		(var relationValue:number = "relationComponent ? relationComponent.value : 0" (event "relationComponent.evChanged"))
 		(var relationStr:str = "toLower(SC.Battle.PLAYER_RELATION.VALUE_TO_NAME[relationValue])")
@@ -821,11 +842,20 @@
 		(var diplomacyRelationValue:number = "diplomacyRelationComponent ? diplomacyRelationComponent.value : 0" (event "diplomacyRelationComponent.evChanged"))
 		(var relationStrByDiplomacy:str = "DIPLOMACY_RELATION_TO_RELATION_STR[diplomacyRelationValue]")
 
+		#flagship for tournament
+		(var shipEntity:gfx = "avatarComponent ? avatarComponent.ship.ref.ship : null" (event "avatarComponent.evShipRefChanged"))
+		(var shipId:str = "shipEntity ? toString(shipEntity.id) : ''")
+		(var isShipWeightEnabled:bool = "TP_SHIPWEIGHT_DATA.ENABLE_SHIPWEIHT")
+		(var shipWeightData:dict = "shipId in TP_SHIPWEIGHT_DATA ? TP_SHIPWEIGHT_DATA[shipId] : {}")
+		(var isFlagShip:bool = "isShipWeightEnabled && 'FLAGSHIP' in shipWeightData ? shipWeightData.FLAGSHIP : false")
+		(var flagShipColorKey:str = "isAlly ? 'ally' : 'enemy'")
+
 		#bar color
 		(macro TP_GET_PREF_NUMBER "'alphaScale'" "TP_USERPREFS_KEY.HEALTHBAR_OPACITY" _modifier="0.1" _default="0.4")
 		(var regenBarColorTransform:dict = "{redMultiplier:0,greenMultiplier:0,blueMultiplier:0,alphaMultiplier:1.0,redOffset:230,greenOffset:230,blueOffset:230,alphaOffset:0 }")
 		(var markerColorTransform:dict = 
-			"	diplomacyRelationComponent	? TWO_TEAMS_COLOR_TRANSFORMS[relationStrByDiplomacy] :
+			"	isFlagShip					? TP_FLAGSHIP_COLOR_TRANSFORM[flagShipColorKey] :
+				diplomacyRelationComponent	? TWO_TEAMS_COLOR_TRANSFORMS[relationStrByDiplomacy] :
 				isAlly						? TWO_TEAMS_COLOR_TRANSFORMS['ally'] :
 				isMultyTeamEnabled			? MULTI_TEAMS_COLOR_TRANSFORMS[teamId]
 											: TWO_TEAMS_COLOR_TRANSFORMS[relationStr]"
@@ -851,14 +881,11 @@
 	)
 
 	(block
-		(class $WorldMarkerItemMargins)
 		(style
 			(width = "100%")
 			(height = "100%")
 			(align = "center|middle")
 		)
-
-		#(element InfotipSystemBlur)
 		
 		(block
 			(class $FullsizeAbsolute)
