@@ -27,15 +27,14 @@
 #		- Indent does not matter. But I recommend you putting 4 spaces or 1 tab for the sake of readablity.
 #	4. Done. You don't have to edit anything further and should be able to see the values in the game.
 #--------------------------------------------------------------------------------
-(def constant TP_SHIPWEIGHT_DATA {
-	ENABLE_SHIPWEIHT: false,
-	'4179572720': {WEIGHT: 300,	FLAGSHIP: true},
-	'3760075984': {WEIGHT: 12,	FLAGSHIP: false},
-	'4178458320': {WEIGHT: 100},
-	'4074158064': {WEIGHT: 30},
-	'4074682192': {WEIGHT: 160,	FLAGSHIP: true},
-	'4277090288': {WEIGHT: 160,	FLAGSHIP: true},
-})
+# (def constant MOD_TOURNAMENT_SHIPWEIGHT_DATA {
+# 	'4179572720': {WEIGHT: 300,	FLAGSHIP: true},
+# 	'3760075984': {WEIGHT: 12,	FLAGSHIP: false},
+# 	'4178458320': {WEIGHT: 100},
+# 	'4074158064': {WEIGHT: 30},
+# 	'4074682192': {WEIGHT: 160,	FLAGSHIP: true},
+# 	'4277090288': {WEIGHT: 160,	FLAGSHIP: true},
+# })
 (def constant TP_FLAGSHIP_COLOR_TRANSFORM {
 	'ally'	: {redOffset: -256,	greenOffset: -127,	blueOffset: -0},	# blue-ish
 	'enemy'	:{redOffset: -51,	greenOffset: -51,	blueOffset: -256},	# yellow-ish
@@ -707,10 +706,9 @@
 		(var shipId:str = "shipEntity ? toString(shipEntity.id) : ''") #uint long
 
 		# Enabled
-		(var isShipWeightEnabled:bool = "TP_SHIPWEIGHT_DATA.ENABLE_SHIPWEIHT")
-
-		# Data
-		(var shipWeightData:dict = "shipId in TP_SHIPWEIGHT_DATA ? TP_SHIPWEIGHT_DATA[shipId] : {}")
+		(var shipWeights:dict = "MOD_TOURNAMENT_SHIPWEIGHT_DATA")
+		(var isShipWeightEnabled:bool = "shipWeights")
+		(var shipWeightData:dict = "isShipWeightEnabled && shipId in shipWeights ? shipWeights[shipId] : {}")
 
 		# Weight
 		(var weight:number = "'WEIGHT' in shipWeightData ? shipWeightData.WEIGHT : 0")
@@ -845,9 +843,12 @@
 		#flagship for tournament
 		(var shipEntity:gfx = "avatarComponent ? avatarComponent.ship.ref.ship : null" (event "avatarComponent.evShipRefChanged"))
 		(var shipId:str = "shipEntity ? toString(shipEntity.id) : ''")
-		(var isShipWeightEnabled:bool = "TP_SHIPWEIGHT_DATA.ENABLE_SHIPWEIHT")
-		(var shipWeightData:dict = "shipId in TP_SHIPWEIGHT_DATA ? TP_SHIPWEIGHT_DATA[shipId] : {}")
-		(var isFlagShip:bool = "isShipWeightEnabled && 'FLAGSHIP' in shipWeightData ? shipWeightData.FLAGSHIP : false")
+
+		(var shipWeights:dict = "MOD_TOURNAMENT_SHIPWEIGHT_DATA")
+		(var isShipWeightEnabled:bool = "shipWeights")
+		(var shipWeightData:dict = "isShipWeightEnabled && shipId in shipWeights ? shipWeights[shipId] : {}")
+
+		(var isFlagShip:bool = "'FLAGSHIP' in shipWeightData ? shipWeightData.FLAGSHIP : false")
 		(var flagShipColorKey:str = "isAlly ? 'ally' : 'enemy'")
 
 		#bar color
