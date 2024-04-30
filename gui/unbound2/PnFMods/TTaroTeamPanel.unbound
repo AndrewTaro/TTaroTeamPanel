@@ -1,5 +1,5 @@
 (def constant TT_TEAMPANEL_INSTALLED "true")
-(def constant TP_ELEMENT_TOP "160")
+
 (def constant TP_PLAYER_ROW_SIZE {
 	WIDTH: 200,
 	HEIGHT: 27
@@ -11,87 +11,62 @@
 (def constant TP_TOOLTIP_ELEMENTS_VGAP "5px")
 (def constant TP_DIVISION_ELEMENT_WIDTH "20px")
 (def constant TP_CONFIG_ELEMENTS_VGAP "3px")
-#--------------------------------------------------------------------------------
-#For Masters Tournament and the ship-weight rules:
-#
-#	1. Edit the following constant, or Comment out this and make the same one in another file.
-#		- File name is your choice. The only requirement is to place that file somewhere in res_mods/gui/unbound2.
-#	2. Create entries like the examples, and replace them.
-#		- {SHIP_ID:str : { WEIGHT:number, FLAGSHIP:bool }, ...}
-#		- `FLAGSHIP` field is optional. It will be false by default unless specified.
-#		- If `WEIGHT` field or the entire ship weight data is missing, the weight for that ship becomes 0.
-#		- Set `ENABLE_SHIPWEIHT` to `true`
-#		- Ship ID can be retrieved from gameparams.
-#   	- Single-quotation must be used for the keys, not the double.
-#		- Do not forget the comma at the end of each line.
-#		- Indent does not matter. But I recommend you putting 4 spaces or 1 tab for the sake of readablity.
-#	4. Done. You don't have to edit anything further and should be able to see the values in the game.
-#--------------------------------------------------------------------------------
-# (def constant MOD_TOURNAMENT_SHIPWEIGHT_DATA {
-# 	'4179572720': {WEIGHT: 300,	FLAGSHIP: true},
-# 	'3760075984': {WEIGHT: 12,	FLAGSHIP: false},
-# 	'4178458320': {WEIGHT: 100},
-# 	'4074158064': {WEIGHT: 30},
-# 	'4074682192': {WEIGHT: 160,	FLAGSHIP: true},
-# 	'4277090288': {WEIGHT: 160,	FLAGSHIP: true},
-# })
 (def constant TP_FLAGSHIP_COLOR_TRANSFORM {
 	'ally'	: {redOffset: -256,	greenOffset: -127,	blueOffset: -0},	# blue-ish
 	'enemy'	:{redOffset: -51,	greenOffset: -51,	blueOffset: -256},	# yellow-ish
 })
-#--------------------------------------------------------------------------------
 
-(def constant TP_USERPREFS_KEY {
+#--------------------------------------------------------------------------------
+(def constant TP_PREFS {
 	#GENERAL
-	STATS_ALT_VISIBLE	: 'ttTeamPanelShipStatsVisibleOnAlt',
-	UNITS_VISIBLE		: 'ttTeamPanelShipStatsUnitsVisible',
-	STATS_BOLD_FONT		: 'ttTeamPanelShipStatsUseBoldFont',
-	POS_OFFSET			: 'ttTeamPanelPosOffset',
-	SCALE_OFFSET		: 'ttTeamPanelScaleOffset',
-	BLUR_MODE			: 'ttTeamPanelBlurMode',
-	BLUR_ALT_VISIBLE	: 'ttTeamPanelBlurVisibleOnAlt',
-	BLUR_ALPHA			: 'ttTeamPanelBlurOpacity',
-	DEAD_PLAYER_VISIBLE	: 'ttTeamPanelDeadPlayerVisible',
+	STATS_ALT_VISIBLE	: {KEY:	'ttTeamPanelShipStatsVisibleOnAlt',		DEFAULT: false},
+	UNITS_VISIBLE		: {KEY: 'ttTeamPanelShipStatsUnitsVisible',		DEFAULT: true},
+	STATS_BOLD_FONT		: {KEY: 'ttTeamPanelShipStatsUseBoldFont',		DEFAULT: false},
+	POS_OFFSET			: {KEY: 'ttTeamPanelPosOffset',					DEFAULT: 160.0,	MODIFIER: 10.0,	OFFSET: 110.0},
+	SCALE_OFFSET		: {KEY: 'ttTeamPanelScaleOffset',				DEFAULT: 1.0,	MODIFIER: 0.1,	OFFSET: 0.5},
+	BLUR_MODE			: {KEY: 'ttTeamPanelBlurMode',					DEFAULT: true},
+	BLUR_ALT_VISIBLE	: {KEY: 'ttTeamPanelBlurVisibleOnAlt',			DEFAULT: false},
+	BLUR_ALPHA			: {KEY: 'ttTeamPanelBlurOpacity',				DEFAULT: 0.0,	MODIFIER: 0.1,	OFFSET: 0.0},
+	DEAD_PLAYER_VISIBLE	: {KEY: 'ttTeamPanelDeadPlayerVisible',			DEFAULT: true},
 	#NAMES
-	CLAN_NAME			: 'ttTeamPanelClanNameVisible',
-	CLAN_ICON			: 'ttTeamPanelClanIconVisible',
-	PLAYER_NAME			: 'ttTeamPanelPlayerNameVisible',
-	KILL_COUNT			: 'ttTeamPanelPlayerKillsVisible',
-	SHIP_NAME			: 'ttTeamPanelShipNameVisible',
-	SHIP_TIER			: 'ttTeamPanelShipTierVisible',
-	SHIP_NATION			: 'ttTeamPanelShipNationVisible',
-	SHIP_ICON			: 'ttTeamPanelShipIconVisible',
-	SHIP_ICON_COLOR		: 'ttTeamPanelShipIconColorPreset',
-	SHIP_DETECTION		: 'ttTeamPanelShipDetectionVisible',
-	HEALTHBAR_OPACITY	: 'ttTeamPanelHealthBarOpacity',
-	HEALTHBAR_WIDTH		: 'ttTeamPanelHealthBarWidth',
+	CLAN_NAME			: {KEY: 'ttTeamPanelClanNameVisible',			DEFAULT: true},
+	CLAN_ICON			: {KEY: 'ttTeamPanelClanIconVisible',			DEFAULT: false},
+	PLAYER_NAME			: {KEY: 'ttTeamPanelPlayerNameVisible',			DEFAULT: true},
+	KILL_COUNT			: {KEY: 'ttTeamPanelPlayerKillsVisible',		DEFAULT: true},
+	SHIP_NAME			: {KEY: 'ttTeamPanelShipNameVisible',			DEFAULT: true},
+	SHIP_TIER			: {KEY: 'ttTeamPanelShipTierVisible',			DEFAULT: true},
+	SHIP_NATION			: {KEY: 'ttTeamPanelShipNationVisible',			DEFAULT: false},
+	SHIP_ICON			: {KEY: 'ttTeamPanelShipIconVisible',			DEFAULT: true},
+	SHIP_ICON_COLOR		: {KEY: 'ttTeamPanelShipIconColorPreset',		DEFAULT: 0,		MODIFIER: 1,	OFFSET: 0},
+	SHIP_DETECTION		: {KEY: 'ttTeamPanelShipDetectionVisible',		DEFAULT: true},
+	HEALTHBAR_OPACITY	: {KEY: 'ttTeamPanelHealthBarOpacity',			DEFAULT: 0.4,	MODIFIER: 0.1,	OFFSET: 0},
+	HEALTHBAR_WIDTH		: {KEY: 'ttTeamPanelHealthBarWidth',			DEFAULT: 1.0,	MODIFIER: 0.1,	OFFSET: 0.5},
 	#SHIPCONFIGS
 	#Artillery
-	ARTILLERY_RANGE		: 'ttTeamPanelArtilleryRangeVisible',
-	ARTILLERY_RELOAD	: 'ttTeamPanelArtilleryReloadVisible',
+	ARTILLERY_RANGE		: {KEY: 'ttTeamPanelArtilleryRangeVisible',		DEFAULT: true},
+	ARTILLERY_RELOAD	: {KEY: 'ttTeamPanelArtilleryReloadVisible',	DEFAULT: true},
 	#Torpedo
-	TORPEDO_RANGE		: 'ttTeamPanelTorpedoRangeVisible',
-	TORPEDO_RELOAD		: 'ttTeamPanelTorpedoReloadVisible',
+	TORPEDO_RANGE		: {KEY: 'ttTeamPanelTorpedoRangeVisible',		DEFAULT: true},
 	#ATBA
-	ATBA_RANGE			: 'ttTeamPanelAtbaRangeVisible',
+	ATBA_RANGE			: {KEY: 'ttTeamPanelAtbaRangeVisible',			DEFAULT: true},
 	#AntiAir
-	ANTIAIR_RANGE		: 'ttTeamPanelAntiAirRangeVisible',
-	ANTIAIR_RATE		: 'ttTeamPanelAntiAirRateVisible',
+	ANTIAIR_RANGE		: {KEY: 'ttTeamPanelAntiAirRangeVisible',		DEFAULT: true},
+	ANTIAIR_RATE		: {KEY: 'ttTeamPanelAntiAirRateVisible',		DEFAULT: true},
 	#AirSupport
-	AIRSUPPORT_RANGE	: 'ttTeamPanelAirSupportRangeVisible',
-	AIRSUPPORT_RELOAD	: 'ttTeamPanelAirSupportReloadVisible',
+	AIRSUPPORT_RANGE	: {KEY: 'ttTeamPanelAirSupportRangeVisible',	DEFAULT: true},
+	AIRSUPPORT_RELOAD	: {KEY: 'ttTeamPanelAirSupportReloadVisible',	DEFAULT: true},
 	#Speed
-	SPEED_SURFACE		: 'ttTeamPanelSpeedSurfaceVisible',
-	SPEED_UNDERWATER	: 'ttTeamPanelSpeedUnderwaterVisible',
+	SPEED_SURFACE		: {KEY: 'ttTeamPanelSpeedSurfaceVisible',		DEFAULT: true},
+	SPEED_UNDERWATER	: {KEY: 'ttTeamPanelSpeedUnderwaterVisible',	DEFAULT: true},
 	#Visibility
-	VISIBILITY_SURFACE	: 'ttTeamPanelVisibilitySurfaceVisible',
-	VISIBILITY_AIR		: 'ttTeamPanelVisibilityAirVisible',
+	VISIBILITY_SURFACE	: {KEY: 'ttTeamPanelVisibilitySurfaceVisible',	DEFAULT: true},
+	VISIBILITY_AIR		: {KEY: 'ttTeamPanelVisibilityAirVisible',		DEFAULT: true},
 	#Surface Consumable
-	RADAR_RANGE			: 'ttTeamPanelRadarRangeVisible',
-	HYDRO_RANGE			: 'ttTeamPanelHydroRangeVisible',
+	RADAR_RANGE			: {KEY: 'ttTeamPanelRadarRangeVisible',			DEFAULT: true},
+	HYDRO_RANGE			: {KEY: 'ttTeamPanelHydroRangeVisible',			DEFAULT: true},
 	#Sub Consumable
-	SUB_RADAR_RANGE		: 'ttTeamPanelSubRadarRangeVisible',
-	SUB_HYDRO_RANGE		: 'ttTeamPanelSubHydroRangeVisible',
+	SUB_RADAR_RANGE		: {KEY: 'ttTeamPanelSubRadarRangeVisible',		DEFAULT: true},
+	SUB_HYDRO_RANGE		: {KEY: 'ttTeamPanelSubHydroRangeVisible',		DEFAULT: true},
 })
 
 (def constant TP_SHIP_ICON_COLOR_PRESET [
@@ -195,8 +170,7 @@
 	(scope
 		(macro STAGE_SIZE)
 		(macro TP_GET_USERPREFS)
-		(macro TP_GET_PREF_NUMBER "'posOffset'" "TP_USERPREFS_KEY.POS_OFFSET" _modifier="10.0" _default="50.0")
-		(var posTop:number = "TP_ELEMENT_TOP + posOffset - 50")
+		(macro TP_GET_PREF_NUMBER _varName="'posY'" _pref="TP_PREFS.POS_OFFSET")
 	)
 	(bindcall externalCall 'inputMapping.onAction' "['createParamsForAllShipsInBattle', {}]" on='addedToStage')
 	#Hide the default Ub1 ears
@@ -210,7 +184,7 @@
 	(block
 		(style
 			(position = "absolute")
-			(bind top "posTop")
+			(bind top "posY")
 			(width = 100%)
 		)
 		(element TP_TeamPanelLeft _userPrefsNum="_userPrefsNum")
@@ -225,8 +199,7 @@
 		(var allyCollection:gfx = "avatarCollection ? avatarCollection.getChildByPath('team.ally.sortedAlive') : null" (event "avatarCollection.evChildAdded") (event "avatarCollection.evChildRemoved"))
 		(var allyItems:array = "allyCollection ? allyCollection.items : null" (event "allyCollection.evAdded") (event "allyCollection.evRemoved")  (event "allyCollection.evUpdated"))
 		(var isEnabled:bool = "allyItems && allyItems.length > 0")
-		(macro TP_GET_PREF_NUMBER "'scaleOffset'" "TP_USERPREFS_KEY.SCALE_OFFSET" _modifier="0.1" _default="0.5")
-		(var sizeScale:number = "1 + scaleOffset - 0.5")
+		(macro TP_GET_PREF_NUMBER _varName="'sizeScale'" _pref="TP_PREFS.SCALE_OFFSET")
 	)
 
 	(style
@@ -255,8 +228,7 @@
 		(var enemyCollection:gfx = "avatarCollection ? avatarCollection.getChildByPath('team.enemy.sortedAlive') : null" (event "avatarCollection.evChildAdded") (event "avatarCollection.evChildRemoved"))
 		(var enemyItems:array = "enemyCollection ? enemyCollection.items : null" (event "enemyCollection.evAdded") (event "enemyCollection.evRemoved") (event "enemyCollection.evUpdated"))
 		(var isEnabled:bool = "enemyItems && enemyItems.length > 0")
-		(macro TP_GET_PREF_NUMBER "'scaleOffset'" "TP_USERPREFS_KEY.SCALE_OFFSET" _modifier="0.1" _default="0.5")
-		(var sizeScale:number = "1 + scaleOffset - 0.5")
+		(macro TP_GET_PREF_NUMBER _varName="'sizeScale'" _pref="TP_PREFS.SCALE_OFFSET")
 	)
 
 	(style
@@ -287,42 +259,41 @@
 		(var _entity:gfx = "null")
 
 		#Artillery
-		(macro TP_GET_PREF_BOOL _varName="'isArtilleryRangeVisible'" _prefKey="TP_USERPREFS_KEY.ARTILLERY_RANGE")
-		(macro TP_GET_PREF_BOOL _varName="'isArtilleryReloadVisible'" _prefKey="TP_USERPREFS_KEY.ARTILLERY_RELOAD")
+		(macro TP_GET_PREF_BOOL _varName="'isArtilleryRangeVisible'" _pref="TP_PREFS.ARTILLERY_RANGE")
+		(macro TP_GET_PREF_BOOL _varName="'isArtilleryReloadVisible'" _pref="TP_PREFS.ARTILLERY_RELOAD")
 		(var isArtilleryEnabled:bool = "isArtilleryRangeVisible || isArtilleryReloadVisible")
 		#ATBA
-		(macro TP_GET_PREF_BOOL _varName="'isAtbaRangeVisible'" _prefKey="TP_USERPREFS_KEY.ATBA_RANGE")
+		(macro TP_GET_PREF_BOOL _varName="'isAtbaRangeVisible'" _pref="TP_PREFS.ATBA_RANGE")
 		(var isAtbaEnabled:bool = "isAtbaRangeVisible")
 		#Torpedo
-		(macro TP_GET_PREF_BOOL _varName="'isTorpedoRangeVisible'" _prefKey="TP_USERPREFS_KEY.TORPEDO_RANGE")
-		#(macro TP_GET_PREF_BOOL _varName="'isTorpedoReloadVisible'" _prefKey="TP_USERPREFS_KEY.TORPEDO_RELOAD")
+		(macro TP_GET_PREF_BOOL _varName="'isTorpedoRangeVisible'" _pref="TP_PREFS.TORPEDO_RANGE")
 		(var isTorpedoEnabled:bool = "isTorpedoRangeVisible")
 		#AntiAir
-		(macro TP_GET_PREF_BOOL _varName="'isAntiAirRangeVisible'" _prefKey="TP_USERPREFS_KEY.ANTIAIR_RANGE")
-		(macro TP_GET_PREF_BOOL _varName="'isAntiAirRatingVisible'" _prefKey="TP_USERPREFS_KEY.ANTIAIR_RATE")
+		(macro TP_GET_PREF_BOOL _varName="'isAntiAirRangeVisible'" _pref="TP_PREFS.ANTIAIR_RANGE")
+		(macro TP_GET_PREF_BOOL _varName="'isAntiAirRatingVisible'" _pref="TP_PREFS.ANTIAIR_RATE")
 		(var isAntiAirEnabled:bool = "isAntiAirRangeVisible || isAntiAirRatingVisible")
 		#AirSupport
-		(macro TP_GET_PREF_BOOL _varName="'isAirSupportRangeVisible'" _prefKey="TP_USERPREFS_KEY.AIRSUPPORT_RANGE")
-		(macro TP_GET_PREF_BOOL _varName="'isAirSupportReloadVisible'" _prefKey="TP_USERPREFS_KEY.AIRSUPPORT_RELOAD")
+		(macro TP_GET_PREF_BOOL _varName="'isAirSupportRangeVisible'" _pref="TP_PREFS.AIRSUPPORT_RANGE")
+		(macro TP_GET_PREF_BOOL _varName="'isAirSupportReloadVisible'" _pref="TP_PREFS.AIRSUPPORT_RELOAD")
 		(var isAirSupportEnabled:bool = "isAirSupportRangeVisible || isAirSupportReloadVisible")
 		#Mobility
-		(macro TP_GET_PREF_BOOL _varName="'isSurfaceMobilityVisible'" _prefKey="TP_USERPREFS_KEY.SPEED_SURFACE")
-		(macro TP_GET_PREF_BOOL _varName="'isUnderwaterMobilityVisible'" _prefKey="TP_USERPREFS_KEY.SPEED_UNDERWATER")
+		(macro TP_GET_PREF_BOOL _varName="'isSurfaceMobilityVisible'" _pref="TP_PREFS.SPEED_SURFACE")
+		(macro TP_GET_PREF_BOOL _varName="'isUnderwaterMobilityVisible'" _pref="TP_PREFS.SPEED_UNDERWATER")
 		(var isMobilityEnabled:bool = "isSurfaceMobilityVisible || isUnderwaterMobilityVisible")
 		#Visibility
-		(macro TP_GET_PREF_BOOL _varName="'isVisibilityByShipVisible'" _prefKey="TP_USERPREFS_KEY.VISIBILITY_SURFACE")
-		(macro TP_GET_PREF_BOOL _varName="'isVisibilityByPlaneVisible'" _prefKey="TP_USERPREFS_KEY.VISIBILITY_AIR")
+		(macro TP_GET_PREF_BOOL _varName="'isVisibilityByShipVisible'" _pref="TP_PREFS.VISIBILITY_SURFACE")
+		(macro TP_GET_PREF_BOOL _varName="'isVisibilityByPlaneVisible'" _pref="TP_PREFS.VISIBILITY_AIR")
 		(var isVisibilityEnabled:bool = "isVisibilityByShipVisible || isVisibilityByPlaneVisible")
 		#Surface Consumable
-		(macro TP_GET_PREF_BOOL _varName="'isRadarRangeVisible'" _prefKey="TP_USERPREFS_KEY.RADAR_RANGE")
-		(macro TP_GET_PREF_BOOL _varName="'isHydroRangeVisible'" _prefKey="TP_USERPREFS_KEY.HYDRO_RANGE")
+		(macro TP_GET_PREF_BOOL _varName="'isRadarRangeVisible'" _pref="TP_PREFS.RADAR_RANGE")
+		(macro TP_GET_PREF_BOOL _varName="'isHydroRangeVisible'" _pref="TP_PREFS.HYDRO_RANGE")
 		(var isSurfaceConsumableEnabled:bool = "isRadarRangeVisible || isHydroRangeVisible")
 		#Sub Consumables
-		(macro TP_GET_PREF_BOOL _varName="'isSubRadarRangeVisible'" _prefKey="TP_USERPREFS_KEY.SUB_RADAR_RANGE")
-		(macro TP_GET_PREF_BOOL _varName="'isSubHydroRangeVisible'" _prefKey="TP_USERPREFS_KEY.SUB_HYDRO_RANGE")
+		(macro TP_GET_PREF_BOOL _varName="'isSubRadarRangeVisible'" _pref="TP_PREFS.SUB_RADAR_RANGE")
+		(macro TP_GET_PREF_BOOL _varName="'isSubHydroRangeVisible'" _pref="TP_PREFS.SUB_HYDRO_RANGE")
 		(var isSubmarineConsumableEnabled:bool = "isSubRadarRangeVisible || isSubHydroRangeVisible")
 		#ALT
-		(macro TP_GET_PREF_BOOL _varName="'isVisibleOnlyAlt'" _prefKey="TP_USERPREFS_KEY.STATS_ALT_VISIBLE" _default="false")
+		(macro TP_GET_PREF_BOOL _varName="'isVisibleOnlyAlt'" _pref="TP_PREFS.STATS_ALT_VISIBLE")
 		(var camera:gfx = "$datahub.getSingleComponent(CC.camera)")
 		(var altVision:bool = "camera ? camera.altVision : false" (event "camera.evAltVisionChanged"))
 	)
@@ -395,16 +366,16 @@
 		(var mouse:gfx = "$datahub.getSingleComponent(CC.mouse)")
 		(var isMouseActive:bool = "mouse.active" (event "mouse.evActiveChanged"))
 
-		(macro TP_GET_PREF_BOOL _varName="'isDeadPlayerVisible'" _prefKey="TP_USERPREFS_KEY.DEAD_PLAYER_VISIBLE")
+		(macro TP_GET_PREF_BOOL _varName="'isDeadPlayerVisible'" _pref="TP_PREFS.DEAD_PLAYER_VISIBLE")
 		(var battleDataEntity:gfx = "$datahub.getSingleEntity(CC.battleData)")
 		(var gameModeId:number = "battleDataEntity.battleInfo.gameModeId")
 		(var isScenarioMode:bool = "SC.Battle.GAME_MODE.PVE == gameModeId")
 		(var isScenarioBot:bool = "isBot && isScenarioMode")
 		(var isVisible:bool = "(isDeadPlayerVisible && !(isBot && isScenarioMode)) ? true : isAlive")
 
-		(macro TP_GET_PREF_NUMBER "'blurAlpha'" "TP_USERPREFS_KEY.BLUR_ALPHA" _modifier="0.1" _default="0.0")
-		(macro TP_GET_PREF_BOOL _varName="'isBlurMode'" _prefKey="TP_USERPREFS_KEY.BLUR_MODE")
-		(macro TP_GET_PREF_BOOL _varName="'isBlurVisibleOnlyAlt'" _prefKey="TP_USERPREFS_KEY.BLUR_ALT_VISIBLE" _default="false")
+		(macro TP_GET_PREF_NUMBER _varName="'blurAlpha'" _pref="TP_PREFS.BLUR_ALPHA")
+		(macro TP_GET_PREF_BOOL _varName="'isBlurMode'" _pref="TP_PREFS.BLUR_MODE")
+		(macro TP_GET_PREF_BOOL _varName="'isBlurVisibleOnlyAlt'" _pref="TP_PREFS.BLUR_ALT_VISIBLE")
 		(var camera:gfx = "$datahub.getSingleComponent(CC.camera)")
 		(var altVision:bool = "camera ? camera.altVision : false" (event "camera.evAltVisionChanged"))
 		(var isBlurVisible:bool = "isBlurVisibleOnlyAlt ? altVision : true")
@@ -488,8 +459,7 @@
 (def element TP_PlayerInfoItem (_entity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
 	(scope
 		#bar width
-		(macro TP_GET_PREF_NUMBER "'widthOffset'" "TP_USERPREFS_KEY.HEALTHBAR_WIDTH" _modifier="0.1" _default="0.5")
-		(var widthScale:number = "1 + widthOffset - 0.5")
+		(macro TP_GET_PREF_NUMBER _varName="'widthScale'" _pref="TP_PREFS.HEALTHBAR_WIDTH")
 		(var widthSize:number = "TP_PLAYER_ROW_SIZE.WIDTH * widthScale - TP_DIVISION_ELEMENT_WIDTH") # - (division item width - 5). Canbe replaced with margin though
 	)
 	
@@ -539,7 +509,7 @@
 		(var clanEntity:gfx = "$datahub.getPrimaryEntity(CC.clan, clanId)")
 		(var clanName:str = "clanEntity ? clanEntity.clan.tag : null" (event "clanEntity.clan.evTagChanged"))
 		(var clanIcon:str = "'url:../clan_icons/' + clanName + '.png'")
-		(macro TP_GET_PREF_BOOL _varName="'isClanIconVisible'" _prefKey="TP_USERPREFS_KEY.CLAN_ICON" _default="false")
+		(macro TP_GET_PREF_BOOL _varName="'isClanIconVisible'" _pref="TP_PREFS.CLAN_ICON")
 	)
 	(style
 		(align = "middle|center")
@@ -557,7 +527,7 @@
 
 (def element TP_PlayerNameWithTagItem (_entity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
 	(scope
-		(macro TP_GET_PREF_BOOL _varName="'isClanNameVisible'" _prefKey="TP_USERPREFS_KEY.CLAN_NAME")
+		(macro TP_GET_PREF_BOOL _varName="'isClanNameVisible'" _pref="TP_PREFS.CLAN_NAME")
 		(var isInClan:bool = "_entity ? _entity.hasComponent(CC.clanman) : false")
 		(var clanComponent:gfx = "isInClan ? _entity.clanman : null")
 		(var clanId:number = "clanComponent ? clanComponent.clanId : null" (event "clanComponent.evClanIdChanged"))
@@ -565,7 +535,7 @@
 		(var clanName:str = "clanEntity ? clanEntity.clan.tag : null" (event "clanEntity.clan.evTagChanged"))
 		(var clanNameWithBrackets:str = "isInClan && isClanNameVisible ? '[' + clanName + ']' : ''")
 
-		(macro TP_GET_PREF_BOOL _varName="'isPlayerNameVisible'" _prefKey="TP_USERPREFS_KEY.PLAYER_NAME")
+		(macro TP_GET_PREF_BOOL _varName="'isPlayerNameVisible'" _pref="TP_PREFS.PLAYER_NAME")
 		(var pureName:str = "(isPlayerNameVisible && _entity) ? _entity.avatar.pureName : ' '")
 
 		(macro TP_GET_MARKER_DATA "_entity")
@@ -595,12 +565,11 @@
 (def element TP_PlayerKillCountItem (_entity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
 	(scope
 		(var killCount:number = "_entity ? _entity.avatar.frags : 0" (event "_entity.avatar.evFragsChanged"))
-		(macro TP_GET_PREF_BOOL _varName="'isPlayerKillCountVisible'" _prefKey="TP_USERPREFS_KEY.KILL_COUNT")
+		(macro TP_GET_PREF_BOOL _varName="'isPlayerKillCountVisible'" _pref="TP_PREFS.KILL_COUNT")
 	)
 	(style
 		(width = 18px)
 		(align = "middle|center")
-		(marginBottom = 2px)
 	)
 	(bind visible "isPlayerKillCountVisible")
 	(tf
@@ -624,8 +593,8 @@
 
 		(var iconName:str = "'icon_' + markerColorName + '_' + shipType")
 
-		(macro TP_GET_PREF_BOOL _varName="'isShipIconVisible'" _prefKey="TP_USERPREFS_KEY.SHIP_ICON")
-		(macro TP_GET_PREF_NUMBER _varName="'shipIconColorIndex'" _prefKey="TP_USERPREFS_KEY.SHIP_ICON_COLOR" _modifier="1" _default="0")
+		(macro TP_GET_PREF_BOOL _varName="'isShipIconVisible'" _pref="TP_PREFS.SHIP_ICON")
+		(macro TP_GET_PREF_NUMBER _varName="'shipIconColorIndex'" _pref="TP_PREFS.SHIP_ICON_COLOR")
 		(var isColorAvailable:bool = "!(isGolden || tkStatus)")
 		(var colorPreset:dict = "(TP_SHIP_ICON_COLOR_PRESET.length > shipIconColorIndex) ? TP_SHIP_ICON_COLOR_PRESET[shipIconColorIndex] : null")
 		(var colorDict:dict = "(isColorAvailable && colorPreset) ? colorPreset[subType] : {}")
@@ -657,7 +626,7 @@
 		(var shipEntity:gfx = "_entity ? _entity.avatar.ship.ref.ship : null" (event "_entity.avatar.evShipRefChanged"))
 		(var shipName:str = "shipEntity ? tr(shipEntity.nameIDS) : ''") #IDS_PASB518
 		(macro TP_GET_ISAFK)
-		(macro TP_GET_PREF_BOOL _varName="'isShipNameVisible'" _prefKey="TP_USERPREFS_KEY.SHIP_NAME")
+		(macro TP_GET_PREF_BOOL _varName="'isShipNameVisible'" _pref="TP_PREFS.SHIP_NAME")
 	)
 
 	(bind visible "isShipNameVisible")
@@ -684,7 +653,7 @@
 		(var shipEntity:gfx = "_entity ? _entity.avatar.ship.ref.ship : null" (event "_entity.avatar.evShipRefChanged"))
 		(var flagName:str = "shipEntity ? shipEntity.flagName : ''") #IDS_PASB518
 		(macro TP_GET_ISAFK)
-		(macro TP_GET_PREF_BOOL _varName="'isShipNationVisible'" _prefKey="TP_USERPREFS_KEY.SHIP_NATION" _default="false")
+		(macro TP_GET_PREF_BOOL _varName="'isShipNationVisible'" _pref="TP_PREFS.SHIP_NATION")
 	)
 
 	(style
@@ -731,7 +700,7 @@
 	(scope
 		(var shipEntity:gfx = "_entity ? _entity.avatar.ship.ref.ship : null" (event "_entity.avatar.evShipRefChanged"))
 		(var levelRome:str = "shipEntity ? shipEntity.levelRome : ''") #IDS_PASB518
-		(macro TP_GET_PREF_BOOL _varName="'isShipTierVisible'" _prefKey="TP_USERPREFS_KEY.SHIP_TIER")
+		(macro TP_GET_PREF_BOOL _varName="'isShipTierVisible'" _pref="TP_PREFS.SHIP_TIER")
 	)
 	(style
 		(width = 22px)
@@ -784,7 +753,7 @@
 
 		(macro GET_MARKER_ENTITY_COMPONENT 'health')
 		(var isAlive:bool = "healthComponent ? healthComponent.isAlive : false" (event "healthComponent.evIsAliveChanged"))
-		(macro TP_GET_PREF_BOOL _varName="'isShipDetectionVisible'" _prefKey="TP_USERPREFS_KEY.SHIP_DETECTION")
+		(macro TP_GET_PREF_BOOL _varName="'isShipDetectionVisible'" _pref="TP_PREFS.SHIP_DETECTION")
 		(var iconColorTransform:dict = "isDetected  ? {redMultiplier:0,greenMultiplier:0,blueMultiplier:0,alphaMultiplier:1.0,redOffset:0xFF,greenOffset:0x99,blueOffset:0x33,alphaOffset:0 }
 													: {redMultiplier:0,greenMultiplier:0,blueMultiplier:0,alphaMultiplier:0.6,redOffset:0xFF,greenOffset:0xFF,blueOffset:0xFF,alphaOffset:0 }")
 	)
@@ -852,7 +821,7 @@
 		(var flagShipColorKey:str = "isAlly ? 'ally' : 'enemy'")
 
 		#bar color
-		(macro TP_GET_PREF_NUMBER "'alphaScale'" "TP_USERPREFS_KEY.HEALTHBAR_OPACITY" _modifier="0.1" _default="0.4")
+		(macro TP_GET_PREF_NUMBER _varName="'alphaScale'" _pref="TP_PREFS.HEALTHBAR_OPACITY")
 		(var regenBarColorTransform:dict = "{redMultiplier:0,greenMultiplier:0,blueMultiplier:0,alphaMultiplier:1.0,redOffset:230,greenOffset:230,blueOffset:230,alphaOffset:0 }")
 		(var markerColorTransform:dict = 
 			"	isFlagShip					? TP_FLAGSHIP_COLOR_TRANSFORM[flagShipColorKey] :
@@ -863,8 +832,7 @@
 		)
 
 		#bar width
-		(macro TP_GET_PREF_NUMBER "'widthOffset'" "TP_USERPREFS_KEY.HEALTHBAR_WIDTH" _modifier="0.1" _default="0.5")
-		(var widthScale:number = "1 + widthOffset - 0.5")
+		(macro TP_GET_PREF_NUMBER _varName="'widthScale'" _pref="TP_PREFS.HEALTHBAR_WIDTH")
 
 	)
 
@@ -971,7 +939,7 @@
 		(var isRealParams:bool = "shipBattleInfo ? shipBattleInfo.isRealParams : false")
 		(var shipTTX:gfx = "isRealParams ? newTTX : classicTTX")
 
-		(macro TP_GET_PREF_BOOL _varName="'isVisibleOnlyAlt'" _prefKey="TP_USERPREFS_KEY.STATS_ALT_VISIBLE" _default="false")
+		(macro TP_GET_PREF_BOOL _varName="'isVisibleOnlyAlt'" _pref="TP_PREFS.STATS_ALT_VISIBLE")
 		(var camera:gfx = "$datahub.getSingleComponent(CC.camera)")
 		(var altVision:bool = "camera ? camera.altVision : false" (event "camera.evAltVisionChanged"))
 	)
@@ -1003,8 +971,8 @@
 		(var hasMainGun:bool = "artilleryTTX ? artilleryTTX.mainGun.length > 0 : false")
 		(var range:number = "artilleryTTX ? artilleryTTX.mgMaxDist.value : null")
 		(var reload:number = "artilleryTTX ? artilleryTTX.mgReloadTime.value : null")
-		(macro TP_GET_PREF_BOOL _varName="'isArtilleryRangeVisible'" _prefKey="TP_USERPREFS_KEY.ARTILLERY_RANGE")
-		(macro TP_GET_PREF_BOOL _varName="'isArtilleryReloadVisible'" _prefKey="TP_USERPREFS_KEY.ARTILLERY_RELOAD")
+		(macro TP_GET_PREF_BOOL _varName="'isArtilleryRangeVisible'" _pref="TP_PREFS.ARTILLERY_RANGE")
+		(macro TP_GET_PREF_BOOL _varName="'isArtilleryReloadVisible'" _pref="TP_PREFS.ARTILLERY_RELOAD")
 		(var isEnabled:bool = "isArtilleryRangeVisible || isArtilleryReloadVisible")
 	)
 
@@ -1063,8 +1031,7 @@
 		#(var reload:number = "torpedoGroupsTTX.reloadTime.value")
 
 		
-		(macro TP_GET_PREF_BOOL _varName="'isTorpedoRangeVisible'" _prefKey="TP_USERPREFS_KEY.TORPEDO_RANGE")
-		#(macro TP_GET_PREF_BOOL _varName="'isTorpedoReloadVisible'" _prefKey="TP_USERPREFS_KEY.TORPEDO_RELOAD")
+		(macro TP_GET_PREF_BOOL _varName="'isTorpedoRangeVisible'" _pref="TP_PREFS.TORPEDO_RANGE")
 		(var isEnabled:bool = "isTorpedoRangeVisible")
 	)
 
@@ -1101,7 +1068,7 @@
 		(var artilleryTTX:gfx = "_shipTTX ? _shipTTX.artillery : null")
 		(var hasSecondaryGun:bool = "artilleryTTX ? artilleryTTX.atba.length > 0 : false")
 		(var range:number = "artilleryTTX ? artilleryTTX.atbaMaxDist.value : null")
-		(macro TP_GET_PREF_BOOL _varName="'isAtbaRangeVisible'" _prefKey="TP_USERPREFS_KEY.ATBA_RANGE")
+		(macro TP_GET_PREF_BOOL _varName="'isAtbaRangeVisible'" _pref="TP_PREFS.ATBA_RANGE")
 		(var isEnabled:bool = "isAtbaRangeVisible")
 		
 		#fix for skill---------------------
@@ -1109,7 +1076,7 @@
 		(var avatarComponent:gfx = "_avatarEntity.avatar")
 
 		#shipId -> ownShip (ship in port) -> crewId (crew on board) -> crewSkill (check crew has skill)
-		(var isSelf:bool = "selfPlayer.avatar.id == avatarComponent.id")
+		(var isSelf:bool = "selfPlayer ? selfPlayer.avatar.id == avatarComponent.id : false")
 		(var shipId:number = "avatarComponent ? avatarComponent.ship.ref.ship.id : null" (event "avatarComponent.evShipRefChanged"))
 		(var shipType:str = "avatarComponent ? avatarComponent.shipType : null" (event "avatarComponent.evShipTypeChanged"))
 		(var ownShipEntity:gfx = "$datahub.getPrimaryEntity(CC.ownShip, shipId)")
@@ -1149,8 +1116,8 @@
 		(var airDefenseTTX:gfx = "_shipTTX ? _shipTTX.airDefense : null")
 		(var range:number = "airDefenseTTX ? airDefenseTTX.averageAura.maxDist.value : null")
 		(var integralValue:number = "airDefenseTTX ? airDefenseTTX.integralValue.value : 0")
-		(macro TP_GET_PREF_BOOL _varName="'isAntiAirRangeVisible'" _prefKey="TP_USERPREFS_KEY.ANTIAIR_RANGE")
-		(macro TP_GET_PREF_BOOL _varName="'isAntiAirRatingVisible'" _prefKey="TP_USERPREFS_KEY.ANTIAIR_RATE")
+		(macro TP_GET_PREF_BOOL _varName="'isAntiAirRangeVisible'" _pref="TP_PREFS.ANTIAIR_RANGE")
+		(macro TP_GET_PREF_BOOL _varName="'isAntiAirRatingVisible'" _pref="TP_PREFS.ANTIAIR_RATE")
 		(var isEnabled:bool = "isAntiAirRangeVisible || isAntiAirRatingVisible")
 	)
 
@@ -1174,8 +1141,8 @@
 		(var airSupportTTX:gfx = "_shipTTX ? _shipTTX.airSupport : null")
 		(var range:number = "airSupportTTX ? airSupportTTX.maxDist.value : null")
 		(var reload:number = "airSupportTTX ? airSupportTTX.reloadTime.value : null")
-		(macro TP_GET_PREF_BOOL _varName="'isAirSupportRangeVisible'" _prefKey="TP_USERPREFS_KEY.AIRSUPPORT_RANGE")
-		(macro TP_GET_PREF_BOOL _varName="'isAirSupportReloadVisible'" _prefKey="TP_USERPREFS_KEY.AIRSUPPORT_RELOAD")
+		(macro TP_GET_PREF_BOOL _varName="'isAirSupportRangeVisible'" _pref="TP_PREFS.AIRSUPPORT_RANGE")
+		(macro TP_GET_PREF_BOOL _varName="'isAirSupportReloadVisible'" _pref="TP_PREFS.AIRSUPPORT_RELOAD")
 		(var isEnabled:bool = "isAirSupportRangeVisible || isAirSupportReloadVisible")
 	)
 
@@ -1224,8 +1191,8 @@
 		(var underwaterMobilityTTX:gfx = "_shipTTX ? _shipTTX.underwaterMobility : null")
 		(var underwaterSpeed:number = "underwaterMobilityTTX ? underwaterMobilityTTX.speed.value : null")
 
-		(macro TP_GET_PREF_BOOL _varName="'isSurfaceMobilityVisible'" _prefKey="TP_USERPREFS_KEY.SPEED_SURFACE")
-		(macro TP_GET_PREF_BOOL _varName="'isUnderwaterMobilityVisible'" _prefKey="TP_USERPREFS_KEY.SPEED_UNDERWATER")
+		(macro TP_GET_PREF_BOOL _varName="'isSurfaceMobilityVisible'" _pref="TP_PREFS.SPEED_SURFACE")
+		(macro TP_GET_PREF_BOOL _varName="'isUnderwaterMobilityVisible'" _pref="TP_PREFS.SPEED_UNDERWATER")
 		(var isEnabled:bool = "isSurfaceMobilityVisible || isUnderwaterMobilityVisible")
 	)
 
@@ -1251,7 +1218,7 @@
 		(var avatarComponent:gfx = "_avatarEntity.avatar")
 
 		#shipId -> ownShip (ship in port) -> crewId (crew on board) -> crewSkill (check crew has skill)
-		(var isSelf:bool = "selfPlayer.avatar.id == avatarComponent.id")
+		(var isSelf:bool = "selfPlayer ? selfPlayer.avatar.id == avatarComponent.id : false")
 		(var shipId:number = "avatarComponent ? avatarComponent.ship.ref.ship.id : null" (event "avatarComponent.evShipRefChanged"))
 		(var shipType:str = "avatarComponent ? avatarComponent.shipType : null" (event "avatarComponent.evShipTypeChanged"))
 		(var ownShipEntity:gfx = "$datahub.getPrimaryEntity(CC.ownShip, shipId)")
@@ -1279,8 +1246,8 @@
 		(var modifiedVisibilityByPlane:number = "visibilityByPlane * visibilityModifier") #CAPTAIN SKILL FIX
 		#---------------------
 
-		(macro TP_GET_PREF_BOOL _varName="'isVisibilityByShipVisible'" _prefKey="TP_USERPREFS_KEY.VISIBILITY_SURFACE")
-		(macro TP_GET_PREF_BOOL _varName="'isVisibilityByPlaneVisible'" _prefKey="TP_USERPREFS_KEY.VISIBILITY_AIR")
+		(macro TP_GET_PREF_BOOL _varName="'isVisibilityByShipVisible'" _pref="TP_PREFS.VISIBILITY_SURFACE")
+		(macro TP_GET_PREF_BOOL _varName="'isVisibilityByPlaneVisible'" _pref="TP_PREFS.VISIBILITY_AIR")
 		(var isEnabled:bool = "isVisibilityByShipVisible || isVisibilityByPlaneVisible")
 	)
 
@@ -1305,8 +1272,8 @@
 		(var radarRange:number = "consumables && 'rls' in consumables ? consumables['rls'] : null")
 		(var hydroRange:number = "consumables && 'sonar' in consumables ? consumables['sonar'] : null")
 
-		(macro TP_GET_PREF_BOOL _varName="'isRadarRangeVisible'" _prefKey="TP_USERPREFS_KEY.RADAR_RANGE")
-		(macro TP_GET_PREF_BOOL _varName="'isHydroRangeVisible'" _prefKey="TP_USERPREFS_KEY.HYDRO_RANGE")
+		(macro TP_GET_PREF_BOOL _varName="'isRadarRangeVisible'" _pref="TP_PREFS.RADAR_RANGE")
+		(macro TP_GET_PREF_BOOL _varName="'isHydroRangeVisible'" _pref="TP_PREFS.HYDRO_RANGE")
 		(var isEnabled:bool = "isRadarRangeVisible || isHydroRangeVisible")
 	)
 
@@ -1331,8 +1298,8 @@
 		(var radarRange:number = "consumables && 'submarineLocator' in consumables ? consumables['submarineLocator'] : null")
 		(var hydroRange:number = "consumables && 'hydrophone' in consumables ? consumables['hydrophone'] : null")
 
-		(macro TP_GET_PREF_BOOL _varName="'isSubRadarRangeVisible'" _prefKey="TP_USERPREFS_KEY.SUB_RADAR_RANGE")
-		(macro TP_GET_PREF_BOOL _varName="'isSubHydroRangeVisible'" _prefKey="TP_USERPREFS_KEY.SUB_HYDRO_RANGE")
+		(macro TP_GET_PREF_BOOL _varName="'isSubRadarRangeVisible'" _pref="TP_PREFS.SUB_RADAR_RANGE")
+		(macro TP_GET_PREF_BOOL _varName="'isSubHydroRangeVisible'" _pref="TP_PREFS.SUB_HYDRO_RANGE")
 		(var isEnabled:bool = "isSubRadarRangeVisible || isSubHydroRangeVisible")
 	)
 
@@ -1354,7 +1321,7 @@
 #Image Item
 (def element TP_ShipConfigImageItem (_iconPath:str, _alpha:number="1.0", _isVisible:bool=true, _tooltipTitle:str='', _tooltipTexts:array=[], _userPrefsNum:gfx=null)
 	(scope
-		(macro TP_GET_PREF_BOOL _varName="'isUnitVisible'" _prefKey="TP_USERPREFS_KEY.UNITS_VISIBLE")
+		(macro TP_GET_PREF_BOOL _varName="'isUnitVisible'" _pref="TP_PREFS.UNITS_VISIBLE")
 	)
 	(bind visible "_isVisible")
 	(style
@@ -1418,8 +1385,8 @@
 		(var isNull:bool = "_value == null")
 		(var isZero:bool = "_value == 0")
 		(var isValueVisible:bool = "(isNull && _showNull) || (isZero && _showZero) || _value")
-		(macro TP_GET_PREF_BOOL _varName="'isUnitVisible'" _prefKey="TP_USERPREFS_KEY.UNITS_VISIBLE")
-		(macro TP_GET_PREF_BOOL _varName="'isBoldFont'"    _prefKey="TP_USERPREFS_KEY.STATS_BOLD_FONT" _default="false")
+		(macro TP_GET_PREF_BOOL _varName="'isUnitVisible'" _pref="TP_PREFS.UNITS_VISIBLE")
+		(macro TP_GET_PREF_BOOL _varName="'isBoldFont'"    _pref="TP_PREFS.STATS_BOLD_FONT")
 	)
 
 	(style
@@ -1588,7 +1555,7 @@
 		(var avatarComponent:gfx = "_avatarEntity.avatar")
 
 		#shipId -> ownShip (ship in port) -> crewId (crew on board) -> crewSkill (check crew has skill)
-		(var isSelf:bool = "selfPlayer.avatar.id == avatarComponent.id")
+		(var isSelf:bool = "selfPlayer ? selfPlayer.avatar.id == avatarComponent.id : false")
 		(var shipId:number = "avatarComponent ? avatarComponent.ship.ref.ship.id : null" (event "avatarComponent.evShipRefChanged"))
 		(var shipType:str = "avatarComponent ? avatarComponent.shipType : null" (event "avatarComponent.evShipTypeChanged"))
 		(var ownShipEntity:gfx = "$datahub.getPrimaryEntity(CC.ownShip, shipId)")
@@ -1880,9 +1847,10 @@
 	(scope
 		#fix for skill---------------------
 		(var avatarComponent:gfx = "_avatarEntity ? _avatarEntity.avatar : null")
+		(var selfPlayer:gfx = "$datahub.getSingleEntity(CC.playerAvatar)")
 
 		#shipId -> ownShip (ship in port) -> crewId (crew on board) -> crewSkill (check crew has skill)
-		(var isSelf:bool = "selfPlayer.avatar.id == avatarComponent.id")
+		(var isSelf:bool = "selfPlayer ? selfPlayer.avatar.id == avatarComponent.id : false")
 		(var shipId:number = "avatarComponent ? avatarComponent.ship.ref.ship.id : null" (event "avatarComponent.evShipRefChanged"))
 		(var shipType:str = "avatarComponent ? avatarComponent.shipType : null" (event "avatarComponent.evShipTypeChanged"))
 		(var ownShipEntity:gfx = "$datahub.getPrimaryEntity(CC.ownShip, shipId)")
@@ -2085,13 +2053,12 @@
 	# NEVER. EVER. Cast userPrefs to dict type because it will literally freezes the game
 )
 
-(def macro TP_GET_PREF_NUMBER (_varName:expression, _prefKey:expression, _default:expression="0", _modifier:expression="1.0")
-	# toString is mandatory because the number can be automatically casted to 0 and fails the "== null" check
-	(var name="_varName" type=number value="(_userPrefsNum && toString(_userPrefsNum[_prefKey]) != null) ? (round(_userPrefsNum[_prefKey]) * _modifier) : _default")
+(def macro TP_GET_PREF_NUMBER (_varName:expression, _pref:expression)
+	(var name="_varName" type=number value="_userPrefsNum && isNumber(_userPrefsNum[_pref.KEY]) ? _pref.OFFSET + (round(_userPrefsNum[_pref.KEY]) * _pref.MODIFIER) : _pref.DEFAULT")
 )
 
-(def macro TP_GET_PREF_BOOL (_varName:expression, _prefKey:expression, _default:expression="true")
-	(var name="_varName" type=bool value="(_userPrefsNum && toString(_userPrefsNum[_prefKey]) != null) ? round(_userPrefsNum[_prefKey]) : _default")
+(def macro TP_GET_PREF_BOOL (_varName:expression, _pref:expression)
+	(var name="_varName" type=bool value="_userPrefsNum && isNumber(_userPrefsNum[_pref.KEY]) ? round(_userPrefsNum[_pref.KEY]) : _pref.DEFAULT")
 )
 
 (def macro TP_TOOLTIP_BEHAVIOUR (_isAlly:expression = false)
