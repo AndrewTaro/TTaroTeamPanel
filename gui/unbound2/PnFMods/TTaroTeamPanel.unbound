@@ -35,6 +35,7 @@
 	KILL_COUNT			: {KEY: 'ttTeamPanelPlayerKillsVisible',		DEFAULT: true},
 	SHIP_NAME			: {KEY: 'ttTeamPanelShipNameVisible',			DEFAULT: true},
 	SHIP_TIER			: {KEY: 'ttTeamPanelShipTierVisible',			DEFAULT: true},
+	PREMIUM_TIER		: {KEY: 'ttTeamPanelHighlightPremiumTier',		DEFAULT: false},
 	SHIP_NATION			: {KEY: 'ttTeamPanelShipNationVisible',			DEFAULT: false},
 	SHIP_ICON			: {KEY: 'ttTeamPanelShipIconVisible',			DEFAULT: true},
 	SHIP_ICON_COLOR		: {KEY: 'ttTeamPanelShipIconColorPreset',		DEFAULT: 0,		MODIFIER: 1,	OFFSET: 0},
@@ -659,8 +660,8 @@
 	(style
 		(width = "TP_PLAYER_ROW_SIZE.HEIGHT")
 		(height = "TP_PLAYER_ROW_SIZE.HEIGHT")
-		(bind marginLeft "_isAlly ? 0 : 4px")
-		(bind marginRight "_isAlly ? 4px : 0")
+		(marginLeft = 4px)
+		(marginRight = 4px)
 		(align = "middle|center")
 		(backgroundSize = "fill")
 		(bind backgroundImage "flagName ? 'url:../nation_flags/tiny/flag_' + flagName + '.png' : ''")
@@ -701,6 +702,10 @@
 		(var shipEntity:gfx = "_entity ? _entity.avatar.ship.ref.ship : null" (event "_entity.avatar.evShipRefChanged"))
 		(var levelRome:str = "shipEntity ? shipEntity.levelRome : ''") #IDS_PASB518
 		(macro TP_GET_PREF_BOOL _varName="'isShipTierVisible'" _pref="TP_PREFS.SHIP_TIER")
+		(macro TP_GET_PREF_BOOL _varName="'isPremiumHighlighted'" _pref="TP_PREFS.PREMIUM_TIER")
+
+		(var isPremium:bool = "shipEntity ? shipEntity.isPremium : false") #IDS_PASB518
+		(var fontColor:number = "isPremium && isPremiumHighlighted ? FONT_CLASS_TO_COLOR['$FontColorGolden'] : FONT_CLASS_TO_COLOR['$FontColorWhite']")
 	)
 	(style
 		(width = 22px)
@@ -711,7 +716,7 @@
 		(class $TextDefaultBoldNM)
 		(class $FontEnableReadability)
 		(style
-			#(fontSize = 17)
+			(bind textColor "fontColor")
 		)
 		(bind text "levelRome")
 	)
