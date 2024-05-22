@@ -24,7 +24,7 @@
 	STATS_BOLD_FONT		: {KEY: 'ttTeamPanelShipStatsUseBoldFont',		DEFAULT: false},
 	POS_OFFSET			: {KEY: 'ttTeamPanelPosOffset',					DEFAULT: 160.0,	MODIFIER: 10.0,	OFFSET: 110.0},
 	SCALE_OFFSET		: {KEY: 'ttTeamPanelScaleOffset',				DEFAULT: 1.0,	MODIFIER: 0.1,	OFFSET: 0.5},
-	BLUR_MODE			: {KEY: 'ttTeamPanelBlurMode',					DEFAULT: true},
+	BLUR_MODE			: {KEY: 'ttTeamPanelBlurMode',					DEFAULT: false},
 	BLUR_ALT_VISIBLE	: {KEY: 'ttTeamPanelBlurVisibleOnAlt',			DEFAULT: false},
 	BLUR_ALPHA			: {KEY: 'ttTeamPanelBlurOpacity',				DEFAULT: 0.0,	MODIFIER: 0.1,	OFFSET: 0.0},
 	DEAD_PLAYER_VISIBLE	: {KEY: 'ttTeamPanelDeadPlayerVisible',			DEFAULT: true},
