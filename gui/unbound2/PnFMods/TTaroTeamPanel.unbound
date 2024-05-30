@@ -42,6 +42,7 @@
 	SHIP_DETECTION		: {KEY: 'ttTeamPanelShipDetectionVisible',		DEFAULT: true},
 	HEALTHBAR_OPACITY	: {KEY: 'ttTeamPanelHealthBarOpacity',			DEFAULT: 0.4,	MODIFIER: 0.1,	OFFSET: 0},
 	HEALTHBAR_WIDTH		: {KEY: 'ttTeamPanelHealthBarWidth',			DEFAULT: 1.0,	MODIFIER: 0.1,	OFFSET: 0.5},
+	TEAM_CONSUMABLES	: {KEY: 'ttTeamPanelTeamConsumablesVisible',	DEFAULT: false},
 	#SHIPCONFIGS
 	#Artillery
 	ARTILLERY_RANGE		: {KEY: 'ttTeamPanelArtilleryRangeVisible',		DEFAULT: true},
@@ -431,6 +432,7 @@
 			(element TP_ShipDetectionItem		_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
 			(element TP_PlayerKillCountItem 	_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
 			(element TP_ShipConfigurationsItem 	_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
+			(element TP_ShipConsumablesItem		_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
 		)
 	)
 	
@@ -920,6 +922,146 @@
 		(class $FullsizeAbsolute)
 		(rendererString = blurMeBaby)
 		(macro TP_BIND_BLURINTENSITY "_blurIntensity")
+	)
+)
+
+#Active Consumables Info: wip
+(def element TP_ShipConsumablesItem(_entity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
+	(scope
+		(macro TP_GET_PREF_BOOL _varName="'isTeamConsumableVisible'" _pref="TP_PREFS.TEAM_CONSUMABLES")
+
+		(var _markerEntity:gfx = "_entity")
+		(macro GET_MARKER_ENTITY_COMPONENT 'data')
+		(var consData:array = "dataComponent ? dataComponent.data['consMonitor']: []" (event "dataComponent.evChanged"))
+
+		(macro GET_MARKER_ENTITY_COMPONENT 'health')
+		(var isAlive:bool = "healthComponent ? healthComponent.isAlive : false" (event "healthComponent.evIsAliveChanged"))
+	)
+	(style
+		(flow = "Flow.HORIZONTAL")
+		(bind alpha "isAlive ? 1.0 : 0")
+	)
+	(bind visible "isTeamConsumableVisible")
+
+	(controller $Repeat renderer='TP_TeamConsumableItem'
+		(bind enabled "consData.length")
+		(bind count "consData.length")
+		(args "consData[$index]")
+	)
+)
+
+(def element TP_TeamConsumableItem (_consData:dict=null)
+	# Implicitly using Constants from Consumables Monitor
+	(scope
+		(event evPlayActivatedAnimation)
+		(event evPlayAboutToEndAnimation)
+		(event evPlayEndingAnimation)
+
+		(var consIconPath:str = "_consData ? 'url:../consumables/consumable_' + _consData['icon'] + '.png' : ''")
+		(var consNum:str = "_consData ? _consData['num'] : ''")
+		(var consState:number = "_consData ? _consData['currentState'] : -1")
+		(var consEndTime:number = "_consData ? _consData['endTime'] : 0")
+
+		(var isSpecialConsumable:bool = "_consData ? _consData['icon'] in [
+			'PCY057_TriggerHeal', 'PCY056_TacticalMinefield', 'PCY055_TriggerSabotage', 'PCY054_TacticalVulnerabilityDebuff',
+			'PCY053_SmokePlane', 'PCY052_ReconSquad', 'PCY051_SpeedBuff'
+			] : false"
+		)
+		
+		(var isReady:bool = "consState == SC.Battle.CONSUMABLE_STATES.READY")
+		(var isActive:bool = "consState == SC.Battle.CONSUMABLE_STATES.AT_WORK")
+		(var isReload:bool = "consState == SC.Battle.CONSUMABLE_STATES.RELOAD")
+		(var isEmpty:bool = "consState == SC.Battle.CONSUMABLE_STATES.NO_AMMO")
+		(var isPreparation:bool = "consState == SC.Battle.CONSUMABLE_STATES.PREPARATION")
+		
+		#0: READY, 1: AT_WORK, 2: RELOAD, 3: NO_AMMO, 4:PREPARATION
+		(var consStateColor:number = "CM2_STATE_COLORS[consState]")
+
+		(var timerEntity:gfx = "$datahub.getSingleEntity(CC.timer)")
+		(var consStateTime:number = "consEndTime - timerEntity.timer.currentTime" (event "timerEntity.timer.evFrequent"))
+
+		(var cameraEntity:gfx = "$datahub.getSingleEntity(CC.camera)")
+		(var isTactical:bool = "cameraEntity.camera.isTactical" (event "cameraEntity.camera.evTacticalStateChanged"))
+		(var altVision:bool = "cameraEntity.camera.altVision" (event "cameraEntity.camera.evAltVisionChanged"))
+		(var altVisionEnabled:bool = "altVision && !isTactical")
+
+		(var consStateStr:str = "	isReady ? 'RDY' :
+									isEmpty ? 'NONE':
+									countdownFormat(consStateTime)")
+		(var consNumStr:str = "		consNum != 'inf'?
+									'x' + consNum	:
+									' '")
+
+		(var isConsumableAboutToEnd:bool = "isActive && (consStateTime <= CM2_ENDING_SETTINGS.DURATION)")
+		(var isConsumableEnding:bool = "isActive && (consStateTime <= CM2_APPEAR_SETTINGS.DURATION)")
+
+		(var animatedIconAlpha:number = "CM2_DEFAULT_SETTINGS.ALPHA" watch=false)
+		(var animatedIconMargin:number = "CM2_DEFAULT_SETTINGS.HEIGHT" watch=false)
+		(var isActivatedAnimationPlaying:bool = "false" watch=false)
+
+		(controller $Animation
+			(bindcall play  duration="CM2_APPEAR_SETTINGS.DURATION"
+							easing="Easing.cubic_out"
+							from="{ animatedIconAlpha: CM2_APPEAR_SETTINGS.ALPHA_MIN, animatedIconMargin: CM2_APPEAR_SETTINGS.HEIGHT_MAX }"
+							to=	 "{ animatedIconAlpha: CM2_APPEAR_SETTINGS.ALPHA_MAX, animatedIconMargin: CM2_APPEAR_SETTINGS.HEIGHT_MIN }"
+							(bind enabled "isActive")
+							(event "evPlayActivatedAnimation")
+			)
+			(bind isActivatedAnimationPlaying	"true"  init=false on=evAnimStarted)
+			(bind isActivatedAnimationPlaying	"false" init=false on=evAnimEnded)
+		)
+		(controller $Animation
+			(bindcall play  id='aboutToEndAnim'
+							duration="CM2_ENDING_SETTINGS.BLINK"
+							repeatCount=-1
+							easing="Easing.sine_in"
+							from="{ animatedIconAlpha: CM2_ENDING_SETTINGS.ALPHA_MAX }"
+							to=  "{ animatedIconAlpha: CM2_ENDING_SETTINGS.ALPHA_MIN }"
+							(bind enabled "isConsumableAboutToEnd && !isActivatedAnimationPlaying")
+							(event "evPlayAboutToEndAnimation")
+			)
+			(bindcall stop id='aboutToEndAnim' (event "evPlayEndingAnimation"))
+		)
+		(controller $Animation
+			(bindcall play  duration="CM2_APPEAR_SETTINGS.DURATION"
+							to=	 "{ animatedIconAlpha: CM2_APPEAR_SETTINGS.ALPHA_MIN,	 animatedIconMargin: CM2_APPEAR_SETTINGS.HEIGHT_MAX }"
+							easing="Easing.cubic_out"
+							(bind enabled "isConsumableEnding")
+							(event "evPlayEndingAnimation")
+			)
+			(bind animatedIconAlpha		"CM2_DEFAULT_SETTINGS.ALPHA" init=false on=evAnimEnded)
+			(bind animatedIconMargin	"CM2_DEFAULT_SETTINGS.HEIGHT" init=false on=evAnimEnded)
+		)
+	)
+
+	(dispatch evPlayActivatedAnimation (bind trigger "isActive") (bind enabled "!isActive"))
+	(dispatch evPlayAboutToEndAnimation (bind enabled "isConsumableAboutToEnd && !isActivatedAnimationPlaying"))
+	(dispatch evPlayEndingAnimation (bind trigger "isConsumableEnding") (bind enabled "isConsumableEnding"))
+
+	(hblock $enabled="isSpecialConsumable"
+		(style
+			(bind height "isActive ? 24px : 'auto'")
+		)
+		(block
+			(bind visible "isActive || altVisionEnabled")
+			(style
+				(bind backgroundImage "consIconPath")
+				(scaleX = 0.4)
+				(scaleY = 0.4)
+				(width = 60px)
+				(height = 60px)
+				(bind marginTop "animatedIconMargin")
+				(bind alpha "animatedIconAlpha")
+			)
+		)
+		(block
+			(bind visible "altVisionEnabled")
+			(style
+				(width = 24px)#need to be even number?
+			)
+			(element ConsumableMarkerTextItem "consStateStr" "consStateColor")
+			(element ConsumableMarkerTextItem "consNumStr" "consStateColor")
+		)
 	)
 )
 
@@ -2025,10 +2167,6 @@
 		(width = 27px) (height = 0px) (marginTop = -25px)
 		(bind backgroundImage "'url:../service_kit/ship_classes/icon_default_' + toLower(_className) + '.png'")
 	)
-)
-
-#Active Consumables Info: wip
-(def element TP_ShipActiveConsumablesItem(_entity:gfx=null)
 )
 
 #--------------------------------------------------------------------------------
