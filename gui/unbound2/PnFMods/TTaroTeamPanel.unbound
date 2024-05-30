@@ -933,6 +933,12 @@
 		(var _markerEntity:gfx = "_entity")
 		(macro GET_MARKER_ENTITY_COMPONENT 'data')
 		(var consData:array = "dataComponent ? dataComponent.data['consMonitor']: []" (event "dataComponent.evChanged"))
+		(var lastConsumable:dict = "consData.length > 0 ? consData[consData.length - 1] : null")
+		(var isSpecialConsumable:bool = "lastConsumable ? lastConsumable['icon'] in [
+			'PCY057_TriggerHeal', 'PCY056_TacticalMinefield', 'PCY055_TriggerSabotage', 'PCY054_TacticalVulnerabilityDebuff',
+			'PCY053_SmokePlane', 'PCY052_ReconSquad', 'PCY051_SpeedBuff'
+			] : false"
+		)
 
 		(macro GET_MARKER_ENTITY_COMPONENT 'health')
 		(var isAlive:bool = "healthComponent ? healthComponent.isAlive : false" (event "healthComponent.evIsAliveChanged"))
@@ -941,12 +947,12 @@
 		(flow = "Flow.HORIZONTAL")
 		(bind alpha "isAlive ? 1.0 : 0")
 	)
-	(bind visible "isTeamConsumableVisible")
+	(bind visible "_isAlly && isTeamConsumableVisible")
 
-	(controller $Repeat renderer='TP_TeamConsumableItem'
-		(bind enabled "consData.length")
-		(bind count "consData.length")
-		(args "consData[$index]")
+	#(element TP_TeamConsumableItem _consData = "lastConsumable")
+	(controller $Instance renderer='TP_TeamConsumableItem'
+		(args _consData = "lastConsumable")
+		(bind enabled "isSpecialConsumable")
 	)
 )
 
@@ -961,12 +967,6 @@
 		(var consNum:str = "_consData ? _consData['num'] : ''")
 		(var consState:number = "_consData ? _consData['currentState'] : -1")
 		(var consEndTime:number = "_consData ? _consData['endTime'] : 0")
-
-		(var isSpecialConsumable:bool = "_consData ? _consData['icon'] in [
-			'PCY057_TriggerHeal', 'PCY056_TacticalMinefield', 'PCY055_TriggerSabotage', 'PCY054_TacticalVulnerabilityDebuff',
-			'PCY053_SmokePlane', 'PCY052_ReconSquad', 'PCY051_SpeedBuff'
-			] : false"
-		)
 		
 		(var isReady:bool = "consState == SC.Battle.CONSUMABLE_STATES.READY")
 		(var isActive:bool = "consState == SC.Battle.CONSUMABLE_STATES.AT_WORK")
@@ -1038,7 +1038,7 @@
 	(dispatch evPlayAboutToEndAnimation (bind enabled "isConsumableAboutToEnd && !isActivatedAnimationPlaying"))
 	(dispatch evPlayEndingAnimation (bind trigger "isConsumableEnding") (bind enabled "isConsumableEnding"))
 
-	(hblock $enabled="isSpecialConsumable"
+	(hblock
 		(style
 			(bind height "isActive ? 24px : 'auto'")
 		)
