@@ -22,6 +22,7 @@
 	STATS_ALT_VISIBLE	: {KEY:	'ttTeamPanelShipStatsVisibleOnAlt',		DEFAULT: false},
 	UNITS_VISIBLE		: {KEY: 'ttTeamPanelShipStatsUnitsVisible',		DEFAULT: true},
 	STATS_BOLD_FONT		: {KEY: 'ttTeamPanelShipStatsUseBoldFont',		DEFAULT: false},
+	HIDE_ALLY_BUILDS	: {KEY: 'buildViewerDisableAllyBuilds',			DEFAULT: false}, # Build Viewer Option: Show builds on Tooltip
 	POS_OFFSET			: {KEY: 'ttTeamPanelPosOffset',					DEFAULT: 160.0,	MODIFIER: 10.0,	OFFSET: 110.0},
 	SCALE_OFFSET		: {KEY: 'ttTeamPanelScaleOffset',				DEFAULT: 1.0,	MODIFIER: 0.1,	OFFSET: 0.5},
 	BLUR_MODE			: {KEY: 'ttTeamPanelBlurMode',					DEFAULT: false},
@@ -173,6 +174,7 @@
 		(macro STAGE_SIZE)
 		(macro TP_GET_USERPREFS)
 		(macro TP_GET_PREF_NUMBER _varName="'posY'" _pref="TP_PREFS.POS_OFFSET")
+		(macro TP_GET_PREF_BOOL _varName="'isBlurMode'" _pref="TP_PREFS.BLUR_MODE")
 	)
 	(bindcall externalCall 'inputMapping.onAction' "['createParamsForAllShipsInBattle', {}]" on='addedToStage')
 	# Hide the default Ub1 ears
@@ -181,6 +183,14 @@
 	(style
 		(bind width "stageWidth")
 		(bind height "stageHeight")
+	)
+	(controller $Instance renderer='DeclareBlurLayer'
+		(bind enabled "isBlurMode")
+		(exprs
+			(style
+				(zindex = "ZIndex.BACKGROUND")
+			)
+		)
 	)
 
 	(block
@@ -318,7 +328,7 @@
 			(element TP_PlayerDivisionItem 		_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
 			(element TP_PlayerInfoItem 			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
 			(element TP_PlayerClanIconItem 		_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
-			(element TP_ShipWeightItem 			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum") #For tournament
+			(element TP_ShipWeightItem 			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum" $enabled="MOD_TOURNAMENT_SHIPWEIGHT_DATA") #For tournament
 			(element TP_ShipNationItem 			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
 			(element TP_ShipTierItem 			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
 			(element TP_ShipIconItem 			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
@@ -359,7 +369,7 @@
 		)
 
 		# Mod Config
-		(element TT_ConfigButtonElement _modIndex = "5"
+		(element TT_ConfigButtonElement _modIndex = "5" _tooltipPosition="borderNoTrack"
 			(style
 				(position = "flow")
 			)
@@ -370,6 +380,9 @@
 # Player
 (def element TP_PlayerItem (_items:array, _isAlly:bool=false, _userPrefsNum:gfx=null)
 	(scope
+		(event evMouseOver)
+		(event evMouseOut)
+
 		(var _entity:gfx = "_items[$index]" watch=false)
 		(var _index:number = "indexOf(_entity, _items)")
 		(var healthComponent:gfx = "_entity.hasComponent(CC.health) ? _entity.health : null")
@@ -397,16 +410,25 @@
 		(var camera:gfx = "$datahub.getSingleComponent(CC.camera)")
 		(var altVision:bool = "camera ? camera.altVision : false" (event "camera.evAltVisionChanged"))
 		(var isBlurVisible:bool = "isBlurVisibleOnlyAlt ? altVision : true")
+		(var hoverBackground:str = "_isAlly ? 'ally_bg_panel' : 'enemy_bg_panel'")
+		(var hoverBackgroundUrl:str = "'url:../service_kit/panel_backgrounds/' + hoverBackground + '.png'")
+
+		(var elemWidth:number = "floor($globalLayoutBounds[2]) + 15" (event "$evLayoutBoundsChanged"))
+		# For some really weird reason, tooltip controller and (position="border") have an issue with tracking the border
+		# It tracks the border size only when making the elements larger
+		# But it does not reflect the size down e.g. (visible = false)
+		# Thus once the elements get expanded the border tooltip does not come back to the original position
+		# I have to manually do the calculation here :(
 	)
-	#For tooltip
+	# For tooltip
 	(dispatch evHideInfotip args="{}" (bind trigger "isMouseActive") (event "evMenuItemClicked"))
 
 	(style
-		(backgroundColor = 0x00FFFFFF) #For seamless hittest. Do not use 0x01000000 because it will have a visible dark color!
+		(backgroundColor = 0x00FFFFFF) # For seamless hittest. Do not use 0x01000000 because it will have a visible dark color!
 
-		#(position = "absolute") is required to separate the argument entity and the position of this element within parent layout.
-		#With auto positioning, the layout of elements remains the same - but the argument entities change.
-		#In that case, the spotted indicator or any element that uses (watch=false) variable within their scope can break.
+		# (position = "absolute") is required to separate the argument entity and the position of this element within parent layout.
+		# With auto positioning, the layout of elements remains the same - but the argument entities change.
+		# In that case, the spotted indicator or any element that uses (watch=false) variable within their scope can break.
 		(position = "absolute")
 		(bind left "_isAlly ? 0 : auto")
 		(bind right "_isAlly ? auto : 0")
@@ -419,29 +441,53 @@
 		(bind visible "isBlurVisible")
 	)
 
-	(element HorizontalDividerTwoPx
+	(element TP_HorizontalDividerTwoPx
 		(bind visible "_index == 0")
-		(style
-			(alpha = 2.0)
-		)
 	)
-	#Ally: hblock, Enemy: reverse hblock
+	
+	# Ally: hblock, Enemy: reverse hblock
 	(block
 		(style
 			(height = "TP_PLAYER_ROW_SIZE.HEIGHT")
+			(hitTest = true)
+		)
+
+		(dispatch evMouseOver args={} on='rollOver')
+		(dispatch evMouseOut  args={} on='rollOut')
+
+		# Hover animation
+		(block
+			(class $FullsizeAbsolute)
+			(style
+				(bind backgroundImage "hoverBackgroundUrl")
+				(scale9grid = 3)
+				(alpha = 0)
+			)
+			(controller $Animation
+				(bindcall play  duration=0.15
+								to="{ alpha: 1 }"
+								(event "evMouseOver")
+				)
+				(bindcall play  duration=0.15
+								to="{ alpha: 0 }"
+								(event "evMouseOut")
+				)
+			)
 		)
 
 		(element TP_ShipHealthBarItem _entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
+
 		(hblock
 			(style
 				(align = "center|middle")
 				(bind alpha "isAlive ? 1.0 : 0.4")
 				(bind flow "_isAlly ? Flow.HORIZONTAL : Flow.REVERSE_HORIZONTAL")
+				(hitTest = false)
 			)
 			(element TP_PlayerDivisionItem 		_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
 			(element TP_PlayerInfoItem 			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
 			(element TP_PlayerClanIconItem 		_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
-			(element TP_ShipWeightItem 			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum") #For tournament
+			(element TP_ShipWeightItem 			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum" $enabled="MOD_TOURNAMENT_SHIPWEIGHT_DATA") #For tournament
 			(element TP_ShipNationItem 			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
 			(element TP_ShipTierItem 			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
 			(element TP_ShipIconItem 			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
@@ -450,28 +496,24 @@
 			(element TP_ShipConfigurationsItem 	_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
 			(element TP_ShipConsumablesItem		_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
 		)
-	)
-	
-	#Tooltip for Detailed Ship Stats
-	(controller $Tooltip
-		(renderer = 'TP_TooltipShipConfigurationsItem')
-		(args "_entity")
-		(macro TP_TOOLTIP_BEHAVIOUR "_isAlly")
-	)
 
-	#Context Menu for Report/Compliment/Division
-	(controller $Tooltip (renderer = 'ContextMenuPlayer')
-		(bind enabled "isContextMenuAvailable")
-		(args _playerEntity="_entity" _selfPlayer="selfPlayer")
-		(macro DEFAULT_MENU_BEHAVIOUR "evHideInfotip" "1")
-		(cache=false)
-	)
+		# Tooltip for Detailed Ship Stats
+		(controller $Tooltip
+			(renderer = 'TP_TooltipShipConfigurationsItem')
+			(args "_entity" _userPrefsNum="_userPrefsNum")
+			(macro TP_TOOLTIP_BEHAVIOUR "_isAlly")
+		)
 
-	(element HorizontalDividerTwoPx
-		(style
-			(alpha = 2.0)
+		# Context Menu for Report/Compliment/Division
+		(controller $Tooltip (renderer = 'ContextMenuPlayer')
+			(bind enabled "isContextMenuAvailable")
+			(args _playerEntity="_entity" _selfPlayer="selfPlayer")
+			(macro DEFAULT_MENU_BEHAVIOUR "evHideInfotip" "1")
+			(cache=false)
 		)
 	)
+
+	(element TP_HorizontalDividerTwoPx)
 )
 
 # Player Info
@@ -693,10 +735,7 @@
 		(var shipEntity:gfx = "_entity ? _entity.avatar.ship.ref.ship : null" (event "_entity.avatar.evShipRefChanged"))
 		(var shipId:str = "shipEntity ? toString(shipEntity.id) : ''") #uint long
 
-		# Enabled
-		(var shipWeights:dict = "MOD_TOURNAMENT_SHIPWEIGHT_DATA")
-		(var isShipWeightEnabled:bool = "shipWeights")
-		(var shipWeightData:dict = "isShipWeightEnabled && shipId in shipWeights ? shipWeights[shipId] : {}")
+		(var shipWeightData:dict = "shipId in MOD_TOURNAMENT_SHIPWEIGHT_DATA ? MOD_TOURNAMENT_SHIPWEIGHT_DATA[shipId] : {}")
 
 		# Weight
 		(var weight:number = "'WEIGHT' in shipWeightData ? shipWeightData.WEIGHT : 0")
@@ -706,7 +745,6 @@
 		(width = 20px)
 		(align = "center")
 	)
-	(bind visible "isShipWeightEnabled")
 	(tf
 		(class $TextDefaultBoldNM)
 		(class $FontEnableReadability)
@@ -836,9 +874,9 @@
 		(var shipEntity:gfx = "avatarComponent ? avatarComponent.ship.ref.ship : null" (event "avatarComponent.evShipRefChanged"))
 		(var shipId:str = "shipEntity ? toString(shipEntity.id) : ''")
 
-		(var shipWeights:dict = "MOD_TOURNAMENT_SHIPWEIGHT_DATA")
-		(var isShipWeightEnabled:bool = "shipWeights")
-		(var shipWeightData:dict = "isShipWeightEnabled && shipId in shipWeights ? shipWeights[shipId] : {}")
+		(var shipWeights:dict = "{}" watch=false)
+		(bind shipWeights "MOD_TOURNAMENT_SHIPWEIGHT_DATA" $enabled="MOD_TOURNAMENT_SHIPWEIGHT_DATA") # Error supression
+		(var shipWeightData:dict = "shipId in shipWeights ? shipWeights[shipId] : {}")
 
 		(var isFlagShip:bool = "'FLAGSHIP' in shipWeightData ? shipWeightData.FLAGSHIP : false")
 		(var flagShipColorKey:str = "isAlly ? 'ally' : 'enemy'")
@@ -867,7 +905,7 @@
 		(pivotX = "0")
 		(pivotY = "0")
 		(bind width "TP_PLAYER_ROW_SIZE.WIDTH * widthScale")
-		(height = "TP_PLAYER_ROW_SIZE.HEIGHT")
+		(height = "100%")
 		(align = "center|middle")
 		(hitTest = false)
 	)
@@ -917,6 +955,9 @@
 		(var panelElement:str = "_isBlur ? 'TP_ContrastPanelBlur' : 'TP_ContrastPanelNormal'")
 	)
 	(class $FullsizeAbsolute)
+	(style
+		(hitTest = false)
+	)
 	(controller $Instance
 		(bind renderer "panelElement")
 		(args "_intensity")
@@ -925,15 +966,25 @@
 
 (def element TP_ContrastPanelNormal(_alpha:number=1.0)
 	(class $FullsizeAbsolute)
-	(mc hud_bar_bg_sliced
-		(class $FullsizeAbsolute)
+	(style
+		(padding = -1px)
 		(bind alpha "_alpha")
 	)
+	(block
+		(class $FullsizeAbsolute)
+		(style
+			(backgroundImage = "'url:../service_kit/panel_backgrounds/hint_panel_high_contrast.png'")
+			(scale9grid = 3)
+		)
+	)
+	# (mc contrast_panel
+	# 	(class $FullsizeAbsolute)
+	# 	(bind alpha "_alpha")
+	# )
 )
 
 (def element TP_ContrastPanelBlur(_blurIntensity:number=0.3)
 	(class $FullsizeAbsolute)
-	(element DeclareBlurLayer)
 	(mc mc_blurmap_medium
 		(class $FullsizeAbsolute)
 		(rendererString = blurMeBaby)
@@ -1079,6 +1130,15 @@
 			(element ConsumableMarkerTextItem "consNumStr" "consStateColor")
 		)
 	)
+)
+
+(def element TP_HorizontalDividerTwoPx()
+	(style
+		(alpha = 2.0)
+		(hitTest = false)
+		(width = 100%)
+	)
+	(element HorizontalDividerTwoPx)
 )
 
 #--------------------------------------------------------------------------------
@@ -1598,11 +1658,25 @@
 
 		(var isRealParams:bool = "shipBattleInfo ? shipBattleInfo.isRealParams : false")
 		(var shipTTX:gfx = "isRealParams ? shipBattleInfo.shipTTX : ttxEntity.mods_ShipParamsInBattle.shipTTX")
+
+		(var vehicleId:str = "_entity && _entity.hasComponent(CC.vehicleInfo) ? toString(_entity.vehicleInfo.id) : ''" (event "_entity.evAdded"))
+
+		(var buildsEntityWatcher:gfx = "$datahub.getPrimWatcher(CC.mods_DataComponent, BV_COMPONENT_KEY_BUILDS)")
+		(var buildsEntity:gfx = "buildsEntityWatcher.entity" (event "buildsEntityWatcher.event"))
+		(var buildsDataComponent:gfx = "buildsEntity ? buildsEntity.mods_DataComponent : null" (event "buildsEntity.evAdded"))
+		(var buildsData:dict = "buildsDataComponent ? buildsDataComponent.data : {}" (event "buildsDataComponent.evDataChanged"))
+		(var buildData:dict = "vehicleId in buildsData ? buildsData[vehicleId] : {}")
+		(var skills:array = "'skills' in buildData ? buildData.skills : []")
+		(var modernizations:array = "'modernizations' in buildData ? buildData.modernizations : []")
+		(var signals:array = "'signals' in buildData ? buildData.signals : []")
+
+		(macro TP_GET_PREF_BOOL _varName="'isOwnBuildOnly'" _pref="TP_PREFS.HIDE_ALLY_BUILDS")
 	)
 
 	(style
 		(align = "middle|center")
 		(hitTest = false)
+		(flow = "Flow.HORIZONTAL")
 	)
 
 	(macro TOOLTIP_SYSTEM_DEFAULT_BACKGROUND)
@@ -1621,6 +1695,15 @@
 		(element TP_TooltipMobilityItem "shipTTX")
 		(element TP_TooltipVisibilityItem "shipTTX" _avatarEntity="_entity" _isRealParams="isRealParams")
 		(element TP_TooltipConsumableItem "shipBattleInfo")
+	)
+	(block $enabled="TT_BUILDVIEWER_INSTALLED"
+		(style
+			(align = "middle|center")
+		)
+		(bind visible "!isOwnBuildOnly")
+		(element BV_SkillsElement "skills")
+		(element BV_ModernizationsElement "modernizations")
+		(element BV_SignalsElement "signals")
 	)
 )
 
@@ -2223,7 +2306,7 @@
 (def macro TP_TOOLTIP_BEHAVIOUR (_isAlly:expression = false)
 
 	(bindcall show animation =	{	duration:	"0.3",
-									delay:		"0.3",
+									delay:		"0.15",
 									easing:		"Easing.cubic_out",
 									from:		{ alpha: 0, top: 5 },
 									to:			{ alpha: 1, top: 0 }
@@ -2242,15 +2325,15 @@
 
 	(offset = {	x: 35, y: 15})
 
-	(screenBoundsOffset = {			left:	10,
-									top:	10,
-									right:	10,
-									bottom:	10 })
+	(bind screenBoundsOffset "{	left:	_isAlly ? elemWidth : 10,
+								top:	10,
+								right:	_isAlly ? 10 : elemWidth,
+								bottom:	10 }")
 	
 	(priority = "0")
 
 	(bind align "_isAlly ? right|middle : left|middle")
-	(position="trackMouse")
+	(position="absolute")
 )
 
 (def macro TP_BIND_BLURINTENSITY(_blurIntensity:expression="0.3")
