@@ -1659,17 +1659,6 @@
 		(var isRealParams:bool = "shipBattleInfo ? shipBattleInfo.isRealParams : false")
 		(var shipTTX:gfx = "isRealParams ? shipBattleInfo.shipTTX : ttxEntity.mods_ShipParamsInBattle.shipTTX")
 
-		(var vehicleId:str = "_entity && _entity.hasComponent(CC.vehicleInfo) ? toString(_entity.vehicleInfo.id) : ''" (event "_entity.evAdded"))
-
-		(var buildsEntityWatcher:gfx = "$datahub.getPrimWatcher(CC.mods_DataComponent, BV_COMPONENT_KEY_BUILDS)")
-		(var buildsEntity:gfx = "buildsEntityWatcher.entity" (event "buildsEntityWatcher.event"))
-		(var buildsDataComponent:gfx = "buildsEntity ? buildsEntity.mods_DataComponent : null" (event "buildsEntity.evAdded"))
-		(var buildsData:dict = "buildsDataComponent ? buildsDataComponent.data : {}" (event "buildsDataComponent.evDataChanged"))
-		(var buildData:dict = "vehicleId in buildsData ? buildsData[vehicleId] : {}")
-		(var skills:array = "'skills' in buildData ? buildData.skills : []")
-		(var modernizations:array = "'modernizations' in buildData ? buildData.modernizations : []")
-		(var signals:array = "'signals' in buildData ? buildData.signals : []")
-
 		(macro TP_GET_PREF_BOOL _varName="'isOwnBuildOnly'" _pref="TP_PREFS.HIDE_ALLY_BUILDS")
 	)
 
@@ -1696,15 +1685,31 @@
 		(element TP_TooltipVisibilityItem "shipTTX" _avatarEntity="_entity" _isRealParams="isRealParams")
 		(element TP_TooltipConsumableItem "shipBattleInfo")
 	)
-	(block $enabled="TT_BUILDVIEWER_INSTALLED"
-		(style
-			(align = "middle|center")
-		)
-		(bind visible "!isOwnBuildOnly")
-		(element BV_SkillsElement "skills")
-		(element BV_ModernizationsElement "modernizations")
-		(element BV_SignalsElement "signals")
+	(controller $Instance renderer='TP_BuildViewerItem'
+		(bind enabled "!isOwnBuildOnly")
+		(args "_entity")
 	)
+)
+
+(def element TP_BuildViewerItem(_entity:gfx)
+	(scope
+		(var vehicleId:str = "_entity && _entity.hasComponent(CC.vehicleInfo) ? toString(_entity.vehicleInfo.id) : ''" (event "_entity.evAdded"))
+
+		(var buildsEntityWatcher:gfx = "$datahub.getPrimWatcher(CC.mods_DataComponent, BV_COMPONENT_KEY_BUILDS)")
+		(var buildsEntity:gfx = "buildsEntityWatcher.entity" (event "buildsEntityWatcher.event"))
+		(var buildsDataComponent:gfx = "buildsEntity ? buildsEntity.mods_DataComponent : null" (event "buildsEntity.evAdded"))
+		(var buildsData:dict = "buildsDataComponent ? buildsDataComponent.data : {}" (event "buildsDataComponent.evDataChanged"))
+		(var buildData:dict = "vehicleId in buildsData ? buildsData[vehicleId] : {}")
+		(var skills:array = "'skills' in buildData ? buildData.skills : []")
+		(var modernizations:array = "'modernizations' in buildData ? buildData.modernizations : []")
+		(var signals:array = "'signals' in buildData ? buildData.signals : []")
+	)
+	(style
+		(align = "middle|center")
+	)
+	(element BV_SkillsElement "skills")
+	(element BV_ModernizationsElement "modernizations")
+	(element BV_SignalsElement "signals")
 )
 
 (def element TP_TooltipArtilleryItem(_shipTTX:gfx, _userPrefsNum:gfx=null)
