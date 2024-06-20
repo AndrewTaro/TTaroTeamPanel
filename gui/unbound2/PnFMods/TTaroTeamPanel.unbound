@@ -2122,6 +2122,7 @@
 		(var visibilityTTX:gfx = "_shipTTX.visibility")
 		(var visibilityByShip:number = "visibilityTTX ? visibilityTTX.visibilityByShip.normal.value : null") #CAPTAIN SKILL FIX
 		(var visibilityByPlane:number = "visibilityTTX ? visibilityTTX.visibilityByPlane.normal.value : null") #CAPTAIN SKILL FIX
+		(var visibilityByShipSmoke:number = "visibilityTTX ? visibilityTTX.visibilityByShip.smoke.value : null")
 
 		#fix------------------
 		(var modifiedVisibilityByShip:number = "visibilityByShip * visibilityModifier") #CAPTAIN SKILL FIX
@@ -2144,6 +2145,7 @@
 
 		(block
 			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_VISIBILITY_DIST_BY_SHIP'" _value="modifiedVisibilityByShip" _unit="'km'" _userPrefsNum="_userPrefsNum")
+			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_VISIBILITY_DIST_BY_GK_IN_SMOKE_BATTLE'" _value="visibilityByShipSmoke" _unit="'km'" _userPrefsNum="_userPrefsNum")
 			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_VISIBILITY_DIST_BY_PLANE'" _value="modifiedVisibilityByPlane" _unit="'km'" _userPrefsNum="_userPrefsNum")
 		)
 	)
