@@ -39,6 +39,7 @@
 	PREMIUM_TIER		: {KEY: 'ttTeamPanelHighlightPremiumTier',		DEFAULT: false},
 	SHIP_NATION			: {KEY: 'ttTeamPanelShipNationVisible',			DEFAULT: false},
 	SHIP_ICON			: {KEY: 'ttTeamPanelShipIconVisible',			DEFAULT: true},
+	SHIP_ICON_STATUS	: {KEY: 'ttTeamPanelShipIconStatusColor',		DEFAULT: true},
 	SHIP_ICON_COLOR		: {KEY: 'ttTeamPanelShipIconColorPreset',		DEFAULT: 0,		MODIFIER: 1,	OFFSET: 0},
 	SHIP_DETECTION		: {KEY: 'ttTeamPanelShipDetectionVisible',		DEFAULT: true},
 	HEALTHBAR_OPACITY	: {KEY: 'ttTeamPanelHealthBarOpacity',			DEFAULT: 0.4,	MODIFIER: 0.1,	OFFSET: 0},
@@ -644,10 +645,13 @@
 (def element TP_ShipIconItem(_entity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
 	(scope
 		(macro TP_GET_MARKER_DATA "_entity")
-		(var markerColorName:str = 
+		(macro TP_GET_PREF_BOOL _varName="'isShipIconStatusColor'" _pref="TP_PREFS.SHIP_ICON_STATUS")
+		(var isIconGolden:bool = "isGolden && isShipIconStatusColor")
+		(var isIconTkStatus:bool = "tkStatus && isShipIconStatusColor")
+		(var markerColorName:str =
 			"	!isAlive			? 'sunk' :
-				isGolden			? 'division' :
-				tkStatus			? 'teamkiller' :
+				isIconGolden		? 'division' :
+				isIconTkStatus		? 'teamkiller' :
 				'white'
 			"
 		)
@@ -656,7 +660,7 @@
 
 		(macro TP_GET_PREF_BOOL _varName="'isShipIconVisible'" _pref="TP_PREFS.SHIP_ICON")
 		(macro TP_GET_PREF_NUMBER _varName="'shipIconColorIndex'" _pref="TP_PREFS.SHIP_ICON_COLOR")
-		(var isColorAvailable:bool = "!(isGolden || tkStatus)")
+		(var isColorAvailable:bool = "!(isIconGolden || isIconTkStatus)")
 		(var colorPreset:dict = "(TP_SHIP_ICON_COLOR_PRESET.length > shipIconColorIndex) ? TP_SHIP_ICON_COLOR_PRESET[shipIconColorIndex] : null")
 		(var colorDict:dict = "(isColorAvailable && colorPreset) ? colorPreset[subType] : {}")
 	)
