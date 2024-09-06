@@ -16,6 +16,10 @@
 	'enemy'	:{redOffset: -51,	greenOffset: -51,	blueOffset: -256},	# yellow-ish
 })
 
+(def constant TP_BANNED_SHIP_COLOR_TRANSFORM {
+	redOffset: -256,	greenOffset: -256,	blueOffset: -256,	# black
+})
+
 #--------------------------------------------------------------------------------
 (def constant TP_PREFS {
 	#GENERAL
@@ -157,6 +161,8 @@
 	#'Submarine': null
 })
 (def constant TP_ATBA_CREW_ID "-1") #Works until WG introduces the EPIC ATBA SKILL (hope that never happens)
+
+(def constant TP_COMPONENT_KEY_BANNED_SHIPS "'modTTaroTeamPanelBannedShips'")
 
 (def css $TP_ShipConfigText()
 	(extends $TextDefault13NM)
@@ -841,27 +847,27 @@
 
 (def element TP_ShipHealthBarItem(_entity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
 	(scope
-		#entity
+		# Entity
 		(var _markerEntity:gfx = "_entity")
 
-		#multi teams
+		# Multi Teams
 		(var customElementsVisibilityComponent:gfx = "$datahub.getSingleEntity(CC.customElementsVisibility)")
 		(var enabledElements:number = "customElementsVisibilityComponent ? customElementsVisibilityComponent.customElementsVisibility.enabledElements : null" (event "customElementsVisibilityComponent.customElementsVisibility.evChanged"))
 		(var isMultyTeamEnabled:bool = "(enabledElements & SC.Battle.CUSTOM_BATTLE_ELEMENTS.MULTYTEAMS) > 0")
 
-		#health
+		# Health
 		(macro GET_MARKER_ENTITY_COMPONENT 'health')
 		(var healthValue:number = "healthComponent ? healthComponent.value : 0" (event "healthComponent.evValueChanged"))
 		(var healthMax:number = "healthComponent ? healthComponent.max : 0" (event "healthComponent.evMaxChanged"))
 		(var healthRatio:number = "healthMax ? healthValue / healthMax : 1")
 		(var isAlive:bool = "healthComponent ? healthComponent.isAlive : false" (event "healthComponent.evIsAliveChanged"))
 
-		#regeneration
+		# Regeneration
 		(macro GET_MARKER_ENTITY_COMPONENT 'dataComponent')
 		(var regenMaxValue:number = "dataComponentComponent ? dataComponentComponent.data.maxValue : 0" (event "dataComponentComponent.evDataChanged"))
 		(var regenRatio:number = "healthMax ? regenMaxValue / healthMax : 0")
 
-		#relation
+		# Relation
 		(macro GET_MARKER_ENTITY_COMPONENT 'avatar')
 		(var teamId:number = "avatarComponent ? avatarComponent.teamId : 0" (event "avatarComponent.evTeamIdChanged"))
 		(macro GET_MARKER_ENTITY_COMPONENT 'relation')
@@ -869,12 +875,12 @@
 		(var relationStr:str = "toLower(SC.Battle.PLAYER_RELATION.VALUE_TO_NAME[relationValue])")
 		(var isAlly:bool = "relationComponent && isIn(relationComponent.value, [SC.Battle.PLAYER_RELATION.ALLY, SC.Battle.PLAYER_RELATION.SELF])" (event "relationComponent.evChanged"))
 
-		#diplomacy
+		# Diplomacy
 		(macro GET_MARKER_ENTITY_COMPONENT 'diplomacyRelation')
 		(var diplomacyRelationValue:number = "diplomacyRelationComponent ? diplomacyRelationComponent.value : 0" (event "diplomacyRelationComponent.evChanged"))
 		(var relationStrByDiplomacy:str = "DIPLOMACY_RELATION_TO_RELATION_STR[diplomacyRelationValue]")
 
-		#flagship for tournament
+		# Flagship for Tournament
 		(var shipEntity:gfx = "avatarComponent ? avatarComponent.ship.ref.ship : null" (event "avatarComponent.evShipRefChanged"))
 		(var shipId:str = "shipEntity ? toString(shipEntity.id) : ''")
 
@@ -885,18 +891,27 @@
 		(var isFlagShip:bool = "'FLAGSHIP' in shipWeightData ? shipWeightData.FLAGSHIP : false")
 		(var flagShipColorKey:str = "isAlly ? 'ally' : 'enemy'")
 
-		#bar color
+		# Ship Restrictions
+		(var bannedShipsEntityWatcher:gfx = "$datahub.getPrimWatcher(CC.mods_DataComponent, TP_COMPONENT_KEY_BANNED_SHIPS)")
+		(var bannedShipsEntity:gfx = "bannedShipsEntityWatcher.entity" (event "bannedShipsEntityWatcher.event"))
+		(var bannedShipsDataComponent:gfx = "bannedShipsEntity ? bannedShipsEntity.mods_DataComponent : null" (event "bannedShipsEntity.evAdded"))
+		(var bannedShipsByTeam:dict = "bannedShipsDataComponent ? bannedShipsDataComponent.data.bannedShipsByTeam : {}" (event "bannedShipsDataComponent.evDataChanged"))
+		(var bannedShips:array = "toString(teamId) in bannedShipsByTeam ? bannedShipsByTeam[toString(teamId)] : []")
+		(var isBannedShip:bool = "shipId in bannedShips")
+
+		# Bar Color
 		(macro TP_GET_PREF_NUMBER _varName="'alphaScale'" _pref="TP_PREFS.HEALTHBAR_OPACITY")
 		(var regenBarColorTransform:dict = "{redMultiplier:0,greenMultiplier:0,blueMultiplier:0,alphaMultiplier:1.0,redOffset:230,greenOffset:230,blueOffset:230,alphaOffset:0 }")
 		(var markerColorTransform:dict = 
-			"	isFlagShip					? TP_FLAGSHIP_COLOR_TRANSFORM[flagShipColorKey] :
+			"	isBannedShip				? TP_BANNED_SHIP_COLOR_TRANSFORM :
+				isFlagShip					? TP_FLAGSHIP_COLOR_TRANSFORM[flagShipColorKey] :
 				diplomacyRelationComponent	? TWO_TEAMS_COLOR_TRANSFORMS[relationStrByDiplomacy] :
 				isAlly						? TWO_TEAMS_COLOR_TRANSFORMS['ally'] :
 				isMultyTeamEnabled			? MULTI_TEAMS_COLOR_TRANSFORMS[teamId]
 											: TWO_TEAMS_COLOR_TRANSFORMS[relationStr]"
 		)
 
-		#bar width
+		# Bar Width
 		(macro TP_GET_PREF_NUMBER _varName="'widthScale'" _pref="TP_PREFS.HEALTHBAR_WIDTH")
 
 	)
