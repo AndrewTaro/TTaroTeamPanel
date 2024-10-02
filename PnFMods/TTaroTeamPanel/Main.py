@@ -239,7 +239,7 @@ class ShipRestrictionChecker(object):
         Create DH entity
         """
         self._entityId = ui.createUiElement()
-        ui.addDataComponentWithId(self._entityId, COMPONENT_KEY, {'bannedShipsByTeam': []})
+        ui.addDataComponentWithId(self._entityId, COMPONENT_KEY, {'bannedShipsByTeam': {}})
 
     def _removeEntity(self):
         """
