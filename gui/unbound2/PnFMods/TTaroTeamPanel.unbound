@@ -502,6 +502,7 @@
 			(element TP_PlayerKillCountItem 	_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
 			(element TP_ShipConfigurationsItem 	_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
 			(element TP_ShipConsumablesItem		_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
+			(element TP_ShipDamageItem			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum" $enabled="DMonitor_INFLICTED_DAMAGE_COMPONENT_KEY")
 		)
 
 		# Tooltip for Detailed Ship Stats
@@ -759,6 +760,56 @@
 		(class $TextDefaultBoldNM)
 		(class $FontEnableReadability)
 		(bind text "weightText")
+	)
+)
+
+(def element TP_ShipDamageItem(_entity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
+	(scope
+		(event evShow)
+
+		(var avatarId:str = "_entity ? _entity.avatar.id : 0")
+
+		(macro IS_SPECTATOR_MODE)
+
+		# Inflicted Damage Data Entity
+        (var iDamageEntityWatcher:gfx = "$datahub.getPrimWatcher(CC.mods_DataComponent, DMonitor_INFLICTED_DAMAGE_COMPONENT_KEY)")
+		(var iDamageEntity:gfx = "iDamageEntityWatcher.entity" (event "iDamageEntityWatcher.event"))
+
+		(var animatedDamage:number = "0" watch=false)
+
+		(var iDamageDataComponent:gfx = "iDamageEntity ? iDamageEntity.mods_DataComponent : null")
+		(var inflictedDamageData:dict = "iDamageDataComponent ? iDamageDataComponent.data : {}" (event "iDamageDataComponent.evDataChanged"))
+		(var inflictedDamage:dict = "avatarId in inflictedDamageData ? inflictedDamageData[avatarId] : {}")
+        (var totalDamage:number = "'totalDamage' in inflictedDamage ? inflictedDamage.totalDamage : 0")
+
+		(controller $Animation
+            # Increasing damage
+			(bindcall play	duration = 0.6
+							to = "{ animatedDamage: totalDamage}"
+							easing="Easing.cubic_out"
+							(bind trigger "totalDamage")
+							(event "evShow")
+			)
+		)
+	)
+
+	(bind visible "iDamageEntity && isSpectatorTrainingMode")
+
+	(dispatch evShow on='addedToStage')
+
+	(style
+		(width = 65px)
+		(align = "center")
+	)
+	(tf
+		(class $TextDefaultBold18NM)
+		#(class $FontEnableReadability)
+		(style
+			(width = 100%)
+			(textAlign = "right")
+			(bind textColor "_isAlly ? 0xFFCCFF99 : 0xFFFF9933")
+		)
+		(bind text "formatSeparator(ceil(animatedDamage))")
 	)
 )
 #
@@ -1666,6 +1717,8 @@
 	(scope
 		(var avatarId:number = "_entity ? _entity.avatar.id : 0")
 
+		(macro IS_SPECTATOR_MODE)
+
 		#Classic TTX
 		(var ttxCollection:gfx = "$datahub.getCollection(CC.mods_ShipParamsInBattle)")
 		(var ttxEntity:gfx = "$datahub.getPrimaryEntity(CC.mods_ShipParamsInBattle, avatarId)" (event "ttxCollection.evAdded"))
@@ -1689,7 +1742,7 @@
 
 	(macro TOOLTIP_SYSTEM_DEFAULT_BACKGROUND)
 
-	(element TOOLTIP_SYSTEM_DEFAULT_CONTAINER
+	(element TOOLTIP_SYSTEM_DEFAULT_CONTAINER $enabled="!isSpectatorTrainingMode"
 		(style
 			(vgap = 10px)
 			(width = 300px)
@@ -1704,9 +1757,18 @@
 		(element TP_TooltipVisibilityItem "shipTTX" _avatarEntity="_entity" _isRealParams="isRealParams")
 		(element TP_TooltipConsumableItem "shipBattleInfo")
 	)
-	(controller $Instance renderer='TP_BuildViewerItem'
-		(bind enabled "!isOwnBuildOnly")
-		(args "_entity")
+	(block
+		(style
+			(align = "middle|center")
+		)
+		(controller $Instance renderer='TP_BuildViewerItem'
+			(bind enabled "!isOwnBuildOnly")
+			(args "_entity")
+		)
+		(controller $Instance renderer='TP_DamageMonitorItem'
+			(bind enabled "isSpectatorTrainingMode")
+			(args "_entity")
+		)
 	)
 )
 
@@ -1729,6 +1791,16 @@
 	(element BV_SkillsElement "skills")
 	(element BV_ModernizationsElement "modernizations")
 	(element BV_SignalsElement "signals")
+)
+
+(def element TP_DamageMonitorItem(_entity:gfx)
+	(scope
+		(var avatarId:str = "_entity ? _entity.avatar.id : ''")
+	)
+	(style
+		(align = "middle|center")
+	)
+	(element DMonitor_DamagePanelElement _targetAvatarId="avatarId")
 )
 
 (def element TP_TooltipArtilleryItem(_shipTTX:gfx, _userPrefsNum:gfx=null)
