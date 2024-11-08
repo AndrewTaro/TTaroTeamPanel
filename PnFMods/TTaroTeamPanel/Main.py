@@ -67,8 +67,8 @@ class ShipRestriction(object):
         maxShips = cls.RESTRICTION_DATA.get('maxShips', -1)
         minShips = cls.RESTRICTION_DATA.get('minShips', 0)
         maxShips = cls.__convertInfinite(maxShips)
-        if not minShips <= len(avatars) <= maxShips:
-            return set(avatar.ship.ref.ship.id for avatar in avatars)
+        if not (minShips <= len(avatars) <= maxShips):
+            return set(avatar.ship.ref.ship.fullName for avatar in avatars)
         return set()
     
     @classmethod
@@ -81,10 +81,10 @@ class ShipRestriction(object):
         maxRepeatingShips = cls.__convertInfinite(maxRepeatingShips)
 
         for avatar in avatars:
-            shipId = avatar.ship.ref.ship.id
-            counter.setdefault(shipId, 0)
-            counter[shipId] += 1
-        return set(sId for sId, count in counter.iteritems() if count > maxRepeatingShips)
+            shipName = avatar.ship.ref.ship.fullName
+            counter.setdefault(shipName, 0)
+            counter[shipName] += 1
+        return set(sName for sName, count in counter.iteritems() if count > maxRepeatingShips)
     
     @classmethod
     def validateClasses(cls, avatars):
@@ -100,7 +100,7 @@ class ShipRestriction(object):
             minShips = classLimit[0]
             maxShips = cls.__convertInfinite(classLimit[1])
             if not minShips <= shipTypes.count(shipType) <= maxShips:
-                invalidShips |= set(avatar.ship.ref.ship.id for avatar in avatars if shipType == avatar.shipType)
+                invalidShips |= set(avatar.ship.ref.ship.fullName for avatar in avatars if shipType == avatar.shipType)
         return invalidShips
     
     @classmethod
@@ -112,15 +112,15 @@ class ShipRestriction(object):
 
         counter = {}
         for avatar in avatars:
-            shipId = avatar.ship.ref.ship.id
-            counter.setdefault(shipId, 0)
-            counter[shipId] += 1
+            shipName = avatar.ship.ref.ship.fullName
+            counter.setdefault(shipName, 0)
+            counter[shipName] += 1
 
         invalidShips = set()
         for shipLimit in shipLimits:
             limit = cls.__convertInfinite( shipLimit.get('limit', -1) )
             ships = set(shipLimit.get('ships', []))
-            count = sum(counter.get(sId, 0) for sId in ships)
+            count = sum(counter.get(sName, 0) for sName in ships)
             if count > limit:
                 invalidShips |= ships
                 
@@ -137,7 +137,7 @@ class ShipRestriction(object):
         maxCount = cls.__convertInfinite(maxCount)
         shipTypes = combinedClassesLimit.get('classes', [])
 
-        affectedShips = [avatar.ship.ref.ship.id for avatar in avatars if avatar.shipType in shipTypes]
+        affectedShips = [avatar.ship.ref.ship.fullName for avatar in avatars if avatar.shipType in shipTypes]
 
         if not minCount <= len(affectedShips) <= maxCount:
             return set(affectedShips)
@@ -156,19 +156,19 @@ class ShipRestriction(object):
         invalidShips = set()
         for avatar in avatars:
             ship = avatar.ship.ref.ship
-            shipId = ship.id
+            shipName = ship.fullName
 
-            if shipId in excludedShips:
-                invalidShips.add(shipId)
+            if shipName in excludedShips:
+                invalidShips.add(shipName)
             elif avatar.shipType not in shipTypes:
-                invalidShips.add(shipId)
+                invalidShips.add(shipName)
             elif ship.level not in shipTiers:
-                invalidShips.add(shipId)
+                invalidShips.add(shipName)
         
         return invalidShips
     
     @classmethod
-    def getInvalidShipIds(cls, avatars):
+    def getInvalidShipNames(cls, avatars):
         """
         Return tuple of invalid ships
         """
@@ -226,7 +226,7 @@ class ShipRestrictionChecker(object):
             avatars = avatarsByTeam.setdefault(teamId, [])
             avatars.append(entity[CC.avatar])
 
-        data = {str(i): ShipRestriction.getInvalidShipIds(avatarsByTeam.get(i, [])) for i in range(2)}
+        data = {str(i): ShipRestriction.getInvalidShipNames(avatarsByTeam.get(i, [])) for i in range(2)}
         self._updateEntity(data)
 
         avatarsByTeam.clear()
@@ -256,7 +256,7 @@ class ShipRestrictionChecker(object):
         Update datahub
         data = 
             {
-                teamId: [shipId, shipId],
+                teamId: [shipName, shipName],
             },
         """
         ui.updateUiElementData(self._entityId, {'bannedShipsByTeam': data})
