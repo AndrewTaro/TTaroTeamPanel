@@ -25,6 +25,8 @@ You can personalize it to be the simplest team panel, or the most info-flooded o
 
 # Ship Restriction Highlight
 This feature highlights the invalid ships or composition in the teams, making it easier to identify the forfeit in tournaments.
+
+Creating `ship_restrictions.json` file in `res_mods` folder will activate it.  (So the path will be `res_mods/ship_restrictions.json`)
 - `minShips`: Minimum number of ships to be a valid team.
 - `maxShips`: Maximum number of ships to be a valid team.
 - `maxRepeatingShips`: Maximum number of duplicating ships in a team.
