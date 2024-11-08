@@ -22,3 +22,77 @@ You can personalize it to be the simplest team panel, or the most info-flooded o
 
 # Config
 [TTaro Mod Config](../../../TTaroModConfig) supports this mod.  You can adjust many features from that menu.
+
+# Ship Restriction Highlight
+This feature highlights the invalid ships or composition in the teams, making it easier to identify the forfeit in tournaments.
+- `minShips`: Minimum number of ships to be a valid team.
+- `maxShips`: Maximum number of ships to be a valid team.
+- `maxRepeatingShips`: Maximum number of duplicating ships in a team.
+- `classes`: Minimum and maximum number of classes in a team. `-1` indicates unlimited.
+- `limitedShips`: So-called bracket bans. There can be multiple brackets.
+    - `ships`: Ships in a bracket
+    - `limit`: Maximum number of ships in this bracket
+- `combinedClasses`: Restriction on the number of ships from multiple classes combined.
+    - `min`: Minimum number of ships
+    - `max`: Maximum number of ships
+    - `classes`: List of classes to combine
+- `filters`: Various filters.
+    - `excludedShips`: Prohibited ships.
+    - `classes`: Allowed classes.
+    - `tiers`: Allowed tiers.
+```json
+{
+    "minShips": 7,
+    "maxShips": 9,
+    "maxRepeatingShips": -1,
+    "classes": {
+        "AirCarrier": [0, 0],
+        "Battleship": [0, 2],
+        "Cruiser": [0, -1],
+        "Destroyer": [0, -1],
+        "Submarine": [0, 0]
+    },
+    "limitedShips": [
+        {
+            "ships": [
+				"PRSB110_Sovetskaya_Rossiya",
+				"PASB510_Ohio",
+				"PBSB210_St_Vincent",
+				"PASB110_Vermont"
+			],
+            "limit": 1
+        }
+    ],
+    "combinedClasses": {
+        "min": 0,
+        "max": 2,
+        "classes": ["Battleship"]
+    },
+    "filters": {
+        "excludedShips": [
+			"PJSD890_AZUR_Shimakaze",
+			"PJSB700_ARP_Yamato",
+			"PBSC810_Defence",
+			"PJSC610_Kitakami",
+			"PFSD810_Colorful_Kleber",
+			"PZSD510_Lushun",
+			"PISC590_Black_Napoli",
+			"PASC610_Puerto_Rico",
+			"PASB720_Rhode_Island",
+			"PWSD610_Smaland",
+			"PRSC610_Smolensk",
+			"PRSC530_Black_Smolensk",
+			"PASD510_Somers",
+			"PBSB510_Thunderer",
+			"PASB730_Wisconsin",
+			"PJSC590_Black_Yoshino",
+			"PRSC210_Pr_84_Alexander_Nevsky",
+			"PGSC710_Hildebrand",
+			"PRSC810_Komissar",
+			"PASB210_Louisiana"
+		],
+        "classes": ["Battleship", "Cruiser", "Destroyer"],
+        "tiers": [10]
+    }
+}
+```
