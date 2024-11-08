@@ -943,12 +943,14 @@
 		(var flagShipColorKey:str = "isAlly ? 'ally' : 'enemy'")
 
 		# Ship Restrictions
+		(var shipFullName:str = "shipEntity ? shipEntity.fullName : ''")
 		(var bannedShipsEntityWatcher:gfx = "$datahub.getPrimWatcher(CC.mods_DataComponent, TP_COMPONENT_KEY_BANNED_SHIPS)")
 		(var bannedShipsEntity:gfx = "bannedShipsEntityWatcher.entity" (event "bannedShipsEntityWatcher.event"))
 		(var bannedShipsDataComponent:gfx = "bannedShipsEntity ? bannedShipsEntity.mods_DataComponent : null" (event "bannedShipsEntity.evAdded"))
 		(var bannedShipsByTeam:dict = "bannedShipsDataComponent ? bannedShipsDataComponent.data.bannedShipsByTeam : {}" (event "bannedShipsDataComponent.evDataChanged"))
-		(var bannedShips:array = "toString(teamId) in bannedShipsByTeam ? bannedShipsByTeam[toString(teamId)] : []")
-		(var isBannedShip:bool = "shipId in bannedShips")
+		(var teamIdStr:str = "toString(teamId)")
+		(var bannedShips:array = "teamIdStr in bannedShipsByTeam ? bannedShipsByTeam[teamIdStr] : []")
+		(var isBannedShip:bool = "shipFullName in bannedShips")
 
 		# Bar Color
 		(macro TP_GET_PREF_NUMBER _varName="'alphaScale'" _pref="TP_PREFS.HEALTHBAR_OPACITY")
