@@ -41,6 +41,8 @@ try:
 except:
     pass
 
+from EntityController import EntityController
+
 
 CC = constants.UiComponents
 ShipTypes = constants.ShipTypes
@@ -48,8 +50,6 @@ PLAYABLE_SHIP_TYPES = (ShipTypes.AIRCARRIER, ShipTypes.BATTLESHIP, ShipTypes.CRU
 
 RES_MODS_FOLDER = utils.getModDir() + '/../../'
 SHIP_RESTRICTION_FILE = RES_MODS_FOLDER + 'ship_restrictions.json'
-
-COMPONENT_KEY = 'modTTaroTeamPanelBannedShips'
 
 
 class ShipRestriction(object):
@@ -201,8 +201,12 @@ class ShipRestriction(object):
                     utils.logInfo('[TTaroTeamPanel] No ship restriction found.')
                     cls.RESTRICTION_DATA = {}
                     return
-                cls.RESTRICTION_DATA = utils.jsonDecode(restrictions)
-                utils.logInfo('[TTaroTeamPanel] Ship restrictions found.')
+                try:
+                    cls.RESTRICTION_DATA = utils.jsonDecode(restrictions)
+                    utils.logInfo('[TTaroTeamPanel] Ship restrictions found.')
+                except:
+                    cls.RESTRICTION_DATA = {}
+                    utils.logInfo('[TTaroTeamPanel] Unknown error occured while parsing ship restrictions. Ship restrictions are disabled')
 
 
 ShipRestriction.init()
@@ -212,13 +216,17 @@ class ShipRestrictionChecker(object):
     """
     Checks the ship compositions in a match
     """
+    COMPONENT_KEY = 'modTTaroTeamPanelBannedShips'
+
     def __init__(self):
-        self._entityId = None
+        self.entityController = EntityController(ShipRestrictionChecker.COMPONENT_KEY)
         events.onBattleShown(self.__onBattleStart)
         events.onBattleQuit(self.__onBattleEnd)
 
     def __onBattleStart(self, *args):
-        self._addEntity()
+        # Works only in the training room
+        if not self._isRestrictionAvailable:
+            return
 
         avatarsByTeam = {}
         for entity in dataHub.getEntityCollections('avatar'):
@@ -227,39 +235,86 @@ class ShipRestrictionChecker(object):
             avatars.append(entity[CC.avatar])
 
         data = {str(i): ShipRestriction.getInvalidShipNames(avatarsByTeam.get(i, [])) for i in range(2)}
-        self._updateEntity(data)
+
+        self.entityController.createEntity()
+        self.entityController.updateEntity({'bannedShipsByTeam': data})
 
         avatarsByTeam.clear()
 
     def __onBattleEnd(self, *args):
-        self._removeEntity()
+        self.entityController.removeEntity()
 
-    def _addEntity(self):
-        """
-        Create DH entity
-        """
-        self._entityId = ui.createUiElement()
-        ui.addDataComponentWithId(self._entityId, COMPONENT_KEY, {'bannedShipsByTeam': {}})
+    def _isRestrictionAvailable(self):
+        entity = dataHub.getSingleEntity('battleInfo')
+        if entity:
+            return entity[CC.battleInfo].battleType == 'TrainingBattle'
+        return False
 
-    def _removeEntity(self):
-        """
-        Remove DH entity
-        """
-        try:
-            ui.deleteUiElement(self._entityId)
-            self._entityId = None
-        except:
-            pass
-
-    def _updateEntity(self, data):
-        """
-        Update datahub
-        data = 
-            {
-                teamId: [shipName, shipName],
-            },
-        """
-        ui.updateUiElementData(self._entityId, {'bannedShipsByTeam': data})
+compChecker = ShipRestrictionChecker()
 
 
-checker = ShipRestrictionChecker()
+class ShipConsumableChecker(object):
+    """
+    Checks the ship consumables in a match
+    """
+    COMPONENT_KEY = 'modTTaroTeamPanelConsumableRanges'
+    TITLE_TO_INFO = {
+        'RLSSearch'         : {'type': 'rls',               'attr': 'distShip'},
+        'SonarSearch'       : {'type': 'sonar',             'attr': 'distShip'},
+        'SubmarineLocator'  : {'type': 'submarineLocator',  'attr': 'acousticWaveMaxDist_submarine_detection'},
+        'Hydrophone'        : {'type': 'hydrophone',        'attr': 'hydrophoneWaveRadius'},
+    }
+
+    def __init__(self):
+        self.entityController = EntityController(ShipConsumableChecker.COMPONENT_KEY)
+        events.onBattleShown(self.__onBattleStart)
+        events.onBattleQuit(self.__onBattleEnd)
+
+    def __onBattleStart(self, *args):
+        self.entityController.createEntity()
+        data = self._getAllConsumablesData()
+        self.entityController.updateEntity(data)
+
+        utils.logInfo('[TTaroTeamPanel] Ship consumables have been updated.')
+
+    def __onBattleEnd(self, *args):
+        self.entityController.removeEntity()
+
+    def _getAllConsumablesData(self):
+        consumablesData = {}
+        for entity in dataHub.getEntityCollections('shipBattleInfo'):
+            ship = entity[CC.shipBattleInfo]
+            data = self._getConsumablesDataByShip(ship)
+            if data is not None:
+                consumablesData[ship.playerId] = data
+
+        return consumablesData
+    
+    def _getConsumablesDataByShip(self, ship):
+        data = {}
+        allConsumables = ship.mainConsumables + [cons for consList in ship.altConsumables for cons in consList]
+        for cons in allConsumables:
+            consInfo = self.__getConsumableInfo(cons)
+            if consInfo is None:
+                continue
+            consType = consInfo['type']
+            data[consType] = self.__getConsumableRange(cons, consInfo)
+
+        if len(data) > 0:
+            return data
+        return None
+
+    def __getConsumableInfo(self, consumable):
+        consName = consumable.title
+        for ident, consInfo in ShipConsumableChecker.TITLE_TO_INFO.iteritems():
+            if ident.upper() in consName:
+                return consInfo
+        return None
+
+    def __getConsumableRange(self, consumable, consInfo):
+        paramName = consInfo['attr']
+        for attr in consumable.attributes.neutral:
+            if attr.paramName == paramName:
+                return attr.measuredValue
+            
+consChecker = ShipConsumableChecker()

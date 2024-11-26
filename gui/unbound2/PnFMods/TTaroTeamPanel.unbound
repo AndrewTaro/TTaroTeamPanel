@@ -163,6 +163,7 @@
 (def constant TP_ATBA_CREW_ID "-1") #Works until WG introduces the EPIC ATBA SKILL (hope that never happens)
 
 (def constant TP_COMPONENT_KEY_BANNED_SHIPS "'modTTaroTeamPanelBannedShips'")
+(def constant TP_COMPONENT_KEY_CONSUMABLE_RANGES "'modTTaroTeamPanelConsumableRanges'")
 
 (def css $TP_ShipConfigText()
 	(extends $TextDefault13NM)
@@ -1562,10 +1563,14 @@
 
 (def element TP_ShipConfigSurfaceConsumableItem(_shipTTX:gfx, _avatarEntity:gfx, _userPrefsNum:gfx=null)
 	(scope
-		(var shipId:str = "_avatarEntity ? toString(_avatarEntity.avatar.ship.ref.ship.id) : null" (event "_avatarEntity.avatar.evShipRefChanged"))
-		(var consumables:dict = "shipId in TP_CONSUMABLES_DATA ? TP_CONSUMABLES_DATA[shipId] : null")
-		(var radarRange:number = "consumables && 'rls' in consumables ? consumables['rls'] : null")
-		(var hydroRange:number = "consumables && 'sonar' in consumables ? consumables['sonar'] : null")
+		(var avatarId:str = "_avatarEntity ? toString(_avatarEntity.avatar.id) : ''")
+		(var consumableEntityWatcher:gfx = "$datahub.getPrimWatcher(CC.mods_DataComponent, TP_COMPONENT_KEY_CONSUMABLE_RANGES)")
+		(var consumableEntity:gfx = "consumableEntityWatcher.entity" (event "consumableEntityWatcher.event"))
+		(var consumableDataComponent:gfx = "consumableEntity ? consumableEntity.mods_DataComponent : null" (event "consumableEntity.evAdded"))
+		(var consumableData:dict = "consumableDataComponent ? consumableDataComponent.data : {}" (event "consumableDataComponent.evDataChanged"))
+		(var consumableRanges:dict = "avatarId in consumableData ? consumableData[avatarId] : null")
+		(var radarRange:number = "consumableRanges && 'rls' in consumableRanges ? consumableRanges['rls'] : null")
+		(var hydroRange:number = "consumableRanges && 'sonar' in consumableRanges ? consumableRanges['sonar'] : null")
 
 		(macro TP_GET_PREF_BOOL _varName="'isRadarRangeVisible'" _pref="TP_PREFS.RADAR_RANGE")
 		(macro TP_GET_PREF_BOOL _varName="'isHydroRangeVisible'" _pref="TP_PREFS.HYDRO_RANGE")
@@ -1574,7 +1579,7 @@
 
 	(bind visible "isEnabled")
 	(style
-		(bind alpha "consumables ? 1.0 : 0.0")
+		(bind alpha "consumableRanges ? 1.0 : 0.0")
 		(vgap = "TP_CONFIG_ELEMENTS_VGAP")
 	)
 
@@ -1588,10 +1593,14 @@
 
 (def element TP_ShipConfigSubmarineConsumableItem(_shipTTX:gfx, _avatarEntity:gfx, _userPrefsNum:gfx=null)
 	(scope
-		(var shipId:str = "_avatarEntity ? toString(_avatarEntity.avatar.ship.ref.ship.id) : null" (event "_avatarEntity.avatar.evShipRefChanged"))
-		(var consumables:dict = "shipId in TP_CONSUMABLES_DATA ? TP_CONSUMABLES_DATA[shipId] : null")
-		(var radarRange:number = "consumables && 'submarineLocator' in consumables ? consumables['submarineLocator'] : null")
-		(var hydroRange:number = "consumables && 'hydrophone' in consumables ? consumables['hydrophone'] : null")
+		(var avatarId:str = "_avatarEntity ? toString(_avatarEntity.avatar.id) : ''")
+		(var consumableEntityWatcher:gfx = "$datahub.getPrimWatcher(CC.mods_DataComponent, TP_COMPONENT_KEY_CONSUMABLE_RANGES)")
+		(var consumableEntity:gfx = "consumableEntityWatcher.entity" (event "consumableEntityWatcher.event"))
+		(var consumableDataComponent:gfx = "consumableEntity ? consumableEntity.mods_DataComponent : null" (event "consumableEntity.evAdded"))
+		(var consumableData:dict = "consumableDataComponent ? consumableDataComponent.data : {}" (event "consumableDataComponent.evDataChanged"))
+		(var consumableRanges:dict = "avatarId in consumableData ? consumableData[avatarId] : null")
+		(var radarRange:number = "consumableRanges && 'submarineLocator' in consumableRanges ? consumableRanges['submarineLocator'] : null")
+		(var hydroRange:number = "consumableRanges && 'hydrophone' in consumableRanges ? consumableRanges['hydrophone'] : null")
 
 		(macro TP_GET_PREF_BOOL _varName="'isSubRadarRangeVisible'" _pref="TP_PREFS.SUB_RADAR_RANGE")
 		(macro TP_GET_PREF_BOOL _varName="'isSubHydroRangeVisible'" _pref="TP_PREFS.SUB_HYDRO_RANGE")
@@ -1601,7 +1610,7 @@
 	(bind visible "isEnabled")
 
 	(style
-		(bind alpha "consumables ? 1.0 : 0.0")
+		(bind alpha "consumableRanges ? 1.0 : 0.0")
 		(vgap = "TP_CONFIG_ELEMENTS_VGAP")
 	)
 
