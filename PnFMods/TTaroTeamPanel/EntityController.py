@@ -15,7 +15,7 @@ class EntityController(object):
         self._entityId = None
         self._componentKey = componentKey
 
-    def createEntity(self, data={}):
+    def createEntity(self, data=None):
         """
         Create DH entity
         """
