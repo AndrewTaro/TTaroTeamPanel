@@ -8,6 +8,7 @@
 	WITH_UNIT: 48,
 	NO_UNIT: 32
 })
+(def constant TP_DEFAULT_HEIGHT "160px")
 (def constant TP_TOOLTIP_ELEMENTS_VGAP "5px")
 (def constant TP_DIVISION_ELEMENT_WIDTH "20px")
 (def constant TP_CONFIG_ELEMENTS_VGAP "3px")
@@ -27,7 +28,7 @@
 	UNITS_VISIBLE		: {KEY: 'ttTeamPanelShipStatsUnitsVisible',		DEFAULT: true},
 	STATS_BOLD_FONT		: {KEY: 'ttTeamPanelShipStatsUseBoldFont',		DEFAULT: false},
 	HIDE_ALLY_BUILDS	: {KEY: 'buildViewerDisableAllyBuilds',			DEFAULT: false}, # Build Viewer Option: Show builds on Tooltip
-	POS_OFFSET			: {KEY: 'ttTeamPanelPosOffset',					DEFAULT: 160.0,	MODIFIER: 10.0,	OFFSET: 110.0},
+	POS_OFFSET_MODIFIER	: {KEY: 'ttTeamPanelPosOffset',					DEFAULT: 0,		MODIFIER: 1.0,	OFFSET: -5},
 	SCALE_OFFSET		: {KEY: 'ttTeamPanelScaleOffset',				DEFAULT: 1.0,	MODIFIER: 0.1,	OFFSET: 0.5},
 	BLUR_MODE			: {KEY: 'ttTeamPanelBlurMode',					DEFAULT: false},
 	BLUR_ALT_VISIBLE	: {KEY: 'ttTeamPanelBlurVisibleOnAlt',			DEFAULT: false},
@@ -181,8 +182,10 @@
 	(scope
 		(macro STAGE_SIZE)
 		(macro TP_GET_USERPREFS)
-		(macro TP_GET_PREF_NUMBER _varName="'posY'" _pref="TP_PREFS.POS_OFFSET")
+		(macro TP_GET_PREF_NUMBER _varName="'posYModifier'" _pref="TP_PREFS.POS_OFFSET_MODIFIER")
 		(macro TP_GET_PREF_BOOL _varName="'isBlurMode'" _pref="TP_PREFS.BLUR_MODE")
+
+		(var posY:number = "TP_DEFAULT_HEIGHT + (posYModifier * 10)")
 	)
 	(bindcall externalCall 'inputMapping.onAction' "['createParamsForAllShipsInBattle', {}]" on='addedToStage')
 	# Hide the default Ub1 ears
