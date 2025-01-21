@@ -1688,7 +1688,8 @@
 		(var isRealParams:bool = "shipBattleInfo ? shipBattleInfo.isRealParams : false")
 		(var shipTTX:gfx = "isRealParams ? shipBattleInfo.shipTTX : ttxEntity.mods_ShipParamsInBattle.shipTTX")
 
-		(macro TT_GET_PREF_BOOL _varName="'isOwnBuildOnly'" _pref="TP_PREFS.HIDE_ALLY_BUILDS")
+		(macro TT_GET_PREF_BOOL _varName="'isOwnBuildOnly'" _pref="BV_PREFS.DISABLE_ALLY_BUILDS")
+		(macro TT_GET_PREF_BOOL _varName="'isOwnDamageOnly'" _pref="DMonitor_PREFS.HIDE_OTHERS")
 	)
 
 	(style
@@ -1723,7 +1724,7 @@
 			(args "_entity")
 		)
 		(controller $Instance renderer='TP_DamageMonitorItem'
-			(bind enabled "isSpectatorTrainingMode")
+			(bind enabled "!isOwnDamageOnly")
 			(args "_entity")
 		)
 	)
