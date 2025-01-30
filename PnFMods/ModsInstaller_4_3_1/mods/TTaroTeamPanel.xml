@@ -1,0 +1,18 @@
+<code>
+	<target_File file="gui/battle_elements.xml">
+		<root_Node>
+			<find_Node tag="elementList">
+				<insert>
+					<element class="lesta.unbound2.UbElement" elementName="TTaroTeamPanels" name="unbound2TTaroTeamPanels">
+						<properties hitTest="true"/>
+					</element>
+					<attrs>
+						<do_if_not_exist tag="element" type="name" name="unbound2TTaroTeamPanels"/>
+						<position insert="before_node" tag="element" attr_1="elementName" value_1="MainHud"/>
+					</attrs>
+				</insert>
+			</find_Node>
+		</root_Node>
+	</target_File>
+	<check name="TTaroTeamPanels" version="1.0.0"/>
+</code>
