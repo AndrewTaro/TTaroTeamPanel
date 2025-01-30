@@ -1641,17 +1641,21 @@
 
 	(style
 		(bind width "isUnitVisible ? TP_SHIPCONFIG_ELEMENT_WIDTH.WITH_UNIT : TP_SHIPCONFIG_ELEMENT_WIDTH.NO_UNIT")
-		(align = "right")
 	)
 	(hblock
 		(bind visible "isValueVisible")
 		(style
-			(marginRight = "XS")
+			(width = 100%)
+			(align = "right")
 		)
 		(tf
 			(bind class "isBoldFont ? '$TP_ShipConfigTextBold' : '$TP_ShipConfigText'")
 			(style
-				(marginRight = "XS")
+				(bind marginRight "isUnitVisible ? XS : S")
+				(textAlign = "right")
+				(width = 100%)
+				# Without width and textAlign there is one fucking pixel misalignment on some texts
+				# This is cursed
 			)
 			(bind text "isNull ? ' ' : formatFloatingPoint(_value, _roundDigit)")
 		)
@@ -1662,6 +1666,7 @@
 			(alpha = "TC")
 			(style
 				(width = "20px")
+				(marginRight = "XS")
 			)
 		)
 	)
