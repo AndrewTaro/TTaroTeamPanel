@@ -128,6 +128,11 @@
 		(macro TT_GET_PREF_NUMBER _varName="'posYModifier'" _pref="TP_PREFS.POS_OFFSET_MODIFIER")
 		(macro TT_GET_PREF_BOOL _varName="'isBlurMode'" _pref="TP_PREFS.BLUR_MODE")
 
+		(macro TT_GET_PREF_BOOL _varName="'isVisibleOnlyOnAlt'" _pref="TP_PREFS.ALL_ALT_VISIBLE")
+		(var camera:gfx = "$datahub.getSingleComponent(CC.camera)")
+		(var altVision:bool = "camera ? camera.altVision : false" (event "camera.evAltVisionChanged"))
+		(var isiVisible:bool = "isVisibleOnlyOnAlt ? altVision : true")
+
 		(var posY:number = "TP_DEFAULT_HEIGHT + (posYModifier * 10)")
 	)
 	(bindcall externalCall 'inputMapping.onAction' "['createParamsForAllShipsInBattle', {}]" on='addedToStage')
@@ -148,6 +153,7 @@
 	)
 
 	(block
+		(bind visible "isiVisible")
 		(style
 			(position = "absolute")
 			(bind top "posY")
@@ -448,8 +454,8 @@
 			(element TP_ShipDetectionItem		_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
 			(element TP_PlayerKillCountItem 	_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
 			(element TP_ShipConfigurationsItem 	_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
-			(element TP_ShipConsumablesItem		_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
-			(element TP_ShipDamageItem			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum" $enabled="DMonitor_INFLICTED_DAMAGE_COMPONENT_KEY")
+			(element TP_ShipConsumablesItem		_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum" $enabled="TT_CONSUMABLESMONITOR_INSTALLED")
+			(element TP_ShipDamageItem			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum" $enabled="TT_DAMAGEMONITOR_INSTALLED")
 		)
 
 		# Tooltip for Detailed Ship Stats
@@ -1678,6 +1684,7 @@
 (def element TP_TooltipShipConfigurationsItem(_entity:gfx=null, _userPrefsNum:gfx=null)
 	(scope
 		(var avatarId:number = "_entity ? _entity.avatar.id : 0")
+		(var isSelf:bool = "_entity ? _entity.hasComponent(CC.playerAvatar) : false" (event "_entity.evAdded")(event "_entity.evRemoved"))
 
 		(macro IS_SPECTATOR_MODE)
 
@@ -1693,8 +1700,11 @@
 		(var isRealParams:bool = "shipBattleInfo ? shipBattleInfo.isRealParams : false")
 		(var shipTTX:gfx = "isRealParams ? shipBattleInfo.shipTTX : ttxEntity.mods_ShipParamsInBattle.shipTTX")
 
-		(macro TT_GET_PREF_BOOL _varName="'isOwnBuildOnly'" _pref="BV_PREFS.DISABLE_ALLY_BUILDS")
-		(macro TT_GET_PREF_BOOL _varName="'isOwnDamageOnly'" _pref="DMonitor_PREFS.HIDE_OTHERS")
+		(macro TT_GET_PREF_BOOL _varName="'isOwnBuildOnly'"		_pref="TP_PREFS.HIDE_BUILD")
+		(var isBuildVisible:bool = "TT_BUILDVIEWER_INSTALLED && (isSpectatorTrainingMode || (!isOwnBuildOnly || isSelf))")
+
+		(macro TT_GET_PREF_BOOL _varName="'isOwnDamageOnly'"	_pref="TP_PREFS.HIDE_DAMAGE")
+		(var isDamageVisible:bool = "TT_DAMAGEMONITOR_INSTALLED && (isSpectatorTrainingMode || (!isOwnDamageOnly || isSelf))")
 	)
 
 	(style
@@ -1725,11 +1735,11 @@
 			(align = "middle|center")
 		)
 		(controller $Instance renderer='TP_BuildViewerItem'
-			(bind enabled "!isOwnBuildOnly")
+			(bind enabled "isBuildVisible")
 			(args "_entity")
 		)
 		(controller $Instance renderer='TP_DamageMonitorItem'
-			(bind enabled "!isOwnDamageOnly")
+			(bind enabled "isDamageVisible")
 			(args "_entity")
 		)
 	)
