@@ -561,6 +561,9 @@
 		(var pureName:str = "(isPlayerNameVisible && _entity) ? _entity.avatar.pureName : ' '")
 
 		(macro TP_GET_MARKER_DATA "_entity")
+
+		(var colorClass:str = "isGolden ? '$FontColorGolden' : '$FontColorWhite' ")
+		(var fontColor:number = "FONT_CLASS_TO_COLOR[colorClass]")
 	)
 	
 	(style
@@ -573,11 +576,11 @@
 	(tf
 		(class $TextDefault13NM)
 		(class $FontEnableReadability)
-		(bind class "isGolden ? '$FontColorGolden' : '$None'")
 		(alpha = 0.95)
 		(style
 			(width = "100%")
 			(elideMode = true)
+			(bind textColor "fontColor")
 			(bind textAlign "_isAlly ? left : right")
 		)
 		(bind text "clanNameWithBrackets + pureName")
@@ -650,8 +653,15 @@
 	(scope
 		(var shipEntity:gfx = "_entity ? _entity.avatar.ship.ref.ship : null" (event "_entity.avatar.evShipRefChanged"))
 		(var shipName:str = "shipEntity ? tr(shipEntity.nameIDS) : ''") #IDS_PASB518
-		(macro TP_GET_ISAFK)
+		(macro TP_GET_ISAFK _entity="_entity")
 		(macro TT_GET_PREF_BOOL _varName="'isShipNameVisible'" _pref="TP_PREFS.SHIP_NAME")
+		
+		(var colorClass:str = "	isAFK		? '$FontColorOrange' :
+								isGolden	? '$FontColorGolden' :
+								tkStatus	? '$FontColorTeamkiller'
+											: '$FontColorWhite' "
+		)
+		(var fontColor:number = "FONT_CLASS_TO_COLOR[colorClass]")
 	)
 
 	(bind visible "isShipNameVisible")
@@ -663,10 +673,10 @@
 
 	(tf
 		(class $TextDefaultBoldNM)
-		(bind class "isAFK ? '$FontColorUnready' : tkStatus ? '$FontColorTeamkiller' : '$None'")
 		(style
 			(width = 100%)
 			(elideMode = true)
+			(bind textColor "fontColor")
 			(bind textAlign "_isAlly ? left : right")
 		)
 		(bind text "shipName")
@@ -677,7 +687,6 @@
 	(scope
 		(var shipEntity:gfx = "_entity ? _entity.avatar.ship.ref.ship : null" (event "_entity.avatar.evShipRefChanged"))
 		(var flagName:str = "shipEntity ? shipEntity.flagName : ''") #IDS_PASB518
-		(macro TP_GET_ISAFK)
 		(macro TT_GET_PREF_BOOL _varName="'isShipNationVisible'" _pref="TP_PREFS.SHIP_NATION")
 	)
 
@@ -877,7 +886,8 @@
 		(macro GET_MARKER_ENTITY_COMPONENT 'relation')
 		(var relationValue:number = "relationComponent ? relationComponent.value : 0" (event "relationComponent.evChanged"))
 		(var relationStr:str = "toLower(SC.Battle.PLAYER_RELATION.VALUE_TO_NAME[relationValue])")
-		(var isAlly:bool = "relationComponent && isIn(relationComponent.value, [SC.Battle.PLAYER_RELATION.ALLY, SC.Battle.PLAYER_RELATION.SELF])" (event "relationComponent.evChanged"))
+		(var isAlly:bool = "relationComponent && isIn(relationValue, [SC.Battle.PLAYER_RELATION.ALLY, SC.Battle.PLAYER_RELATION.SELF])")
+		(var isSelf:bool = "relationComponent && relationValue == SC.Battle.PLAYER_RELATION.SELF")
 
 		# Diplomacy
 		(macro GET_MARKER_ENTITY_COMPONENT 'diplomacyRelation')
@@ -912,6 +922,7 @@
 			"	isBannedShip				? TP_BANNED_SHIP_COLOR_TRANSFORM :
 				isFlagShip					? TP_FLAGSHIP_COLOR_TRANSFORM[flagShipColorKey] :
 				diplomacyRelationComponent	? TWO_TEAMS_COLOR_TRANSFORMS[relationStrByDiplomacy] :
+				isSelf						? TWO_TEAMS_COLOR_TRANSFORMS['division'] :
 				isAlly						? TWO_TEAMS_COLOR_TRANSFORMS['ally'] :
 				isMultyTeamEnabled			? MULTI_TEAMS_COLOR_TRANSFORMS[teamId]
 											: TWO_TEAMS_COLOR_TRANSFORMS[relationStr]"
@@ -2342,19 +2353,12 @@
 #--------------------------------------------------------------------------------
 # Macros
 #--------------------------------------------------------------------------------
-(def macro TP_GET_ISAFK ()
+(def macro TP_GET_ISAFK (_entity:expression)
 	# Returns isAFK:bool
 	#
 	# Entity
 	(macro IS_SPECTATOR_MODE)
-	(var avatarComponent:gfx = "_entity && _entity.hasComponent(CC.avatar) ? _entity.avatar : null")
-	(var relationComponent:gfx = "_entity && _entity.hasComponent(CC.relation) ? _entity.relation : null")
-	(var healthComponent:gfx = "_entity && _entity.hasComponent(CC.health) ? _entity.health : null")
-	# Vars
-	(var relationValue:number = "relationComponent ? relationComponent.value : -1" (event "relationComponent.evChanged"))
-	(var tkStatus:bool = "avatarComponent && avatarComponent.tkStatus" (event "avatarComponent.evTeamkillStatusChanged")) # Necessary!
-	(var isSelf:bool = "relationValue == SC.Battle.PLAYER_RELATION.SELF")
-	(var isAlive:bool = "healthComponent ? healthComponent.isAlive : true" (event "healthComponent.evIsAliveChanged"))
+	(macro TP_GET_MARKER_DATA _entity="_entity")
 	(var isBot:bool = "avatarComponent ? avatarComponent.isBot : true")
 	(var isLoadedInBattle:bool = "avatarComponent ? avatarComponent.isLoadedInBattle : true" (event "avatarComponent.evIsLoadedInBattleChanged"))
 	(var isAFK:bool = "isAlive && !isSpectatorTrainingMode && !isSelf && !isBot && !isLoadedInBattle")
