@@ -922,7 +922,7 @@
 			"	isBannedShip				? TP_BANNED_SHIP_COLOR_TRANSFORM :
 				isFlagShip					? TP_FLAGSHIP_COLOR_TRANSFORM[flagShipColorKey] :
 				diplomacyRelationComponent	? TWO_TEAMS_COLOR_TRANSFORMS[relationStrByDiplomacy] :
-				isSelf						? TWO_TEAMS_COLOR_TRANSFORMS['division'] :
+				isSelf						? {redOffset: -213,	greenOffset: -90,	blueOffset: -178} :
 				isAlly						? TWO_TEAMS_COLOR_TRANSFORMS['ally'] :
 				isMultyTeamEnabled			? MULTI_TEAMS_COLOR_TRANSFORMS[teamId]
 											: TWO_TEAMS_COLOR_TRANSFORMS[relationStr]"
