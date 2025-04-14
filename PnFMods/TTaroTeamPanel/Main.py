@@ -313,7 +313,7 @@ class ShipConsumableChecker(object):
 
     def __getConsumableRange(self, consumable, consInfo):
         paramName = consInfo['attr']
-        for attr in consumable.attributes.neutral:
+        for attr in consumable.activeAttributes.neutral:
             if attr.paramName == paramName:
                 return attr.measuredValue
             
