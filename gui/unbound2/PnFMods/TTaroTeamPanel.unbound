@@ -874,7 +874,7 @@
 		(var healthMax:number = "healthComponent ? healthComponent.max : 0" (event "healthComponent.evMaxChanged"))
 		(var healthRatio:number = "healthMax ? healthValue / healthMax : 1")
 		(var isAlive:bool = "healthComponent ? healthComponent.isAlive : false" (event "healthComponent.evIsAliveChanged"))
-		(bind healthRatio "1" watch=false init=false (bind enabled "!isAlive")(bind trigger "isAlive")) # on respawn but not visible. in such case, health component is not updated yet
+		(bind healthRatio "healthValue == 0 ? 1 : healthValue" watch=false init=false (bind enabled "!isAlive")(bind trigger "isAlive")) # on respawn but not visible. in such case, health component is not updated yet
 
 		# Regeneration
 		(macro GET_MARKER_ENTITY_COMPONENT 'dataComponent')
