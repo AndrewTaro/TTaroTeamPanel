@@ -184,7 +184,7 @@
 
 	(element TP_HeaderItem _isAlly="true" _userPrefsNum="_userPrefsNum")
 
-	(controller $Repeat renderer='TP_PlayerRowItem'
+	(controller $Repeat renderer='TP_PlayerItem'
 		(bind count "allyCollection ? allyCollection.items.length : 0")
 		(args "allyItems" _isAlly="true" _userPrefsNum="_userPrefsNum")
 
@@ -215,7 +215,7 @@
 
 	(element TP_HeaderItem _isAlly="false" _userPrefsNum="_userPrefsNum")
 
-	(controller $Repeat renderer='TP_PlayerRowItem'
+	(controller $Repeat renderer='TP_PlayerItem'
 		(bind count "enemyCollection ? enemyCollection.items.length : 0")
 		(args "enemyItems" _isAlly="false" _userPrefsNum="_userPrefsNum")
 
@@ -337,94 +337,14 @@
 	)
 )
 
-(def element TP_PlayerRowItem (_items:array, _isAlly:bool=false, _userPrefsNum:gfx=null)
-	(scope
-		# Deferred init
-		(event evAddedToStage)
-
-		(var appearDelay:number = "1.5 + $index * 0.15" watch=false)
-
-		(var isEnabled:bool = false watch=false)
-		(var entity:gfx = "_items[$index]" watch=false)
-		(var indexInItems:number = "indexOf(entity, _items)")
-		(controller $Animation		
-			(bindcall play
-				delay = "appearDelay"
-				duration = "0.001"
-				from	 = "{ isEnabled: false }"
-				to		 = "{ isEnabled: true }"
-				init	 = true
-			)
-		)
-
-		(var animatedTop:number = "indexInItems == 0 ? 0 : (indexInItems * (TP_PLAYER_ROW_SIZE.HEIGHT + 2)) + 2" watch=false)
-		(controller $Animation		
-			(bindcall play
-				duration = "0.3"
-				to		 = "{ animatedTop: indexInItems == 0 ? 0 : (indexInItems * (TP_PLAYER_ROW_SIZE.HEIGHT + 2)) + 2 }"
-				watch	 = false
-				(bind trigger "indexInItems")
-			)
-		)
-
-		(macro TT_GET_PREF_NUMBER _varName="'blurAlpha'" _pref="TP_PREFS.BLUR_ALPHA")
-		(macro TT_GET_PREF_BOOL _varName="'isBlurMode'" _pref="TP_PREFS.BLUR_MODE")
-		(macro TT_GET_PREF_BOOL _varName="'isBlurVisibleOnlyAlt'" _pref="TP_PREFS.BLUR_ALT_VISIBLE")
-		(var camera:gfx = "$datahub.getSingleComponent(CC.camera)")
-		(var altVision:bool = "camera ? camera.altVision : false" (event "camera.evAltVisionChanged"))
-		(var isBlurVisible:bool = "isBlurVisibleOnlyAlt ? altVision : true")
-	)
-
-	(style
-		(position = "absolute")
-		# (position = "absolute") is required to separate the argument entity and the position of this element within parent layout.
-		# With auto positioning, the layout of elements remains the same - but the argument entities change.
-		# In that case, the spotted indicator or any element that uses (watch=false) variable within their scope can break.
-		
-		(bind left "_isAlly ? 0 : auto")
-		(bind right "_isAlly ? auto : 0")
-		(bind top "animatedTop")
-		(alpha = 0)
-	)
-
-	(dispatch evAddedToStage args="{}" on='addedToStage')
-
-	(controller $Animation		
-		(bindcall play
-			delay = "appearDelay"
-			duration = "0.3"
-			from	 = "{ alpha: 0 }"
-			to		 = "{ alpha: 1 }"
-			(event "evAddedToStage")
-		)
-	)
-
-	(element TP_ContrastPanel _isBlur="isBlurMode" _intensity="blurAlpha"
-		(bind visible "isBlurVisible")
-	)
-	
-	(element TP_HorizontalDividerTwoPx
-		(bind visible "indexInItems == 0")
-	)
-	(block
-		(controller $Instance renderer='TP_PlayerItem'
-			(bind enabled "isEnabled")
-			(args
-				_entity			= "entity"
-				_isAlly			= "_isAlly"
-				_userPrefsNum	= "_userPrefsNum"
-			)
-		)
-	)
-	(element TP_HorizontalDividerTwoPx)
-)
-
 # Player
-(def element TP_PlayerItem (_entity:gfx, _isAlly:bool=false, _userPrefsNum:gfx=null)
+(def element TP_PlayerItem (_items:array, _isAlly:bool=false, _userPrefsNum:gfx=null)
 	(scope
 		(event evMouseOver)
 		(event evMouseOut)
-		
+
+		(var _entity:gfx = "_items[$index]" watch=false)
+		(var _index:number = "indexOf(_entity, _items)")
 		(var healthComponent:gfx = "_entity.hasComponent(CC.health) ? _entity.health : null" (event "_entity.evAdded")(event "_entity.evRemoved"))
 		(var isAlive:bool = "healthComponent ? healthComponent.isAlive : false" (event "healthComponent.evIsAliveChanged"))
 		#For tooltip
@@ -444,6 +364,12 @@
 		(var isScenarioBot:bool = "isBot && isScenarioMode")
 		(var isVisible:bool = "(isDeadPlayerVisible && !(isBot && isScenarioMode)) ? true : isAlive")
 
+		(macro TT_GET_PREF_NUMBER _varName="'blurAlpha'" _pref="TP_PREFS.BLUR_ALPHA")
+		(macro TT_GET_PREF_BOOL _varName="'isBlurMode'" _pref="TP_PREFS.BLUR_MODE")
+		(macro TT_GET_PREF_BOOL _varName="'isBlurVisibleOnlyAlt'" _pref="TP_PREFS.BLUR_ALT_VISIBLE")
+		(var camera:gfx = "$datahub.getSingleComponent(CC.camera)")
+		(var altVision:bool = "camera ? camera.altVision : false" (event "camera.evAltVisionChanged"))
+		(var isBlurVisible:bool = "isBlurVisibleOnlyAlt ? altVision : true")
 		(var hoverBackground:str = "_isAlly ? 'ally_bg_panel' : 'enemy_bg_panel'")
 		(var hoverBackgroundUrl:str = "'url:../service_kit/panel_backgrounds/' + hoverBackground + '.png'")
 
@@ -459,9 +385,25 @@
 
 	(style
 		(backgroundColor = 0x00FFFFFF) # For seamless hittest. Do not use 0x01000000 because it will have a visible dark color!
+
+		# (position = "absolute") is required to separate the argument entity and the position of this element within parent layout.
+		# With auto positioning, the layout of elements remains the same - but the argument entities change.
+		# In that case, the spotted indicator or any element that uses (watch=false) variable within their scope can break.
+		(position = "absolute")
+		(bind left "_isAlly ? 0 : auto")
+		(bind right "_isAlly ? auto : 0")
+		(bind top "_index == 0 ? 0 : (_index * (TP_PLAYER_ROW_SIZE.HEIGHT + 2)) + 2")
 	)
 
 	(bind visible "isVisible")
+
+	(element TP_ContrastPanel _isBlur="isBlurMode" _intensity="blurAlpha"
+		(bind visible "isBlurVisible")
+	)
+
+	(element TP_HorizontalDividerTwoPx
+		(bind visible "_index == 0")
+	)
 	
 	# Ally: hblock, Enemy: reverse hblock
 	(block
@@ -531,6 +473,8 @@
 			(cache=false)
 		)
 	)
+
+	(element TP_HorizontalDividerTwoPx)
 )
 
 # Player Info
