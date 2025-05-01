@@ -379,9 +379,13 @@
 		# But it does not reflect the size down e.g. (visible = false)
 		# Thus once the elements get expanded the border tooltip does not come back to the original position
 		# I have to manually do the calculation here :(
+
+		(event evAddedToStage)
+		(var appearDelay:number = "1.5 + $index * 0.15")
 	)
 	# For tooltip
 	(dispatch evHideInfotip args="{}" (bind trigger "isMouseActive") (event "evMenuItemClicked"))
+	(dispatch evAddedToStage args="{}" on=addedToStage)
 
 	(style
 		(backgroundColor = 0x00FFFFFF) # For seamless hittest. Do not use 0x01000000 because it will have a visible dark color!
@@ -393,6 +397,18 @@
 		(bind left "_isAlly ? 0 : auto")
 		(bind right "_isAlly ? auto : 0")
 		(bind top "_index == 0 ? 0 : (_index * (TP_PLAYER_ROW_SIZE.HEIGHT + 2)) + 2")
+
+		(alpha = 0)
+	)
+	(controller $Animation
+		(bindcall play
+			delay	 = "appearDelay"
+			duration = 0.3
+			from	 = "{ alpha: 0 }"
+			to		 = "{ alpha: 1 }"
+			watch	 = false
+			(event "evAddedToStage")
+		)
 	)
 
 	(bind visible "isVisible")
@@ -506,21 +522,49 @@
 
 (def element TP_PlayerDivisionItem (_entity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
 	(scope
-		(var divisionMemberComponent:gfx = "_entity && _entity.hasComponent(CC.divisionMember) ? _entity.divisionMember : null")
+		(event evTextMuted)
+
+		(var divisionMemberComponent:gfx = "_entity && _entity.hasComponent(CC.divisionMember) ? _entity.divisionMember : null" (event "_entity.evAdded")(event "_entity.evRemoved"))
 		(var divisionSign:number = "divisionMemberComponent ? divisionMemberComponent.divisionSign : null" (event "divisionMemberComponent.evDivisionChanged"))
 		(var isInSameDivision:bool = "divisionMemberComponent ? divisionMemberComponent.isInSameDivision : false" (event "divisionMemberComponent.evDivisionChanged"))
 		(var division:number = "divisionMemberComponent ? divisionMemberComponent.division : 0" (event "divisionMemberComponent.evDivisionChanged"))
 		(var isInDivision:bool = "division > 0")
 		(var isDivisionHidden:bool = "divisionMemberComponent ? divisionMemberComponent.divisionHidden : false" (event "divisionMemberComponent.evDivisionHiddenChanged"))
 		(var divisionIconIndex:number = "isInSameDivision ? (divisionSign + 1) : (divisionSign + 1 + 10)")
+
+		(var contactComponent:gfx = "_entity && _entity.hasComponent(CC.contact) ? _entity.contact : null" (event "_entity.evAdded")(event "_entity.evRemoved"))
+		(var isIgnored:bool = "contactComponent ? contactComponent.isIgnored : false" (event "contactComponent.evIsIgnoredChanged"))
+
+		(var avatarComponent:gfx = "_entity ? _entity.avatar : null")
+		(var isMuted:bool = "avatarComponent ? avatarComponent.mute : false" (event "avatarComponent.evMuteChanged"))
+
+		(var isTextChatMuted:bool = "isMuted || isIgnored")
 	)
+	(dispatch evTextMuted (bind trigger "isTextChatMuted"))
+
 	(style
 		(width = "TP_DIVISION_ELEMENT_WIDTH")
+		(height = 100%)
 		(align = "middle|center")
 	)
+	
 	(mc division_item
 		(bind visible "isInDivision && !isDivisionHidden")
 		(bindcall gotoAndStop "divisionIconIndex" init=true)
+	)
+	(block
+		(class $FullsizeAbsolute)
+		(style
+			(bind align "_isAlly ? left : right")
+		)
+		(bind visible "isTextChatMuted")
+		(mc icon_text_chat_small
+			(bindcall gotoAndStop "'muted'" init=true)
+			(style
+				(bind scaleX "_isAlly ? 1 : -1")
+				(pivotX = 50%)
+			)	
+		)
 	)
 )
 
