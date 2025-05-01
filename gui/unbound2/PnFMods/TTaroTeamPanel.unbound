@@ -522,8 +522,6 @@
 
 (def element TP_PlayerDivisionItem (_entity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
 	(scope
-		(event evTextMuted)
-
 		(var divisionMemberComponent:gfx = "_entity && _entity.hasComponent(CC.divisionMember) ? _entity.divisionMember : null" (event "_entity.evAdded")(event "_entity.evRemoved"))
 		(var divisionSign:number = "divisionMemberComponent ? divisionMemberComponent.divisionSign : null" (event "divisionMemberComponent.evDivisionChanged"))
 		(var isInSameDivision:bool = "divisionMemberComponent ? divisionMemberComponent.isInSameDivision : false" (event "divisionMemberComponent.evDivisionChanged"))
@@ -540,7 +538,6 @@
 
 		(var isTextChatMuted:bool = "isMuted || isIgnored")
 	)
-	(dispatch evTextMuted (bind trigger "isTextChatMuted"))
 
 	(style
 		(width = "TP_DIVISION_ELEMENT_WIDTH")
