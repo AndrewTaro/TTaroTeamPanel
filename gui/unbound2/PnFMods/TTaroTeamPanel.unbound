@@ -1084,19 +1084,24 @@
 		(var _markerEntity:gfx = "_entity")
 		(macro GET_MARKER_ENTITY_COMPONENT 'data')
 		(var consData:array = "dataComponent ? dataComponent.data['consMonitor']: []" (event "dataComponent.evChanged"))
-		(var lastConsumable:dict = "consData.length > 0 ? consData[consData.length - 1] : null")
-		(var isSpecialConsumable:bool = "lastConsumable ? lastConsumable['icon'] in [
+		(var lastConsumable:dict = "consData && consData.length > 0 ? consData[consData.length - 1] : {}")
+		(var isSpecialConsumable:bool = "'icon' in lastConsumable ? lastConsumable['icon'] in [
 			'PCY057_TriggerHeal', 'PCY056_TacticalMinefield', 'PCY055_TriggerSabotage', 'PCY054_TacticalVulnerabilityDebuff',
 			'PCY053_SmokePlane', 'PCY052_ReconSquad', 'PCY051_SpeedBuff'
 			] : false"
 		)
 
+		(macro GET_MARKER_ENTITY_COMPONENT 'vehicle')
+		(var isShipVisible:bool = "vehicleComponent ? vehicleComponent.visibilityFlags : false" (event "vehicleComponent.evVisibilityFlagsChanged"))
+
 		(macro GET_MARKER_ENTITY_COMPONENT 'health')
 		(var isAlive:bool = "healthComponent ? healthComponent.isAlive : false" (event "healthComponent.evIsAliveChanged"))
+
+		(var iconAlpha:number = "!isAlive ? 0 : isShipVisible ? 1 : 0.3")
 	)
 	(style
 		(flow = "Flow.HORIZONTAL")
-		(bind alpha "isAlive ? 1.0 : 0")
+		(bind alpha "iconAlpha")
 	)
 	(bind visible "_isAlly && isTeamConsumableVisible")
 
@@ -1881,7 +1886,7 @@
 	)
 	(bind visible "hasMainGun")
 
-	(vtile
+	(block
 		(style
 			(vgap = "TP_TOOLTIP_ELEMENTS_VGAP")
 		)
@@ -1957,7 +1962,7 @@
 	)
 	(bind visible "hasSecondaryGun")
 
-	(vtile
+	(block
 		(style
 			(vgap = "TP_TOOLTIP_ELEMENTS_VGAP")
 		)
@@ -2019,7 +2024,7 @@
 
 	(bind visible "torpedoesTTX || torpedoGroupsTTX")
 
-	(vtile
+	(block
 		(style
 			(vgap = "TP_TOOLTIP_ELEMENTS_VGAP")
 		)
@@ -2091,7 +2096,7 @@
 
 	(bind visible "airDefenseTTX")
 
-	(vtile
+	(block
 		(style
 			(vgap = "TP_TOOLTIP_ELEMENTS_VGAP")
 		)
@@ -2136,7 +2141,7 @@
 
 	(bind visible "airSupportTTX")
 
-	(vtile
+	(block
 		(style
 			(vgap = "TP_TOOLTIP_ELEMENTS_VGAP")
 		)
@@ -2170,7 +2175,7 @@
 
 	(bind visible "depthChargesTTX")
 
-	(vtile
+	(block
 		(style
 			(vgap = "TP_TOOLTIP_ELEMENTS_VGAP")
 		)
@@ -2203,7 +2208,7 @@
 
 	(bind visible "mobilityTTX || underwaterMobilityTTX")
 
-	(vtile
+	(block
 		(style
 			(vgap = "TP_TOOLTIP_ELEMENTS_VGAP")
 		)
@@ -2259,7 +2264,7 @@
 
 	(bind visible "visibilityTTX")
 
-	(vtile
+	(block
 		(style
 			(vgap = "TP_TOOLTIP_ELEMENTS_VGAP")
 		)
