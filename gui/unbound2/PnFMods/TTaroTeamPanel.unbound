@@ -109,6 +109,24 @@
 (def constant TP_COMPONENT_KEY_BANNED_SHIPS "'modTTaroTeamPanelBannedShips'")
 (def constant TP_COMPONENT_KEY_CONSUMABLE_RANGES "'modTTaroTeamPanelConsumableRanges'")
 
+(def constant TP_DISPLAY_MODES {
+	DISABLE : 0,
+	ENABLE  : 1,
+	ADAPTIVE: 2,
+})
+
+(def constant TP_SHIPCONFIG_RENDERER_SETTINGS [
+	{renderer: 'TP_ShipConfigVisibilityItem',			prefSubKey: 'VISIBILITY',			headerImage: 'url:../crew_commander/skills/detection_visibility_range.png',	headerTitle: 'IDS_SHIP_PARAM_DETECTION',	headerDescriptions: ['IDS_SHIP_PARAM_VISIBILITY_DIST_BY_SHIP','IDS_SHIP_PARAM_VISIBILITY_DIST_BY_PLANE']},
+	{renderer: 'TP_ShipConfigMobilityItem',				prefSubKey: 'SPEED',				headerImage: 'url:../modules/icon_module_Engine_researched.png',			headerTitle: 'IDS_SHIP_PARAM_MAXSPEED',		headerDescriptions: ['IDS_SHIP_PARAM_MOBILITY','IDS_SHIP_PARAM_UNDERWATER_MOBILITY'], headerImageAlpha: 0.7 },
+	{renderer: 'TP_ShipConfigAirSupportItem',			prefSubKey: 'AIRSUPPORT',			headerImage: 'url:../battle_hud/icon_frag/icon_frag_bomb.png',				headerTitle: 'IDS_SHIP_PARAM_AIR_SUPPORT',	headerDescriptions: ['IDS_SHIP_PARAM_MAX_DIST','IDS_SHIP_PARAM_SHOT_DELAY'], headerImageAlpha: 0.7},
+	{renderer: 'TP_ShipConfigAirDefenseItem',			prefSubKey: 'ANTIAIR',				headerImage: 'url:../battle_hud/lower_log_modifiers/AAAuraDamage.png',		headerTitle: 'IDS_SHIP_PARAM_AIR_DEFENSE',	headerDescriptions: ['IDS_SHIP_PARAM_MAX_DIST','IDS_SHIP_PARAM_AIR_DEFENSE']},
+	{renderer: 'TP_ShipConfigAtbaItem',					prefSubKey: 'ATBA',					headerImage: 'url:../battle_hud/icon_frag/icon_frag_atba.png',				headerTitle: 'IDS_SHIP_PARAM_ATBA',			headerDescriptions: ['IDS_SHIP_PARAM_MAX_DIST']},
+	{renderer: 'TP_ShipConfigArtilleryItem',			prefSubKey: 'ARTILLERY',			headerImage: 'url:../modules/icon_module_Artillery_researched.png',			headerTitle: 'IDS_SHIP_PARAM_MAIN_GUN',		headerDescriptions: ['IDS_SHIP_PARAM_MAX_DIST','IDS_SHIP_PARAM_SHOT_DELAY']},
+	{renderer: 'TP_ShipConfigTorpedoItem',				prefSubKey: 'TORPEDO',				headerImage: 'url:../modules/icon_module_Torpedoes_researched.png',			headerTitle: 'IDS_SHIP_PARAM_TORPEDOES',	headerDescriptions: ['IDS_SHIP_PARAM_MAX_DIST'], headerImageAlpha: 0.8},
+	{renderer: 'TP_ShipConfigSurfaceConsumableItem',	prefSubKey: 'SURFACE_CONSUMABLE',	headerImage: 'url:../battle_hud/icon_frag/icon_frag_wave.png',				headerTitle: 'IDS_TITLE_CONSUMABLES',		headerDescriptions: ['IDS_DOCK_CONSUME_TITLE_PCY008_SONARSEARCH','IDS_DOCK_CONSUME_TITLE_PCY019_RLSSEARCH'], headerImageAlpha: 0.7},
+	{renderer: 'TP_ShipConfigSubmarineConsumableItem',	prefSubKey: 'SUB_CONSUMABLE',		headerImage: 'url:../battle_hud/icon_frag/icon_frag_wave.png',				headerTitle: 'IDS_TITLE_CONSUMABLES',		headerDescriptions: ['IDS_DOCK_CONSUME_TITLE_PCY045_HYDROPHONE','IDS_DOCK_CONSUME_TITLE_PCY048_SUBMARINELOCATOR'], headerImageAlpha: 0.7},
+])
+
 (def css $TP_ShipConfigText()
 	(extends $TextDefault13NM)
 	(extends $FontEnableReadability)
@@ -126,7 +144,7 @@
 		(macro STAGE_SIZE)
 		(macro TT_GET_USERPREF)
 		(macro TT_GET_PREF_NUMBER _varName="'posYModifier'" _pref="TP_PREFS.POS_OFFSET_MODIFIER")
-		(macro TT_GET_PREF_BOOL _varName="'isBlurMode'" _pref="TP_PREFS.BLUR_MODE")
+		(macro TT_GET_PREF_BOOL _varName="'isBlurMode'" _pref="TP_PREFS.BACKGROUND.MODE")
 
 		(macro TT_GET_PREF_BOOL _varName="'isVisibleOnlyOnAlt'" _pref="TP_PREFS.ALL_ALT_VISIBLE")
 		(var camera:gfx = "$datahub.getSingleComponent(CC.camera)")
@@ -229,111 +247,74 @@
 	(scope
 		# To suppress error
 		(var _entity:gfx = "null")
-
-		#Artillery
-		(macro TT_GET_PREF_BOOL _varName="'isArtilleryRangeVisible'" _pref="TP_PREFS.ARTILLERY_RANGE")
-		(macro TT_GET_PREF_BOOL _varName="'isArtilleryReloadVisible'" _pref="TP_PREFS.ARTILLERY_RELOAD")
-		(var isArtilleryEnabled:bool = "isArtilleryRangeVisible || isArtilleryReloadVisible")
-		#ATBA
-		(macro TT_GET_PREF_BOOL _varName="'isAtbaRangeVisible'" _pref="TP_PREFS.ATBA_RANGE")
-		(var isAtbaEnabled:bool = "isAtbaRangeVisible")
-		#Torpedo
-		(macro TT_GET_PREF_BOOL _varName="'isTorpedoRangeVisible'" _pref="TP_PREFS.TORPEDO_RANGE")
-		(var isTorpedoEnabled:bool = "isTorpedoRangeVisible")
-		#AntiAir
-		(macro TT_GET_PREF_BOOL _varName="'isAntiAirRangeVisible'" _pref="TP_PREFS.ANTIAIR_RANGE")
-		(macro TT_GET_PREF_BOOL _varName="'isAntiAirRatingVisible'" _pref="TP_PREFS.ANTIAIR_RATE")
-		(var isAntiAirEnabled:bool = "isAntiAirRangeVisible || isAntiAirRatingVisible")
-		#AirSupport
-		(macro TT_GET_PREF_BOOL _varName="'isAirSupportRangeVisible'" _pref="TP_PREFS.AIRSUPPORT_RANGE")
-		(macro TT_GET_PREF_BOOL _varName="'isAirSupportReloadVisible'" _pref="TP_PREFS.AIRSUPPORT_RELOAD")
-		(var isAirSupportEnabled:bool = "isAirSupportRangeVisible || isAirSupportReloadVisible")
-		#Mobility
-		(macro TT_GET_PREF_BOOL _varName="'isSurfaceMobilityVisible'" _pref="TP_PREFS.SPEED_SURFACE")
-		(macro TT_GET_PREF_BOOL _varName="'isUnderwaterMobilityVisible'" _pref="TP_PREFS.SPEED_UNDERWATER")
-		(var isMobilityEnabled:bool = "isSurfaceMobilityVisible || isUnderwaterMobilityVisible")
-		#Visibility
-		(macro TT_GET_PREF_BOOL _varName="'isVisibilityByShipVisible'" _pref="TP_PREFS.VISIBILITY_SURFACE")
-		(macro TT_GET_PREF_BOOL _varName="'isVisibilityByPlaneVisible'" _pref="TP_PREFS.VISIBILITY_AIR")
-		(var isVisibilityEnabled:bool = "isVisibilityByShipVisible || isVisibilityByPlaneVisible")
-		#Surface Consumable
-		(macro TT_GET_PREF_BOOL _varName="'isRadarRangeVisible'" _pref="TP_PREFS.RADAR_RANGE")
-		(macro TT_GET_PREF_BOOL _varName="'isHydroRangeVisible'" _pref="TP_PREFS.HYDRO_RANGE")
-		(var isSurfaceConsumableEnabled:bool = "isRadarRangeVisible || isHydroRangeVisible")
-		#Sub Consumables
-		(macro TT_GET_PREF_BOOL _varName="'isSubRadarRangeVisible'" _pref="TP_PREFS.SUB_RADAR_RANGE")
-		(macro TT_GET_PREF_BOOL _varName="'isSubHydroRangeVisible'" _pref="TP_PREFS.SUB_HYDRO_RANGE")
-		(var isSubmarineConsumableEnabled:bool = "isSubRadarRangeVisible || isSubHydroRangeVisible")
-		#ALT
-		(macro TT_GET_PREF_BOOL _varName="'isVisibleOnlyAlt'" _pref="TP_PREFS.STATS_ALT_VISIBLE")
-		(var camera:gfx = "$datahub.getSingleComponent(CC.camera)")
-		(var altVision:bool = "camera ? camera.altVision : false" (event "camera.evAltVisionChanged"))
 	)
 	(style
 		(bind flow "_isAlly ? Flow.HORIZONTAL : Flow.REVERSE_HORIZONTAL")
+		(align = "center|middle")
+		(height = 0)
+		(marginTop = "-13")
 	)
-
-	(hblock
+	# For margin
+	(block
 		(style
-			(align = "center|middle")
-			(height = 0)
-			(marginTop = "-13")
 			(bind flow "_isAlly ? Flow.HORIZONTAL : Flow.REVERSE_HORIZONTAL")
 		)
-		# For margin
-		(block
-			(style
-				(bind flow "_isAlly ? Flow.HORIZONTAL : Flow.REVERSE_HORIZONTAL")
-			)
-			(element TP_PlayerDivisionItem 		_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
-			(element TP_PlayerInfoItem 			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
-			(element TP_PlayerClanIconItem 		_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
-			(element TP_ShipWeightItem 			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum" $enabled="MOD_TOURNAMENT_SHIPWEIGHT_DATA") #For tournament
-			(element TP_ShipNationItem 			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
-			(element TP_ShipTierItem 			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
-			(element TP_ShipIconItem 			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
-			(element TP_ShipDetectionItem		_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
-			(element TP_PlayerKillCountItem 	_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
-		)
-		#
+		(element TP_PlayerDivisionItem 		_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
+		(element TP_PlayerInfoItem 			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
+		(element TP_PlayerClanIconItem 		_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
+		(element TP_ShipWeightItem 			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum" $enabled="MOD_TOURNAMENT_SHIPWEIGHT_DATA") #For tournament
+		(element TP_ShipNationItem 			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
+		(element TP_ShipTierItem 			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
+		(element TP_ShipIconItem 			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
+		(element TP_ShipDetectionItem		_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
+		(element TP_PlayerKillCountItem 	_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
+	)
+	#
 
-		# TODO
-		# I really should move all these strings to constant
-		# Maybe repace with repeat as well
-		#
-		(block
-			(style
-				(bind flow "_isAlly ? Flow.HORIZONTAL : Flow.REVERSE_HORIZONTAL")
-				(hitTest = true)
-			)
-			(bind visible "isVisibleOnlyAlt ? altVision : true")
-
-			# Visibility
-			(element TP_ShipConfigImageItem "'url:../crew_commander/skills/detection_visibility_range.png'" _isVisible="isVisibilityEnabled" _tooltipTitle='IDS_SHIP_PARAM_DETECTION' _tooltipTexts=['IDS_SHIP_PARAM_VISIBILITY_DIST_BY_SHIP','IDS_SHIP_PARAM_VISIBILITY_DIST_BY_PLANE'] _userPrefsNum="_userPrefsNum")
-			# Speed
-			(element TP_ShipConfigImageItem "'url:../modules/icon_module_Engine_researched.png'" _isVisible="isMobilityEnabled" _tooltipTitle='IDS_SHIP_PARAM_MAXSPEED' _tooltipTexts=['IDS_SHIP_PARAM_MOBILITY','IDS_SHIP_PARAM_UNDERWATER_MOBILITY'] _userPrefsNum="_userPrefsNum")
-			# AirStrike
-			(element TP_ShipConfigImageItem "'url:../battle_hud/icon_frag/icon_frag_bomb.png'" _isVisible="isAirSupportEnabled" _alpha="0.7" _tooltipTitle='IDS_SHIP_PARAM_AIR_SUPPORT' _tooltipTexts=['IDS_SHIP_PARAM_MAX_DIST','IDS_SHIP_PARAM_SHOT_DELAY'] _userPrefsNum="_userPrefsNum")
-			# AA
-			(element TP_ShipConfigImageItem "'url:../battle_hud/lower_log_modifiers/AAAuraDamage.png'" _isVisible="isAntiAirEnabled" _alpha="0.7" _tooltipTitle='IDS_SHIP_PARAM_AIR_DEFENSE' _tooltipTexts=['IDS_SHIP_PARAM_MAX_DIST','IDS_SHIP_PARAM_AIR_DEFENSE'] _userPrefsNum="_userPrefsNum")
-			# ATBA
-			(element TP_ShipConfigImageItem "'url:../battle_hud/icon_frag/icon_frag_atba.png'" _isVisible="isAtbaEnabled" _tooltipTitle='IDS_SHIP_PARAM_ATBA' _tooltipTexts=['IDS_SHIP_PARAM_MAX_DIST'] _userPrefsNum="_userPrefsNum")
-			# Artillery
-			(element TP_ShipConfigImageItem "'url:../modules/icon_module_Artillery_researched.png'" _isVisible="isArtilleryEnabled" _tooltipTitle='IDS_SHIP_PARAM_MAIN_GUN' _tooltipTexts=['IDS_SHIP_PARAM_MAX_DIST','IDS_SHIP_PARAM_SHOT_DELAY'] _userPrefsNum="_userPrefsNum")
-			# Torpedo
-			(element TP_ShipConfigImageItem "'url:../modules/icon_module_Torpedoes_researched.png'" _isVisible="isTorpedoEnabled" _alpha="0.8" _tooltipTitle='IDS_SHIP_PARAM_TORPEDOES' _tooltipTexts=['IDS_SHIP_PARAM_MAX_DIST'] _userPrefsNum="_userPrefsNum")
-			# Hydro/Radar
-			(element TP_ShipConfigImageItem "'url:../battle_hud/icon_frag/icon_frag_wave.png'" _isVisible="isSurfaceConsumableEnabled" _alpha="0.7" _tooltipTitle='IDS_TITLE_CONSUMABLES' _tooltipTexts=['IDS_DOCK_CONSUME_TITLE_PCY008_SONARSEARCH','IDS_DOCK_CONSUME_TITLE_PCY019_RLSSEARCH'] _userPrefsNum="_userPrefsNum")
-			# Hydrophone/SubRadar
-			(element TP_ShipConfigImageItem "'url:../battle_hud/icon_frag/icon_frag_wave.png'" _isVisible="isSubmarineConsumableEnabled" _alpha="0.7" _tooltipTitle='IDS_TITLE_CONSUMABLES' _tooltipTexts=['IDS_DOCK_CONSUME_TITLE_PCY045_HYDROPHONE','IDS_DOCK_CONSUME_TITLE_PCY048_SUBMARINELOCATOR'] _userPrefsNum="_userPrefsNum")
+	# TODO
+	# I really should move all these strings to constant
+	# Maybe repace with repeat as well
+	#
+	(block
+		(style
+			(bind flow "_isAlly ? Flow.HORIZONTAL : Flow.REVERSE_HORIZONTAL")
+			(hitTest = true)
 		)
 
-		# Mod Config
-		(element TT_ConfigButtonElement _modIndex = "5" _tooltipPosition="borderNoTrack"
-			(style
-				(position = "flow")
+		(controller $Repeat renderer='TP_HeaderRendererItem' count="TP_SHIPCONFIG_RENDERER_SETTINGS.length"
+			(args
+				_userPrefsNum = "_userPrefsNum"
 			)
 		)
+	)
+
+	# Mod Config
+	(element TT_ConfigButtonElement _modIndex = "5" _tooltipPosition="borderNoTrack"
+		(style
+			(position = "flow")
+		)
+	)
+)
+
+(def element TP_HeaderRendererItem(_userPrefsNum:gfx=null)
+	(scope
+		(var settings:dict = "TP_SHIPCONFIG_RENDERER_SETTINGS[$index]")
+		(var headerAlpha:number = "'headerAlpha' in settings ? settings.headerAlpha : 1")
+
+		(var camera:gfx = "$datahub.getSingleComponent(CC.camera)")
+		(var altVision:bool = "camera ? camera.altVision : false" (event "camera.evAltVisionChanged"))
+
+		(macro TT_GET_PREF_NUMBER	_varName="'displayMode'"	_pref="TP_PREFS[settings.prefSubKey].DISPLAY_MODE")
+		(macro TP_GET_DISPLAY_MODE	_varName="'isEnabled'"		_prefValue="displayMode")
+	)
+	(bind visible "isEnabled")
+
+	(element TP_ShipConfigImageItem
+		_iconPath		= "settings.headerImage"
+		_alpha			= "headerAlpha"
+		_tooltipTitle	= "settings.headerTitle"
+		_tooltipTexts	= "settings.headerDescriptions"
+		_userPrefsNum	= "_userPrefsNum"
 	)
 )
 
@@ -364,12 +345,12 @@
 		(var isScenarioBot:bool = "isBot && isScenarioMode")
 		(var isVisible:bool = "(isDeadPlayerVisible && !(isBot && isScenarioMode)) ? true : isAlive")
 
-		(macro TT_GET_PREF_NUMBER _varName="'blurAlpha'" _pref="TP_PREFS.BLUR_ALPHA")
-		(macro TT_GET_PREF_BOOL _varName="'isBlurMode'" _pref="TP_PREFS.BLUR_MODE")
-		(macro TT_GET_PREF_BOOL _varName="'isBlurVisibleOnlyAlt'" _pref="TP_PREFS.BLUR_ALT_VISIBLE")
+		(macro TT_GET_PREF_NUMBER _varName="'blurDisplayMode'" _pref="TP_PREFS.BACKGROUND.DISPLAY_MODE")
+		(macro TT_GET_PREF_NUMBER _varName="'blurAlpha'" _pref="TP_PREFS.BACKGROUND.ALPHA")
+		(macro TT_GET_PREF_BOOL _varName="'isBlurMode'" _pref="TP_PREFS.BACKGROUND.MODE")
 		(var camera:gfx = "$datahub.getSingleComponent(CC.camera)")
 		(var altVision:bool = "camera ? camera.altVision : false" (event "camera.evAltVisionChanged"))
-		(var isBlurVisible:bool = "isBlurVisibleOnlyAlt ? altVision : true")
+		(macro TP_GET_DISPLAY_MODE _varName="'isBlurVisible'" _prefValue="blurDisplayMode")
 		(var hoverBackground:str = "_isAlly ? 'ally_bg_panel' : 'enemy_bg_panel'")
 		(var hoverBackgroundUrl:str = "'url:../service_kit/panel_backgrounds/' + hoverBackground + '.png'")
 
@@ -1251,12 +1232,9 @@
 		(var isRealParams:bool = "shipBattleInfo ? shipBattleInfo.isRealParams : false")
 		(var shipTTX:gfx = "isRealParams ? newTTX : classicTTX")
 
-		(macro TT_GET_PREF_BOOL _varName="'isVisibleOnlyAlt'" _pref="TP_PREFS.STATS_ALT_VISIBLE")
 		(var camera:gfx = "$datahub.getSingleComponent(CC.camera)")
 		(var altVision:bool = "camera ? camera.altVision : false" (event "camera.evAltVisionChanged"))
 	)
-
-	(bind visible "isVisibleOnlyAlt ? altVision : true")
 
 	(hblock
 		(style
@@ -1264,124 +1242,120 @@
 			(bind flow "_isAlly ? Flow.HORIZONTAL : Flow.REVERSE_HORIZONTAL")
 			(height = "TP_PLAYER_ROW_SIZE.HEIGHT")
 		)
-		(element TP_ShipConfigVisibilityItem "shipTTX" _avatarEntity="_entity" _isRealParams="isRealParams" _userPrefsNum="_userPrefsNum")
-		(element TP_ShipConfigMobilityItem "shipTTX" _userPrefsNum="_userPrefsNum")
-		(element TP_ShipConfigAirSupportItem "shipTTX" _userPrefsNum="_userPrefsNum")
-		(element TP_ShipConfigAirDefenseItem "shipTTX" _userPrefsNum="_userPrefsNum")
-		(element TP_ShipConfigAtbaItem "shipTTX" _avatarEntity="_entity" _isRealParams="isRealParams" _userPrefsNum="_userPrefsNum") #Forces shipBattleInfoTTX so it always shows the max dist for the enemy
-		(element TP_ShipConfigArtilleryItem "shipTTX" _userPrefsNum="_userPrefsNum")
-		(element TP_ShipConfigTorpedoItem "shipTTX" _userPrefsNum="_userPrefsNum")
-		#(element TP_ShipConfigBatteryItem "shipTTX")
-		(element TP_ShipConfigSurfaceConsumableItem "shipTTX" _avatarEntity="_entity" _userPrefsNum="_userPrefsNum")
-		(element TP_ShipConfigSubmarineConsumableItem "shipTTX" _avatarEntity="_entity" _userPrefsNum="_userPrefsNum")
+		(controller $Repeat renderer='TP_ShipConfigRendererItem' count="TP_SHIPCONFIG_RENDERER_SETTINGS.length"
+			(args
+				_shipTTX	  = "shipTTX"
+				_avatarEntity = "_entity"
+				_isRealParams = "isRealParams"
+				_userPrefsNum = "_userPrefsNum"
+			)
+		)
+	)
+)
+
+(def element TP_ShipConfigRendererItem(_shipTTX:gfx, _avatarEntity:gfx, _isRealParams:bool, _userPrefsNum:gfx=null)
+	(scope
+		(var settings:dict = "TP_SHIPCONFIG_RENDERER_SETTINGS[$index]")
+
+		(macro TT_GET_PREF_NUMBER _varName="'displayMode'" _pref="TP_PREFS[settings.prefSubKey].DISPLAY_MODE")
+		(var isEnabled:bool = "displayMode != TP_DISPLAY_MODES.DISABLE")
+
+		(var camera:gfx = "$datahub.getSingleComponent(CC.camera)")
+		(var altVision:bool = "camera ? camera.altVision : false" (event "camera.evAltVisionChanged"))
+		(macro TP_GET_DISPLAY_MODE _varName="'isVisible'" _prefValue="displayMode")
+
+		(macro TT_GET_PREF_BOOL _varName="'isUnitVisible'" _pref="TP_PREFS.UNITS_VISIBLE")
+	)
+
+	(bind visible "isVisible")	
+
+	(controller $Instance
+		(bind renderer "settings.renderer")
+		(bind enabled "isEnabled")
+		(args
+			_shipTTX	  = "_shipTTX"
+			_avatarEntity = "_avatarEntity"
+			_isRealParams = "_isRealParams"
+			_userPrefsNum = "_userPrefsNum"
+		)
+		(exprs
+			(style
+				(bind width "isUnitVisible ? TP_SHIPCONFIG_ELEMENT_WIDTH.WITH_UNIT : TP_SHIPCONFIG_ELEMENT_WIDTH.NO_UNIT")
+			)
+		)
+	)
+)
+
+# This will reduce unnecessary textfields
+(def macro TP_SHIPCONFIG_TEXT_ITEM(_value:expression, _unit:expression, _isEnabled:expression)
+	(block
+		(style
+			(width = 100%)
+		)
+		(controller $Instance renderer='TP_ShipConfigTextItem'
+			(bind enabled "_isEnabled")
+			(args
+				_value="null == _value ? 0 : _value" # Without null check, the log will start crying about Invalid cast type
+				_unit="_unit"
+				_userPrefsNum="_userPrefsNum"
+			)
+		)
 	)
 )
 
 (def element TP_ShipConfigArtilleryItem(_shipTTX:gfx, _userPrefsNum:gfx=null)
 	(scope
 		(var artilleryTTX:gfx = "_shipTTX ? _shipTTX.artillery : null")
-		(var hasMainGun:bool = "artilleryTTX ? artilleryTTX.mainGun.length > 0 : false")
 		(var range:number = "artilleryTTX ? artilleryTTX.mgMaxDist.value : null")
 		(var reload:number = "artilleryTTX ? artilleryTTX.mgReloadTime.value : null")
-		(macro TT_GET_PREF_BOOL _varName="'isArtilleryRangeVisible'" _pref="TP_PREFS.ARTILLERY_RANGE")
-		(macro TT_GET_PREF_BOOL _varName="'isArtilleryReloadVisible'" _pref="TP_PREFS.ARTILLERY_RELOAD")
-		(var isEnabled:bool = "isArtilleryRangeVisible || isArtilleryReloadVisible")
+		(macro TT_GET_PREF_BOOL _varName="'isArtilleryRangeVisible'" _pref="TP_PREFS.ARTILLERY.RANGE")
+		(macro TT_GET_PREF_BOOL _varName="'isArtilleryReloadVisible'" _pref="TP_PREFS.ARTILLERY.RELOAD")
 	)
 
-	(bind visible "isEnabled")
-
-	(style
-		(bind alpha "hasMainGun ? 1.0 : 0.0")
-		(vgap = "TP_CONFIG_ELEMENTS_VGAP")
-	)
-
-	(element TP_ShipConfigTextItem _value="range" _unit="'km'" _userPrefsNum="_userPrefsNum"
-		(bind visible "isArtilleryRangeVisible")
-	)
-	(element TP_ShipConfigTextItem _value="reload" _unit="'s'" _userPrefsNum="_userPrefsNum"
-		(bind visible "isArtilleryReloadVisible")
-	)
+	(macro TP_SHIPCONFIG_TEXT_ITEM _value="range"	_unit="'km'"	_isEnabled="isArtilleryRangeVisible")
+	(macro TP_SHIPCONFIG_TEXT_ITEM _value="reload"	_unit="'s'"		_isEnabled="isArtilleryReloadVisible")
 )
 
 (def element TP_ShipConfigTorpedoItem(_shipTTX:gfx, _userPrefsNum:gfx=null)
 	(scope
-		#Surface Torps
+		# Surface Torps
 		(var torpedoesTTX:gfx = "_shipTTX ? _shipTTX.torpedoes : null")
-		#normal torps
+		# Normal torps
 		(var torpedoTTX:gfx = "torpedoesTTX ? torpedoesTTX.torpedo : null")
 		(var torpedoRange:number = "torpedoTTX ? torpedoTTX.maxDist.value : null")
-		(var torpedoRangeStr:str = "torpedoTTX ? formatFloatingPoint(torpedoRange, 1) : ''")
-		#deepwater torps
+		# Deepwater torps
 		(var torpedoDeepwaterTTX:gfx = "torpedoesTTX ? torpedoesTTX.torpedoDeepwater : null")
 		(var torpedoDeepwaterRange:number = "torpedoDeepwaterTTX ? torpedoDeepwaterTTX.maxDist.value : null")
-		(var torpedoDeepwaterRangeStr:str = "torpedoDeepwaterTTX ? formatFloatingPoint(torpedoDeepwaterRange, 1) : ''")
-		#alt torps
+		# Alt torps
 		(var torpedoAltTTX:gfx = "torpedoesTTX ? torpedoesTTX.torpedoAlt : null")
 		(var torpedoAltRange:number = "torpedoAltTTX ? torpedoAltTTX.maxDist.value : null")
-		(var torpedoAltRangeStr:str = "torpedoAltTTX ? formatFloatingPoint(torpedoAltRange, 1) : ''")
-		#all ranges
-		(var ranges:str = "	torpedoRangeStr + 
-							(torpedoRange && torpedoDeepwaterRange ? '/' : '') + torpedoDeepwaterRangeStr +
-							(((torpedoRange || torpedoDeepwaterRange) && torpedoAltRange) ? '/' : '') + torpedoAltRangeStr
-		")
 
-		#(var reload:number = "torpedoesTTX.reloadTime.value")
-
-
-		#Submarine torps
+		# Submarine torps
 		(var torpedoGroupsTTX:gfx = "_shipTTX ? _shipTTX.torpedoGroups : null")
-		#normal torps
+		# Normal torps
 		(var subTorpedoTTX:gfx = "torpedoGroupsTTX ? torpedoGroupsTTX.torpedo : null")
 		(var subTorpedoRange:number = "subTorpedoTTX ? subTorpedoTTX.maxDist.value : null")
-		#deepwater torps
+		# Deepwater torps
 		(var subTorpedoDeepwaterTTX:gfx = "torpedoGroupsTTX ? torpedoGroupsTTX.torpedoDeepwater : null")
 		(var subTorpedoDeepwaterRange:number = "subTorpedoDeepwaterTTX ? subTorpedoDeepwaterTTX.maxDist.value : null")
-		#alt torps
+		# Alt torps
 		(var subTorpedoAltTTX:gfx = "torpedoGroupsTTX ? torpedoGroupsTTX.torpedoAlt : null")
 		(var subTorpedoAltRange:number = "subTorpedoAltTTX ? subTorpedoAltTTX.maxDist.value : null")
-
-		#(var reload:number = "torpedoGroupsTTX.reloadTime.value")
-
-		
-		(macro TT_GET_PREF_BOOL _varName="'isTorpedoRangeVisible'" _pref="TP_PREFS.TORPEDO_RANGE")
-		(var isEnabled:bool = "isTorpedoRangeVisible")
 	)
 
-	(bind visible "isEnabled")
+	(macro TP_SHIPCONFIG_TEXT_ITEM _value="torpedoRange"			_unit="'km'"	_isEnabled="torpedoRange")
+	(macro TP_SHIPCONFIG_TEXT_ITEM _value="torpedoDeepwaterRange"	_unit="'km'"	_isEnabled="torpedoDeepwaterRange")
+	(macro TP_SHIPCONFIG_TEXT_ITEM _value="torpedoAltRange"			_unit="'km'"	_isEnabled="torpedoAltRange")
 
-	(style
-		(bind alpha "torpedoesTTX || torpedoGroupsTTX ? 1.0 : 0.0")
-		(vgap = "TP_CONFIG_ELEMENTS_VGAP")
-	)
-
-	(element TP_ShipConfigTextItem _value="torpedoRange" _unit="'km'" _userPrefsNum="_userPrefsNum"
-		(bind visible "!(torpedoesTTX || torpedoGroupsTTX) || torpedoRange") #shows if there is no torp just for margin
-	)
-	(element TP_ShipConfigTextItem _value="torpedoDeepwaterRange" _unit="'km'" _userPrefsNum="_userPrefsNum"
-		(bind visible "torpedoDeepwaterRange")
-	)
-	(element TP_ShipConfigTextItem _value="torpedoAltRange" _unit="'km'" _userPrefsNum="_userPrefsNum"
-		(bind visible "torpedoAltRange")
-	)
-
-	(element TP_ShipConfigTextItem _value="subTorpedoRange" _unit="'km'" _userPrefsNum="_userPrefsNum"
-		(bind visible "subTorpedoRange") #shows if there is no torp just for margin
-	)
-	(element TP_ShipConfigTextItem _value="subTorpedoDeepwaterRange" _unit="'km'" _userPrefsNum="_userPrefsNum"
-		(bind visible "subTorpedoDeepwaterRange")
-	)
-	(element TP_ShipConfigTextItem _value="subTorpedoAltRange" _unit="'km'" _userPrefsNum="_userPrefsNum"
-		(bind visible "subTorpedoAltRange")
-	)
+	(macro TP_SHIPCONFIG_TEXT_ITEM _value="subTorpedoRange"			_unit="'km'"	_isEnabled="subTorpedoRange")
+	(macro TP_SHIPCONFIG_TEXT_ITEM _value="subTorpedoDeepwaterRange"_unit="'km'"	_isEnabled="subTorpedoDeepwaterRange")
+	(macro TP_SHIPCONFIG_TEXT_ITEM _value="subTorpedoAltRange"		_unit="'km'"	_isEnabled="subTorpedoAltRange")
 )
 
 (def element TP_ShipConfigAtbaItem(_shipTTX:gfx, _avatarEntity:gfx, _isRealParams:bool, _userPrefsNum:gfx=null)
 	(scope
 		(var artilleryTTX:gfx = "_shipTTX ? _shipTTX.artillery : null")
-		(var hasSecondaryGun:bool = "artilleryTTX ? artilleryTTX.atba.length > 0 : false")
 		(var range:number = "artilleryTTX ? artilleryTTX.atbaMaxDist.value : null")
-		(macro TT_GET_PREF_BOOL _varName="'isAtbaRangeVisible'" _pref="TP_PREFS.ATBA_RANGE")
-		(var isEnabled:bool = "isAtbaRangeVisible")
 		
 		#fix for skill---------------------
 		(var selfPlayer:gfx = "$datahub.getSingleEntity(CC.playerAvatar)")
@@ -1411,16 +1385,7 @@
 		#---------------------
 	)
 
-	(bind visible "isEnabled")
-
-	(style
-		(bind alpha "hasSecondaryGun ? 1.0 : 0.0")
-		(vgap = "TP_CONFIG_ELEMENTS_VGAP")
-	)
-
-	(element TP_ShipConfigTextItem _value="modifiedAtbaRange" _unit="'km'" _userPrefsNum="_userPrefsNum"
-		(bind visible "isAtbaRangeVisible")
-	)
+	(macro TP_SHIPCONFIG_TEXT_ITEM _value="modifiedAtbaRange"		_unit="'km'"	_isEnabled="modifiedAtbaRange")
 )
 
 (def element TP_ShipConfigAirDefenseItem(_shipTTX:gfx, _userPrefsNum:gfx=null)
@@ -1428,24 +1393,12 @@
 		(var airDefenseTTX:gfx = "_shipTTX ? _shipTTX.airDefense : null")
 		(var range:number = "airDefenseTTX ? airDefenseTTX.averageAura.maxDist.value : null")
 		(var integralValue:number = "airDefenseTTX ? airDefenseTTX.integralValue.value : 0")
-		(macro TT_GET_PREF_BOOL _varName="'isAntiAirRangeVisible'" _pref="TP_PREFS.ANTIAIR_RANGE")
-		(macro TT_GET_PREF_BOOL _varName="'isAntiAirRatingVisible'" _pref="TP_PREFS.ANTIAIR_RATE")
-		(var isEnabled:bool = "isAntiAirRangeVisible || isAntiAirRatingVisible")
+		(macro TT_GET_PREF_BOOL _varName="'isAntiAirRangeVisible'" _pref="TP_PREFS.ANTIAIR.RANGE")
+		(macro TT_GET_PREF_BOOL _varName="'isAntiAirRatingVisible'" _pref="TP_PREFS.ANTIAIR.RATE")
 	)
 
-	(bind visible "isEnabled")
-
-	(style
-		(bind alpha "airDefenseTTX ? 1.0 : 0.0")
-		(vgap = "TP_CONFIG_ELEMENTS_VGAP")
-	)
-
-	(element TP_ShipConfigTextItem _value="range" _unit="'km'" _userPrefsNum="_userPrefsNum"
-		(bind visible "isAntiAirRangeVisible")
-	)
-	(element TP_ShipConfigTextItem _value="integralValue" _unit="'AA'" _roundDigit=0 _userPrefsNum="_userPrefsNum"
-		(bind visible "isAntiAirRatingVisible")
-	)
+	(macro TP_SHIPCONFIG_TEXT_ITEM _value="range"			_unit="'km'"	_isEnabled="isAntiAirRangeVisible")
+	(macro TP_SHIPCONFIG_TEXT_ITEM _value="integralValue"	_unit="'AA'"	_isEnabled="isAntiAirRatingVisible")
 )
 
 (def element TP_ShipConfigAirSupportItem(_shipTTX:gfx, _userPrefsNum:gfx=null)
@@ -1453,24 +1406,12 @@
 		(var airSupportTTX:gfx = "_shipTTX ? _shipTTX.airSupport : null")
 		(var range:number = "airSupportTTX ? airSupportTTX.maxDist.value : null")
 		(var reload:number = "airSupportTTX ? airSupportTTX.reloadTime.value : null")
-		(macro TT_GET_PREF_BOOL _varName="'isAirSupportRangeVisible'" _pref="TP_PREFS.AIRSUPPORT_RANGE")
-		(macro TT_GET_PREF_BOOL _varName="'isAirSupportReloadVisible'" _pref="TP_PREFS.AIRSUPPORT_RELOAD")
-		(var isEnabled:bool = "isAirSupportRangeVisible || isAirSupportReloadVisible")
+		(macro TT_GET_PREF_BOOL _varName="'isAirSupportRangeVisible'" _pref="TP_PREFS.AIRSUPPORT.RANGE")
+		(macro TT_GET_PREF_BOOL _varName="'isAirSupportReloadVisible'" _pref="TP_PREFS.AIRSUPPORT.RELOAD")
 	)
 
-	(bind visible "isEnabled")
-
-	(style
-		(bind alpha "airSupportTTX ? 1.0 : 0.0")
-		(vgap = "TP_CONFIG_ELEMENTS_VGAP")
-	)
-
-	(element TP_ShipConfigTextItem _value="range" _unit="'km'" _userPrefsNum="_userPrefsNum"
-		(bind visible "isAirSupportRangeVisible")
-	)
-	(element TP_ShipConfigTextItem _value="reload" _unit="'s'" _userPrefsNum="_userPrefsNum"
-		(bind visible "isAirSupportReloadVisible")
-	)
+	(macro TP_SHIPCONFIG_TEXT_ITEM _value="range"	_unit="'km'"	_isEnabled="isAirSupportRangeVisible")
+	(macro TP_SHIPCONFIG_TEXT_ITEM _value="reload"	_unit="'s'"		_isEnabled="isAirSupportReloadVisible")
 )
 
 (def element TP_ShipConfigBatteryItem(_shipTTX:gfx)
@@ -1503,24 +1444,12 @@
 		(var underwaterMobilityTTX:gfx = "_shipTTX ? _shipTTX.underwaterMobility : null")
 		(var underwaterSpeed:number = "underwaterMobilityTTX ? underwaterMobilityTTX.speed.value : null")
 
-		(macro TT_GET_PREF_BOOL _varName="'isSurfaceMobilityVisible'" _pref="TP_PREFS.SPEED_SURFACE")
-		(macro TT_GET_PREF_BOOL _varName="'isUnderwaterMobilityVisible'" _pref="TP_PREFS.SPEED_UNDERWATER")
-		(var isEnabled:bool = "isSurfaceMobilityVisible || isUnderwaterMobilityVisible")
+		(macro TT_GET_PREF_BOOL _varName="'isSurfaceMobilityVisible'" _pref="TP_PREFS.SPEED.SURFACE")
+		(macro TT_GET_PREF_BOOL _varName="'isUnderwaterMobilityVisible'" _pref="TP_PREFS.SPEED.UNDERWATER")
 	)
 
-	(bind visible "isEnabled")
-	
-	(style
-		(bind alpha "mobilityTTX || underwaterMobilityTTX ? 1.0 : 0.0")
-		(vgap = "TP_CONFIG_ELEMENTS_VGAP")
-	)
-
-	(element TP_ShipConfigTextItem _value="surfaceSpeed" _unit="'kts'" _userPrefsNum="_userPrefsNum"
-		(bind visible "isSurfaceMobilityVisible")
-	)
-	(element TP_ShipConfigTextItem _value="underwaterSpeed" _unit="'kts'" _userPrefsNum="_userPrefsNum"
-		(bind visible "isUnderwaterMobilityVisible")
-	)
+	(macro TP_SHIPCONFIG_TEXT_ITEM _value="surfaceSpeed"	_unit="'kts'"	_isEnabled="isSurfaceMobilityVisible")
+	(macro TP_SHIPCONFIG_TEXT_ITEM _value="underwaterSpeed"	_unit="'kts'"	_isEnabled="isUnderwaterMobilityVisible && underwaterSpeed")
 )
 
 (def element TP_ShipConfigVisibilityItem(_shipTTX:gfx, _avatarEntity:gfx, _isRealParams:bool, _userPrefsNum:gfx=null)
@@ -1558,23 +1487,12 @@
 		(var modifiedVisibilityByPlane:number = "visibilityByPlane * visibilityModifier") #CAPTAIN SKILL FIX
 		#---------------------
 
-		(macro TT_GET_PREF_BOOL _varName="'isVisibilityByShipVisible'" _pref="TP_PREFS.VISIBILITY_SURFACE")
-		(macro TT_GET_PREF_BOOL _varName="'isVisibilityByPlaneVisible'" _pref="TP_PREFS.VISIBILITY_AIR")
-		(var isEnabled:bool = "isVisibilityByShipVisible || isVisibilityByPlaneVisible")
+		(macro TT_GET_PREF_BOOL _varName="'isVisibilityByShipVisible'" _pref="TP_PREFS.VISIBILITY.SURFACE")
+		(macro TT_GET_PREF_BOOL _varName="'isVisibilityByPlaneVisible'" _pref="TP_PREFS.VISIBILITY.AIR")
 	)
 
-	(bind visible "isEnabled")
-	(style
-		(bind alpha "visibilityTTX ? 1.0 : 0.0")
-		(vgap = "TP_CONFIG_ELEMENTS_VGAP")
-	)
-
-	(element TP_ShipConfigTextItem _value="modifiedVisibilityByShip" _unit="'km'" _userPrefsNum="_userPrefsNum"
-		(bind visible "isVisibilityByShipVisible")
-	)
-	(element TP_ShipConfigTextItem _value="modifiedVisibilityByPlane" _unit="'km'" _userPrefsNum="_userPrefsNum"
-		(bind visible "isVisibilityByPlaneVisible")
-	)
+	(macro TP_SHIPCONFIG_TEXT_ITEM _value="modifiedVisibilityByShip"	_unit="'km'"	_isEnabled="isVisibilityByShipVisible")
+	(macro TP_SHIPCONFIG_TEXT_ITEM _value="modifiedVisibilityByPlane"	_unit="'km'"	_isEnabled="isVisibilityByPlaneVisible")
 )
 
 (def element TP_ShipConfigSurfaceConsumableItem(_shipTTX:gfx, _avatarEntity:gfx, _userPrefsNum:gfx=null)
@@ -1588,23 +1506,12 @@
 		(var radarRange:number = "consumableRanges && 'rls' in consumableRanges ? consumableRanges['rls'] : null")
 		(var hydroRange:number = "consumableRanges && 'sonar' in consumableRanges ? consumableRanges['sonar'] : null")
 
-		(macro TT_GET_PREF_BOOL _varName="'isRadarRangeVisible'" _pref="TP_PREFS.RADAR_RANGE")
-		(macro TT_GET_PREF_BOOL _varName="'isHydroRangeVisible'" _pref="TP_PREFS.HYDRO_RANGE")
-		(var isEnabled:bool = "isRadarRangeVisible || isHydroRangeVisible")
+		(macro TT_GET_PREF_BOOL _varName="'isRadarRangeVisible'" _pref="TP_PREFS.SURFACE_CONSUMABLE.RADAR_RANGE")
+		(macro TT_GET_PREF_BOOL _varName="'isHydroRangeVisible'" _pref="TP_PREFS.SURFACE_CONSUMABLE.HYDRO_RANGE")
 	)
 
-	(bind visible "isEnabled")
-	(style
-		(bind alpha "consumableRanges ? 1.0 : 0.0")
-		(vgap = "TP_CONFIG_ELEMENTS_VGAP")
-	)
-
-	(element TP_ShipConfigTextItem _value="hydroRange" _unit="'km'" _userPrefsNum="_userPrefsNum" _showNull=true
-		(bind visible "isHydroRangeVisible")
-	)
-	(element TP_ShipConfigTextItem _value="radarRange" _unit="'km'" _userPrefsNum="_userPrefsNum" _showNull=true
-		(bind visible "isRadarRangeVisible")
-	)
+	(macro TP_SHIPCONFIG_TEXT_ITEM _value="hydroRange"	_unit="'km'"	_isEnabled="isRadarRangeVisible")
+	(macro TP_SHIPCONFIG_TEXT_ITEM _value="radarRange"	_unit="'km'"	_isEnabled="isHydroRangeVisible")
 )
 
 (def element TP_ShipConfigSubmarineConsumableItem(_shipTTX:gfx, _avatarEntity:gfx, _userPrefsNum:gfx=null)
@@ -1618,32 +1525,19 @@
 		(var radarRange:number = "consumableRanges && 'submarineLocator' in consumableRanges ? consumableRanges['submarineLocator'] : null")
 		(var hydroRange:number = "consumableRanges && 'hydrophone' in consumableRanges ? consumableRanges['hydrophone'] : null")
 
-		(macro TT_GET_PREF_BOOL _varName="'isSubRadarRangeVisible'" _pref="TP_PREFS.SUB_RADAR_RANGE")
-		(macro TT_GET_PREF_BOOL _varName="'isSubHydroRangeVisible'" _pref="TP_PREFS.SUB_HYDRO_RANGE")
-		(var isEnabled:bool = "isSubRadarRangeVisible || isSubHydroRangeVisible")
+		(macro TT_GET_PREF_BOOL _varName="'isSubRadarRangeVisible'" _pref="TP_PREFS.SUB_CONSUMABLE.SUB_RADAR_RANGE")
+		(macro TT_GET_PREF_BOOL _varName="'isSubHydroRangeVisible'" _pref="TP_PREFS.SUB_CONSUMABLE.SUB_HYDRO_RANGE")
 	)
 
-	(bind visible "isEnabled")
-
-	(style
-		(bind alpha "consumableRanges ? 1.0 : 0.0")
-		(vgap = "TP_CONFIG_ELEMENTS_VGAP")
-	)
-
-	(element TP_ShipConfigTextItem _value="hydroRange" _unit="'km'" _userPrefsNum="_userPrefsNum" _showNull=true
-		(bind visible "isSubHydroRangeVisible")
-	)
-	(element TP_ShipConfigTextItem _value="radarRange" _unit="'km'" _userPrefsNum="_userPrefsNum" _showNull=true
-		(bind visible "isSubRadarRangeVisible")
-	)
+	(macro TP_SHIPCONFIG_TEXT_ITEM _value="hydroRange"	_unit="'km'"	_isEnabled="isSubRadarRangeVisible")
+	(macro TP_SHIPCONFIG_TEXT_ITEM _value="radarRange"	_unit="'km'"	_isEnabled="isSubHydroRangeVisible")
 )
 
 # Image Item
-(def element TP_ShipConfigImageItem (_iconPath:str, _alpha:number="1.0", _isVisible:bool=true, _tooltipTitle:str='', _tooltipTexts:array=[], _userPrefsNum:gfx=null)
+(def element TP_ShipConfigImageItem (_iconPath:str, _alpha:number="1.0", _tooltipTitle:str='', _tooltipTexts:array=[], _userPrefsNum:gfx=null)
 	(scope
 		(macro TT_GET_PREF_BOOL _varName="'isUnitVisible'" _pref="TP_PREFS.UNITS_VISIBLE")
 	)
-	(bind visible "_isVisible")
 	(style
 		(bind width "isUnitVisible ? TP_SHIPCONFIG_ELEMENT_WIDTH.WITH_UNIT : TP_SHIPCONFIG_ELEMENT_WIDTH.NO_UNIT")
 		(align = "middle|center")
@@ -1700,44 +1594,40 @@
 )
 
 # Text Item
-(def element TP_ShipConfigTextItem (_value:number, _unit:str=null, _showZero:bool=false, _showNull:bool=false, _roundDigit:number="1.0", _userPrefsNum:gfx=null)
+(def element TP_ShipConfigTextItem (_value:number, _unit:str='', _roundDigit:number="1.0", _userPrefsNum:gfx=null)
 	(scope
-		(var isNull:bool = "_value == null")
-		(var isZero:bool = "_value == 0")
-		(var isValueVisible:bool = "(isNull && _showNull) || (isZero && _showZero) || _value")
+		(var isValueVisible:bool = "_value")
 		(macro TT_GET_PREF_BOOL _varName="'isUnitVisible'" _pref="TP_PREFS.UNITS_VISIBLE")
 		(macro TT_GET_PREF_BOOL _varName="'isBoldFont'"    _pref="TP_PREFS.STATS_BOLD_FONT")
 	)
 
 	(style
-		(bind width "isUnitVisible ? TP_SHIPCONFIG_ELEMENT_WIDTH.WITH_UNIT : TP_SHIPCONFIG_ELEMENT_WIDTH.NO_UNIT")
+		(width = 100%)
+		(align = "right")
+		(bind alpha "isValueVisible ? 1 : 0")
+		(flow = "Flow.HORIZONTAL")
+		(marginTop = 1px)
+		(marginBottom = 2px)
 	)
-	(hblock
-		(bind visible "isValueVisible")
+	(tf
+		(bind class "isBoldFont ? '$TP_ShipConfigTextBold' : '$TP_ShipConfigText'")
 		(style
+			(bind marginRight "isUnitVisible ? XS : S")
+			(textAlign = "right")
 			(width = 100%)
-			(align = "right")
+			# Without width and textAlign there is one fucking pixel misalignment on some texts
+			# This is cursed
 		)
-		(tf
-			(bind class "isBoldFont ? '$TP_ShipConfigTextBold' : '$TP_ShipConfigText'")
-			(style
-				(bind marginRight "isUnitVisible ? XS : S")
-				(textAlign = "right")
-				(width = 100%)
-				# Without width and textAlign there is one fucking pixel misalignment on some texts
-				# This is cursed
-			)
-			(bind text "isNull ? ' ' : formatFloatingPoint(_value, _roundDigit)")
-		)
-		(tf
-			(bind visible "isUnitVisible")
-			(class $TP_ShipConfigText)
-			(bind text "isNull ? ' ' : _unit")
-			(alpha = "TC")
-			(style
-				(width = "20px")
-				(marginRight = "XS")
-			)
+		(bind text "formatFloatingPoint(_value, _roundDigit)")
+	)
+	(tf
+		(bind visible "isUnitVisible")
+		(class $TP_ShipConfigText)
+		(bind text "_unit")
+		(alpha = "TC")
+		(style
+			(width = "20px")
+			(marginRight = "XS")
 		)
 	)
 )
@@ -2406,6 +2296,11 @@
 #--------------------------------------------------------------------------------
 # Macros
 #--------------------------------------------------------------------------------
+
+(def macro TP_GET_DISPLAY_MODE (_varName:expression, _prefValue:expression)
+	(var name="_varName" type=bool value="_prefValue == TMap_DISPLAY_MODES.ADAPTIVE ? altVision : _prefValue")
+)
+
 (def macro TP_GET_ISAFK (_entity:expression)
 	# Returns isAFK:bool
 	#
