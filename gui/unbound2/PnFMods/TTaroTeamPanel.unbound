@@ -2197,7 +2197,7 @@
 #--------------------------------------------------------------------------------
 
 (def macro TP_GET_DISPLAY_MODE (_varName:expression, _prefValue:expression)
-	(var name="_varName" type=bool value="_prefValue == TMap_DISPLAY_MODES.ADAPTIVE ? altVision : _prefValue")
+	(var name="_varName" type=bool value="_prefValue == TP_DISPLAY_MODES.ADAPTIVE ? altVision : _prefValue")
 )
 
 (def macro TP_GET_ISAFK (_entity:expression)
