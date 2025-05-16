@@ -1064,141 +1064,40 @@
 
 		(var _markerEntity:gfx = "_entity")
 		(macro GET_MARKER_ENTITY_COMPONENT 'data')
-		(var consData:array = "dataComponent ? dataComponent.data['consMonitor']: []" (event "dataComponent.evChanged"))
-		(var lastConsumable:dict = "consData && consData.length > 0 ? consData[consData.length - 1] : {}")
-		(var isSpecialConsumable:bool = "'icon' in lastConsumable ? lastConsumable['icon'] in [
-			'PCY057_TriggerHeal', 'PCY056_TacticalMinefield', 'PCY055_TriggerSabotage', 'PCY054_TacticalVulnerabilityDebuff',
-			'PCY053_SmokePlane', 'PCY052_ReconSquad', 'PCY051_SpeedBuff'
-			] : false"
-		)
+		(var consData:array = "dataComponent ? dataComponent.data.consMonitor : []" (event "dataComponent.evChanged"))
 
 		(macro GET_MARKER_ENTITY_COMPONENT 'vehicle')
-		(var isShipVisible:bool = "vehicleComponent ? vehicleComponent.visibilityFlags : false" (event "vehicleComponent.evVisibilityFlagsChanged"))
+		(var isShipVisible:bool = "vehicleComponent ? vehicleComponent : false")
 
 		(macro GET_MARKER_ENTITY_COMPONENT 'health')
 		(var isAlive:bool = "healthComponent ? healthComponent.isAlive : false" (event "healthComponent.evIsAliveChanged"))
 
 		(var iconAlpha:number = "!isAlive ? 0 : isShipVisible ? 1 : 0.3")
+
+		(var isEnabled:bool = "_isAlly && isTeamConsumableVisible")
 	)
 	(style
 		(flow = "Flow.HORIZONTAL")
 		(bind alpha "iconAlpha")
 	)
-	(bind visible "_isAlly && isTeamConsumableVisible")
+	(bind visible "isEnabled")
 
-	#(element TP_TeamConsumableItem _consData = "lastConsumable")
-	(controller $Instance renderer='TP_TeamConsumableItem'
-		(args _consData = "lastConsumable")
-		(bind enabled "isSpecialConsumable")
+	(controller $Repeat renderer='TP_SpecialConsumableRendererItem'
+		(bind enabled "isEnabled && consData.length > 0")
+		(bind count "consData.length")
+		(args
+			_consData = "consData[$index]"
+		)
 	)
 )
 
-(def element TP_TeamConsumableItem (_consData:dict=null)
-	# Implicitly using Constants from Consumables Monitor
+(def element TP_SpecialConsumableRendererItem(_consData:dict)
 	(scope
-		(event evPlayActivatedAnimation)
-		(event evPlayAboutToEndAnimation)
-		(event evPlayEndingAnimation)
-
-		(var consIconPath:str = "_consData ? 'url:../consumables/consumable_' + _consData['icon'] + '.png' : ''")
-		(var consNum:str = "_consData ? _consData['num'] : ''")
-		(var consState:number = "_consData ? _consData['currentState'] : -1")
-		(var consEndTime:number = "_consData ? _consData['endTime'] : 0")
-		
-		(var isReady:bool = "consState == SC.Battle.CONSUMABLE_STATES.READY")
-		(var isActive:bool = "consState == SC.Battle.CONSUMABLE_STATES.AT_WORK")
-		(var isReload:bool = "consState == SC.Battle.CONSUMABLE_STATES.RELOAD")
-		(var isEmpty:bool = "consState == SC.Battle.CONSUMABLE_STATES.NO_AMMO")
-		(var isPreparation:bool = "consState == SC.Battle.CONSUMABLE_STATES.PREPARATION")
-		
-		#0: READY, 1: AT_WORK, 2: RELOAD, 3: NO_AMMO, 4:PREPARATION
-		(var consStateColor:number = "CM2_STATE_COLORS[consState]")
-
-		(var timerEntity:gfx = "$datahub.getSingleEntity(CC.timer)")
-		(var consStateTime:number = "consEndTime - timerEntity.timer.currentTime" (event "timerEntity.timer.evFrequent"))
-
-		(var cameraEntity:gfx = "$datahub.getSingleEntity(CC.camera)")
-		(var isTactical:bool = "cameraEntity.camera.isTactical" (event "cameraEntity.camera.evTacticalStateChanged"))
-		(var altVision:bool = "cameraEntity.camera.altVision" (event "cameraEntity.camera.evAltVisionChanged"))
-		(var altVisionEnabled:bool = "altVision && !isTactical")
-
-		(var consStateStr:str = "	isReady ? 'RDY' :
-									isEmpty ? 'NONE':
-									countdownFormat(consStateTime)")
-		(var consNumStr:str = "		consNum != 'inf'?
-									'x' + consNum	:
-									' '")
-
-		(var isConsumableAboutToEnd:bool = "isActive && (consStateTime <= CM2_ENDING_SETTINGS.DURATION)")
-		(var isConsumableEnding:bool = "isActive && (consStateTime <= CM2_APPEAR_SETTINGS.DURATION)")
-
-		(var animatedIconAlpha:number = "CM2_DEFAULT_SETTINGS.ALPHA" watch=false)
-		(var animatedIconMargin:number = "CM2_DEFAULT_SETTINGS.HEIGHT" watch=false)
-		(var isActivatedAnimationPlaying:bool = "false" watch=false)
-
-		(controller $Animation
-			(bindcall play  duration="CM2_APPEAR_SETTINGS.DURATION"
-							easing="Easing.cubic_out"
-							from="{ animatedIconAlpha: CM2_APPEAR_SETTINGS.ALPHA_MIN, animatedIconMargin: CM2_APPEAR_SETTINGS.HEIGHT_MAX }"
-							to=	 "{ animatedIconAlpha: CM2_APPEAR_SETTINGS.ALPHA_MAX, animatedIconMargin: CM2_APPEAR_SETTINGS.HEIGHT_MIN }"
-							(bind enabled "isActive")
-							(event "evPlayActivatedAnimation")
-			)
-			(bind isActivatedAnimationPlaying	"true"  init=false on=evAnimStarted)
-			(bind isActivatedAnimationPlaying	"false" init=false on=evAnimEnded)
-		)
-		(controller $Animation
-			(bindcall play  id='aboutToEndAnim'
-							duration="CM2_ENDING_SETTINGS.BLINK"
-							repeatCount=-1
-							easing="Easing.sine_in"
-							from="{ animatedIconAlpha: CM2_ENDING_SETTINGS.ALPHA_MAX }"
-							to=  "{ animatedIconAlpha: CM2_ENDING_SETTINGS.ALPHA_MIN }"
-							(bind enabled "isConsumableAboutToEnd && !isActivatedAnimationPlaying")
-							(event "evPlayAboutToEndAnimation")
-			)
-			(bindcall stop id='aboutToEndAnim' (event "evPlayEndingAnimation"))
-		)
-		(controller $Animation
-			(bindcall play  duration="CM2_APPEAR_SETTINGS.DURATION"
-							to=	 "{ animatedIconAlpha: CM2_APPEAR_SETTINGS.ALPHA_MIN,	 animatedIconMargin: CM2_APPEAR_SETTINGS.HEIGHT_MAX }"
-							easing="Easing.cubic_out"
-							(bind enabled "isConsumableEnding")
-							(event "evPlayEndingAnimation")
-			)
-			(bind animatedIconAlpha		"CM2_DEFAULT_SETTINGS.ALPHA" init=false on=evAnimEnded)
-			(bind animatedIconMargin	"CM2_DEFAULT_SETTINGS.HEIGHT" init=false on=evAnimEnded)
-		)
+		(var isSpecial:bool = "_consData && 'isSpecial' in _consData && _consData.isSpecial")
 	)
-
-	(dispatch evPlayActivatedAnimation (bind trigger "isActive") (bind enabled "!isActive"))
-	(dispatch evPlayAboutToEndAnimation (bind enabled "isConsumableAboutToEnd && !isActivatedAnimationPlaying"))
-	(dispatch evPlayEndingAnimation (bind trigger "isConsumableEnding") (bind enabled "isConsumableEnding"))
-
-	(hblock
-		(style
-			(bind height "isActive ? 24px : 'auto'")
-		)
-		(block
-			(bind visible "isActive || altVisionEnabled")
-			(style
-				(bind backgroundImage "consIconPath")
-				(scaleX = 0.4)
-				(scaleY = 0.4)
-				(width = 60px)
-				(height = 60px)
-				(bind marginTop "animatedIconMargin")
-				(bind alpha "animatedIconAlpha")
-			)
-		)
-		(block
-			(bind visible "altVisionEnabled")
-			(style
-				(width = 24px)#need to be even number?
-			)
-			(element ConsumableMarkerTextItem "consStateStr" "consStateColor")
-			(element ConsumableMarkerTextItem "consNumStr" "consStateColor")
-		)
+	(controller $Instance renderer='CM2_ConsumableItem'
+		(bind enabled "isSpecial")
+		(args _consData="_consData")
 	)
 )
 
