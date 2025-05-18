@@ -1589,34 +1589,26 @@
 		)
 		(controller $Instance renderer='TP_BuildViewerItem'
 			(bind enabled "isBuildVisible")
-			(args "_entity")
+			(args
+				_entity			= "_entity"
+				_userPrefsNum	= "_userPrefsNum"
+			)
 		)
 		(controller $Instance renderer='TP_DamageMonitorItem'
 			(bind enabled "isDamageVisible")
-			(args "_entity")
+			(args _entity = "_entity")
 		)
 	)
 )
 
-(def element TP_BuildViewerItem(_entity:gfx)
+(def element TP_BuildViewerItem(_entity:gfx, _userPrefsNum:gfx=null)
 	(scope
 		(var vehicleId:str = "_entity && _entity.hasComponent(CC.vehicleInfo) ? toString(_entity.vehicleInfo.id) : ''" (event "_entity.evAdded"))
-
-		(var buildsEntityWatcher:gfx = "$datahub.getPrimWatcher(CC.mods_DataComponent, BV_COMPONENT_KEY_BUILDS)")
-		(var buildsEntity:gfx = "buildsEntityWatcher.entity" (event "buildsEntityWatcher.event"))
-		(var buildsDataComponent:gfx = "buildsEntity ? buildsEntity.mods_DataComponent : null" (event "buildsEntity.evAdded"))
-		(var buildsData:dict = "buildsDataComponent ? buildsDataComponent.data : {}" (event "buildsDataComponent.evDataChanged"))
-		(var buildData:dict = "vehicleId in buildsData ? buildsData[vehicleId] : {}")
-		(var skills:array = "'skills' in buildData ? buildData.skills : []")
-		(var modernizations:array = "'modernizations' in buildData ? buildData.modernizations : []")
-		(var signals:array = "'signals' in buildData ? buildData.signals : []")
 	)
 	(style
 		(align = "middle|center")
 	)
-	(element BV_SkillsElement "skills")
-	(element BV_ModernizationsElement "modernizations")
-	(element BV_SignalsElement "signals")
+	(element BV_BuildPanelElement _vehicleId="vehicleId")
 )
 
 (def element TP_DamageMonitorItem(_entity:gfx)
