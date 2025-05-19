@@ -1911,15 +1911,6 @@
 			(bind enabled "canHitClasses && canHitClasses.length > 0")
 			(args _title="'IDS_SHIP_PARAM_TORPEDOES_AFFECTED_SHIPS'" _canHitClasses="canHitClasses" _userPrefsNum="_userPrefsNum")
 		)
-
-		(block
-			(style
-				(position = "absolute")
-				(height = 100%)
-				(left = 15px)
-			)
-			(element VerticalDivider)
-		)
 	)
 )
 
@@ -2284,8 +2275,8 @@
 	(style
 		(width = 100%)
 		(flow = "Flow.HORIZONTAL")
-		(align = "middle|center")
-		(paddingLeft = "TP_TOOLTIP_PADDINGS.TEXT")
+		(align = "middle|left")
+		(paddingLeft = "TP_TOOLTIP_PADDINGS.SUB_TEXT")
 	)
 
 	(bind visible "isVisible")
@@ -2294,19 +2285,26 @@
 		(class $TextDefaultNM)
 		(bind text "tr(_title) + ': '")
 		(style
-			(width = "100% - TP_TOOLTIP_PADDINGS.TEXT")
+			(width = "100% - TP_TOOLTIP_PADDINGS.SUB_TEXT")
 		)
 	)
-	(controller $Repeat renderer='TP_ClassIconItem'
-		(bind enabled "isVisible")
-		(bind count "_canHitClasses.length")
-		(args _className="_canHitClasses[$index]")
+	(hblock
+		(style
+			(width = 35%)
+			(align = "middle|right")
+			(marginLeft = -50%)
+		)
+		(controller $Repeat renderer='TP_ClassIconItem'
+			(bind enabled "isVisible")
+			(bind count "_canHitClasses.length")
+			(args _className="_canHitClasses[$index]")
+		)
 	)
 )
 
 (def element TP_ClassIconItem (_className:str) layout=true
 	(style
-		(width = 27px) (height = 0px) (marginTop = -25px)
+		(width = 27px) (height = 0) (marginTop = -25px)
 		(bind backgroundImage "'url:../service_kit/ship_classes/icon_default_' + toLower(_className) + '.png'")
 	)
 )
