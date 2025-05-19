@@ -1401,16 +1401,16 @@
 		(var consumableEntity:gfx = "consumableEntityWatcher.entity" (event "consumableEntityWatcher.event"))
 		(var consumableDataComponent:gfx = "consumableEntity ? consumableEntity.mods_DataComponent : null" (event "consumableEntity.evAdded"))
 		(var consumableData:dict = "consumableDataComponent ? consumableDataComponent.data : {}" (event "consumableDataComponent.evDataChanged"))
-		(var consumableRanges:dict = "avatarId in consumableData ? consumableData[avatarId] : null")
-		(var radarRange:number = "consumableRanges && 'rls' in consumableRanges ? consumableRanges['rls'] : null")
-		(var hydroRange:number = "consumableRanges && 'sonar' in consumableRanges ? consumableRanges['sonar'] : null")
+		(var consumableRanges:dict = "avatarId in consumableData ? consumableData[avatarId] : {}")
+		(var radarRange:number = "'rls' in consumableRanges ? consumableRanges.rls : null")
+		(var hydroRange:number = "'sonar' in consumableRanges ? consumableRanges.sonar : null")
 
-		(macro TT_GET_PREF_BOOL _varName="'isRadarRangeVisible'" _pref="TP_PREFS.SURFACE_CONSUMABLE.RADAR_RANGE")
 		(macro TT_GET_PREF_BOOL _varName="'isHydroRangeVisible'" _pref="TP_PREFS.SURFACE_CONSUMABLE.HYDRO_RANGE")
+		(macro TT_GET_PREF_BOOL _varName="'isRadarRangeVisible'" _pref="TP_PREFS.SURFACE_CONSUMABLE.RADAR_RANGE")
 	)
 
-	(macro TP_SHIPCONFIG_TEXT_ITEM _value="hydroRange"	_unit="'km'"	_isEnabled="isRadarRangeVisible")
-	(macro TP_SHIPCONFIG_TEXT_ITEM _value="radarRange"	_unit="'km'"	_isEnabled="isHydroRangeVisible")
+	(macro TP_SHIPCONFIG_TEXT_ITEM _value="hydroRange"	_unit="'km'"	_isEnabled="isHydroRangeVisible")
+	(macro TP_SHIPCONFIG_TEXT_ITEM _value="radarRange"	_unit="'km'"	_isEnabled="isRadarRangeVisible")
 )
 
 (def element TP_ShipConfigSubmarineConsumableItem(_shipTTX:gfx, _avatarEntity:gfx, _userPrefsNum:gfx=null)
@@ -1420,16 +1420,16 @@
 		(var consumableEntity:gfx = "consumableEntityWatcher.entity" (event "consumableEntityWatcher.event"))
 		(var consumableDataComponent:gfx = "consumableEntity ? consumableEntity.mods_DataComponent : null" (event "consumableEntity.evAdded"))
 		(var consumableData:dict = "consumableDataComponent ? consumableDataComponent.data : {}" (event "consumableDataComponent.evDataChanged"))
-		(var consumableRanges:dict = "avatarId in consumableData ? consumableData[avatarId] : null")
-		(var radarRange:number = "consumableRanges && 'submarineLocator' in consumableRanges ? consumableRanges['submarineLocator'] : null")
-		(var hydroRange:number = "consumableRanges && 'hydrophone' in consumableRanges ? consumableRanges['hydrophone'] : null")
+		(var consumableRanges:dict = "avatarId in consumableData ? consumableData[avatarId] : {}")
+		(var radarRange:number = "'submarineLocator' in consumableRanges ? consumableRanges.submarineLocator : null")
+		(var hydroRange:number = "'hydrophone' in consumableRanges ? consumableRanges.hydrophone : null")
 
-		(macro TT_GET_PREF_BOOL _varName="'isSubRadarRangeVisible'" _pref="TP_PREFS.SUB_CONSUMABLE.SUB_RADAR_RANGE")
 		(macro TT_GET_PREF_BOOL _varName="'isSubHydroRangeVisible'" _pref="TP_PREFS.SUB_CONSUMABLE.SUB_HYDRO_RANGE")
+		(macro TT_GET_PREF_BOOL _varName="'isSubRadarRangeVisible'" _pref="TP_PREFS.SUB_CONSUMABLE.SUB_RADAR_RANGE")
 	)
 
-	(macro TP_SHIPCONFIG_TEXT_ITEM _value="hydroRange"	_unit="'km'"	_isEnabled="isSubRadarRangeVisible")
-	(macro TP_SHIPCONFIG_TEXT_ITEM _value="radarRange"	_unit="'km'"	_isEnabled="isSubHydroRangeVisible")
+	(macro TP_SHIPCONFIG_TEXT_ITEM _value="hydroRange"	_unit="'km'"	_isEnabled="isSubHydroRangeVisible")
+	(macro TP_SHIPCONFIG_TEXT_ITEM _value="radarRange"	_unit="'km'"	_isEnabled="isSubRadarRangeVisible")
 )
 
 # Image Item
