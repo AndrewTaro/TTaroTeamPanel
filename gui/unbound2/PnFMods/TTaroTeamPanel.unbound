@@ -9,7 +9,6 @@
 	NO_UNIT: 32
 })
 (def constant TP_DEFAULT_HEIGHT "160px")
-(def constant TP_TOOLTIP_ELEMENTS_VGAP "5px")
 (def constant TP_DIVISION_ELEMENT_WIDTH "20px")
 (def constant TP_CONFIG_ELEMENTS_VGAP "3px")
 (def constant TP_FLAGSHIP_COLOR_TRANSFORM {
@@ -1534,6 +1533,33 @@
 #--------------------------------------------------------------------------------
 # Tooltip Items
 #--------------------------------------------------------------------------------
+(def constant TP_TOOLTIP_SHIPCONFIG_RENDERER_SETTINGS [
+	{renderer: 'TP_TooltipArtilleryItem',			ttxName: 'artillery',			title: 'IDS_SHIP_PARAM_WEAPONRY'},
+	{renderer: 'TP_TooltipTorpedoesItem',			ttxName: 'torpedoes',			title: 'IDS_SHIP_PARAM_TORPEDOES'},
+	{renderer: 'TP_TooltipTorpedoesGroupItem',		ttxName: 'torpedoGroups',		title: 'IDS_SHIP_PARAM_TORPEDOES'},
+	{renderer: 'TP_TooltipAirDefenseItem',			ttxName: 'airDefense',			title: 'IDS_SHIP_PARAM_AIR_DEFENSE'},
+	{renderer: 'TP_TooltipAirSupportItem',			ttxName: 'airSupport',			title: 'IDS_SHIP_PARAM_AIR_SUPPORT'},
+	{renderer: 'TP_TooltipDepthChargeItem',			ttxName: 'depthCharges',		title: 'IDS_SHIP_PARAM_DEPTH_CHARGE'},
+	{renderer: 'TP_TooltipSurfaceMobilityItem',		ttxName: 'mobility',			title: 'IDS_SHIP_PARAM_MOBILITY'},
+	{renderer: 'TP_TooltipUnderwaterMobilityItem',	ttxName: 'underwaterMobility',	title: 'IDS_SHIP_PARAM_UNDERWATER_MOBILITY'},
+	{renderer: 'TP_TooltipVisibilityItem',			ttxName: 'visibility',			title: 'IDS_SHIP_PARAM_DETECTION'},
+])
+
+(def constant TP_TOOLTIP_PADDINGS {
+	HEADER: 0,
+	SUB_HEADER: 5%,
+	TEXT: 5%,
+	SUB_TEXT: 10%,
+})
+
+(def css $TP_FullWidth()
+	(width = 100%)
+)
+
+(def css $TP_TooltipSectionMargin()
+	(marginBottom = 5px)
+)
+
 (def element TP_TooltipShipConfigurationsItem(_entity:gfx=null, _userPrefsNum:gfx=null)
 	(scope
 		(var avatarId:number = "_entity ? _entity.avatar.id : 0")
@@ -1570,18 +1596,18 @@
 
 	(element TOOLTIP_SYSTEM_DEFAULT_CONTAINER $enabled="!isSpectatorTrainingMode"
 		(style
-			(vgap = 10px)
 			(width = 300px)
 		)
-		(element TP_TooltipArtilleryItem "shipTTX")
-		(element TP_TooltipAtbaItem "shipTTX" _avatarEntity="_entity" _isRealParams="isRealParams")
-		(element TP_TooltipTorpedoItem "shipTTX")
-		(element TP_TooltipAirDefenseItem "shipTTX")
-		(element TP_TooltipAirSupportItem "shipTTX")
-		(element TP_TooltipDepthChargeItem "shipTTX")
-		(element TP_TooltipMobilityItem "shipTTX")
-		(element TP_TooltipVisibilityItem "shipTTX" _avatarEntity="_entity" _isRealParams="isRealParams")
-		(element TP_TooltipConsumableItem "shipBattleInfo")
+		(controller $Repeat renderer='TP_TooltipShipConfigRendererItem'
+			(bind count "TP_TOOLTIP_SHIPCONFIG_RENDERER_SETTINGS.length")
+			(args
+				_shipTTX		= "shipTTX"
+				_avatarEntity	= "_entity"
+				_isRealParams	= "isRealParams"
+				_userPrefsNum	= "_userPrefsNum"
+			)
+		)
+		(element TP_TooltipConsumableItem _shipBattleInfo = "shipBattleInfo")
 	)
 	(block
 		(style
@@ -1621,7 +1647,74 @@
 	(element DMonitor_DamagePanelElement _targetAvatarId="avatarId")
 )
 
-(def element TP_TooltipArtilleryItem(_shipTTX:gfx, _userPrefsNum:gfx=null)
+(def element TP_TooltipShipConfigRendererItem(_shipTTX:gfx, _avatarEntity:gfx, _isRealParams:bool, _userPrefsNum:gfx=null)
+	(scope
+		(var settings:dict = "TP_TOOLTIP_SHIPCONFIG_RENDERER_SETTINGS[$index]")
+		(var isTTXAvailable:bool = "null != _shipTTX[settings.ttxName]")
+	)
+	(class $TP_FullWidth)
+
+	(bind visible "isTTXAvailable")
+	(style
+		(marginBottom = 10px)
+	)
+
+	(controller $Instance
+		(renderer = 'TP_TooltipShipConfigTitleItem')
+		(bind enabled "isTTXAvailable")
+		(args
+			_title			= "settings.title"
+			_userPrefsNum 	= "_userPrefsNum"
+		)
+	)
+	(controller $Instance
+		(bind renderer "settings.renderer")
+		(bind enabled "isTTXAvailable")
+		(args
+			_shipTTX	  	= "_shipTTX"
+			_avatarEntity 	= "_avatarEntity"
+			_isRealParams 	= "_isRealParams"
+			_userPrefsNum 	= "_userPrefsNum"
+		)
+	)
+	
+	(block
+		(style
+			(position = "absolute")
+			(height = 100%)
+			(paddingTop = 15px)
+		)
+		(element VerticalDivider)
+	)
+)
+
+(def element TP_TooltipArtilleryItem(_shipTTX:gfx, _avatarEntity:gfx, _isRealParams:bool, _userPrefsNum:gfx=null)
+	(scope
+		(var artilleryTTX:gfx = "_shipTTX.artillery")
+		(var hasMainGun:bool = "artilleryTTX ? artilleryTTX.mainGun.length : false")
+		(var hasSecondaryGun:bool = "artilleryTTX ? artilleryTTX.atba.length : false")
+	)
+
+	(class $TP_FullWidth)
+	(controller $Instance renderer='TP_TooltipMainGunItem'
+		(bind enabled "hasMainGun")
+		(args
+			_shipTTX = "_shipTTX"
+			_userPrefsNum = "_userPrefsNum"
+		)
+	)
+	(controller $Instance renderer='TP_TooltipAtbaItem'
+		(bind enabled "hasSecondaryGun")
+		(args
+			_shipTTX = "_shipTTX"
+			_avatarEntity = "_avatarEntity"
+			_isRealParams = "_isRealParams"
+			_userPrefsNum = "_userPrefsNum"
+		)
+	)
+)
+
+(def element TP_TooltipMainGunItem(_shipTTX:gfx, _userPrefsNum:gfx=null)
 	(scope
 		(var artilleryTTX:gfx = "_shipTTX.artillery")
 		(var mainGunTTX:array = "artilleryTTX ? artilleryTTX.mainGun : null")
@@ -1629,8 +1722,8 @@
 		(var range:number = "artilleryTTX ? artilleryTTX.mgMaxDist.value : null")
 		(var reload:number = "artilleryTTX ? artilleryTTX.mgReloadTime.value : null")
 
-		#awful code. someone must fix this not me
-		#repeat didn't work out well though
+		# ~~Awful code~~ Maybe not so bad after all.
+		# Repeat didn't work out well but its good enough until a ship with 5 different guns appears.
 		(var numBarrels1:number = "hasMainGun ? mainGunTTX[0].numBarrels.value * mainGunTTX[0].numGuns.value : 0")
 		(var numBarrels2:number = "mainGunTTX.length > 1 ? mainGunTTX[1].numBarrels.value * mainGunTTX[1].numGuns.value : 0")
 		(var numBarrels3:number = "mainGunTTX.length > 2 ? mainGunTTX[2].numBarrels.value * mainGunTTX[2].numGuns.value : 0")
@@ -1660,61 +1753,64 @@
 
 		(var caliber:number = "hasMainGun ? mainGunTTX[0].caliber.value : 0")
 		(var overmatch:number = "hasMainGun ? floor(caliber / 14.3) : 0")
+
+		(macro TT_GET_LANGUAGE_INDEX)
+		(macro TT_GET_TRANSLATION _varName="'overmatchTranslation'" _key="'IDS_TT_OVERMATCH'")
 	)
 
-	(style
-		(align = "middle|center")
-	)
-	(bind visible "hasMainGun")
+	(class $TP_FullWidth)
+
+	(element TP_TooltipShipConfigSubTitleItem _subTitle="'IDS_SHIP_PARAM_MAIN_GUN'")
 
 	(block
-		(style
-			(vgap = "TP_TOOLTIP_ELEMENTS_VGAP")
-		)
+		(class $TP_FullWidth)
+		(class $TP_TooltipSectionMargin)
+		(element TP_TooltipShipConfigSubTextItem _subText="'IDS_SHIP_PARAM_MAX_DIST'" _value="range" _unit="'km'" _userPrefsNum="_userPrefsNum")
+		(element TP_TooltipShipConfigSubTextItem _subText="'IDS_SHIP_PARAM_SHOT_DELAY'" _value="reload" _unit="'s'" _userPrefsNum="_userPrefsNum")
+	)
 
-		(element TP_TooltipShipConfigTitleItem _title="'IDS_SHIP_PARAM_MAIN_GUN'")
+	(block
+		(class $TP_FullWidth)
+		(class $TP_TooltipSectionMargin)
+		(element TP_TooltipShipConfigSubTextItem _subText="'IDS_SHIP_PARAM_ARTILLERY_CALIBER'" _value="caliber" _roundDigit=0 _unit="'mm'" _userPrefsNum="_userPrefsNum")
+		(element TP_TooltipShipConfigSubTextItem _subText="overmatchTranslation" _value="overmatch" _roundDigit=0 _unit="'mm'" _userPrefsNum="_userPrefsNum")
+	)
 
-		(block
-			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_MAX_DIST'" _value="range" _unit="'km'" _userPrefsNum="_userPrefsNum")
-			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_SHOT_DELAY'" _value="reload" _unit="'s'" _userPrefsNum="_userPrefsNum")
-		)
+	(block
+		(bind visible "altFire")
+		(class $TP_FullWidth)
+		(class $TP_TooltipSectionMargin)
+		(element TP_TooltipShipConfigSubTextItem _subText="'IDS_SHIP_PARAM_BURST_FIRE_SALVO_COUNT'" _value="altFireShots" _roundDigit=0 _unit=null _userPrefsNum="_userPrefsNum")
+		(element TP_TooltipShipConfigSubTextItem _subText="'IDS_SHIP_PARAM_BURST_FIRE_RELOAD_TIME'" _value="altFireReload" _unit="'s'" _userPrefsNum="_userPrefsNum")
+	)
 
-		(block
-			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_ARTILLERY_CALIBER'" _value="caliber" _roundDigit=0 _unit="'mm'" _userPrefsNum="_userPrefsNum")
-			(element TP_TooltipShipConfigTextItem _title="'Overmatch'" _value="overmatch" _roundDigit=0 _unit="'mm'" _userPrefsNum="_userPrefsNum")
-		)
+	(block
+		(class $TP_FullWidth)
+		(class $TP_TooltipSectionMargin)
+		(element TP_TooltipShipConfigSubTextItem _subText="'HE DPM'" _value="damagePerMinHE" _roundDigit=0 _unit=null _userPrefsNum="_userPrefsNum")
+		(element TP_TooltipShipConfigSubTextItem _subText="'SAP DPM'" _value="damagePerMinCS" _roundDigit=0 _unit=null _userPrefsNum="_userPrefsNum")
+		(element TP_TooltipShipConfigSubTextItem _subText="'AP DPM'" _value="damagePerMinAP" _roundDigit=0 _unit=null _userPrefsNum="_userPrefsNum")
+	)
 
-		(block
-			(bind visible "altFire")
-			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_BURST_FIRE_SALVO_COUNT'" _value="altFireShots" _roundDigit=0 _unit=null _userPrefsNum="_userPrefsNum")
-			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_BURST_FIRE_RELOAD_TIME'" _value="altFireReload" _unit="'s'" _userPrefsNum="_userPrefsNum")
-		)
-
-		(block
-			(element TP_TooltipShipConfigTextItem _title="'HE DPM'" _value="damagePerMinHE" _roundDigit=0 _unit=null _userPrefsNum="_userPrefsNum")
-			(element TP_TooltipShipConfigTextItem _title="'SAP DPM'" _value="damagePerMinCS" _roundDigit=0 _unit=null _userPrefsNum="_userPrefsNum")
-			(element TP_TooltipShipConfigTextItem _title="'AP DPM'" _value="damagePerMinAP" _roundDigit=0 _unit=null _userPrefsNum="_userPrefsNum")
-		)
-
-		(block
-			(element TP_TooltipShipConfigTextItem _title="'HE Penetration'" _value="pircingHE" _unit="'mm'" _roundDigit=0 _userPrefsNum="_userPrefsNum")
-			(element TP_TooltipShipConfigTextItem _title="'SAP Penetration'" _value="pircingCS" _unit="'mm'" _roundDigit=0 _userPrefsNum="_userPrefsNum")
-			(element TP_TooltipShipConfigTextItem _title="'AP Penetration'" _value="pircingAP" _unit="'mm'" _roundDigit=0 _userPrefsNum="_userPrefsNum")
-		)
+	(block
+		(class $TP_FullWidth)
+		(class $TP_TooltipSectionMargin)
+		(element TP_TooltipShipConfigSubTextItem _subText="'HE Penetration'" _value="pircingHE" _unit="'mm'" _roundDigit=0 _userPrefsNum="_userPrefsNum")
+		(element TP_TooltipShipConfigSubTextItem _subText="'SAP Penetration'" _value="pircingCS" _unit="'mm'" _roundDigit=0 _userPrefsNum="_userPrefsNum")
+		(element TP_TooltipShipConfigSubTextItem _subText="'AP Penetration'" _value="pircingAP" _unit="'mm'" _roundDigit=0 _userPrefsNum="_userPrefsNum")
 	)
 )
 
 (def element TP_TooltipAtbaItem(_shipTTX:gfx, _avatarEntity:gfx, _isRealParams:bool, _userPrefsNum:gfx=null)
 	(scope
 		(var artilleryTTX:gfx = "_shipTTX.artillery")
-		(var hasSecondaryGun:bool = "artilleryTTX ? artilleryTTX.atba.length > 0 : false")
 		(var range:number = "artilleryTTX ? artilleryTTX.atbaMaxDist.value : null")
 
-		#fix for skill---------------------
+		# Fix for skill---------------------
 		(var selfPlayer:gfx = "$datahub.getSingleEntity(CC.playerAvatar)")
 		(var avatarComponent:gfx = "_avatarEntity.avatar")
 
-		#shipId -> ownShip (ship in port) -> crewId (crew on board) -> crewSkill (check crew has skill)
+		# shipId -> ownShip (ship in port) -> crewId (crew on board) -> crewSkill (check crew has skill)
 		(var isSelf:bool = "selfPlayer ? selfPlayer.avatar.id == avatarComponent.id : false")
 		(var shipId:number = "avatarComponent ? avatarComponent.ship.ref.ship.id : null" (event "avatarComponent.evShipRefChanged"))
 		(var shipType:str = "avatarComponent ? avatarComponent.shipType : null" (event "avatarComponent.evShipTypeChanged"))
@@ -1725,7 +1821,7 @@
 		
 		(var crewId:number = "ownShipEntity ? ownShipEntity.ownShip.crewId : null" (event "ownShipEntity.ownShip.evCrewChanged"))
 		(var crewSkillEntity:gfx = "$datahub.getPrimaryCompositeEntity(CC.crewSkill, crewId, skillEntity.id)")
-		#(crewId, skill) -> rutrns crewSkill if the crew is onboard and has skill
+		# (crewId, skill) -> rutrns crewSkill if the crew is onboard and has skill
 
 		(var isCorrectionNeeded:bool = "!(crewSkillEntity || isSelf || _isRealParams)")
 
@@ -1733,129 +1829,146 @@
 		(var rangeModifier:number = "isCorrectionNeeded && modifiers ? (1 + modifiers.GSMaxDist * 0.01) : 1.0") #value is negative and %
 		#---------------------
 
-		#fix------------------
+		# Fix-----------------
 		(var modifiedAtbaRange:number = "range * rangeModifier") #CAPTAIN SKILL FIX
 		#---------------------
 	)
 
-	(style
-		(align = "middle|center")
-	)
-	(bind visible "hasSecondaryGun")
+	(class $TP_FullWidth)
+
+	(element TP_TooltipShipConfigSubTitleItem _subTitle="'IDS_SHIP_PARAM_ATBA'")
 
 	(block
-		(style
-			(vgap = "TP_TOOLTIP_ELEMENTS_VGAP")
+		(class $TP_FullWidth)
+		(element TP_TooltipShipConfigSubTextItem _subText="'IDS_SHIP_PARAM_MAX_DIST'" _value="modifiedAtbaRange" _unit="'km'" _userPrefsNum="_userPrefsNum")
+	)
+)
+
+(def element TP_TooltipTorpedoesItem(_shipTTX:gfx, _userPrefsNum:gfx=null)
+	(scope
+		# Surface Torps
+		(var torpedoesTTX:gfx = "_shipTTX.torpedoes")
+		# Normal Torps
+		(var torpedoTTX:gfx = "torpedoesTTX ? torpedoesTTX.torpedo : null")
+		# Deepwater Torps
+		(var torpedoDeepwaterTTX:gfx = "torpedoesTTX ? torpedoesTTX.torpedoDeepwater : null")
+		# Alt Torps
+		(var torpedoAltTTX:gfx = "torpedoesTTX ? torpedoesTTX.torpedoAlt : null")
+		# Reload
+		(var reload:number = "torpedoesTTX ? torpedoesTTX.reloadTime.value : null")
+	)
+
+	(class $TP_FullWidth)
+		
+	(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_SHOT_DELAY'" _value="reload" _unit="'s'" _userPrefsNum="_userPrefsNum")
+
+	(controller $Instance renderer='TP_TooltipTorpedoAmmoItem'
+		(bind enabled "torpedoTTX")
+		(args
+			_title			= 'IDS_SHIP_PARAM_TORPEDO_AMMO'
+			_torpedoAmmoTTX = "torpedoTTX"
+			_userPrefsNum	= "_userPrefsNum"
 		)
+	)
 
-		(element TP_TooltipShipConfigTitleItem _title="'IDS_SHIP_PARAM_ATBA'")
+	(controller $Instance renderer='TP_TooltipTorpedoAmmoItem'
+		(bind enabled "torpedoDeepwaterTTX")
+		(args
+			_title			= 'IDS_SHIP_PARAM_TORPEDO_DEEPWATER_AMMO'
+			_torpedoAmmoTTX = "torpedoDeepwaterTTX"
+			_userPrefsNum	= "_userPrefsNum"
+		)
+	)
 
-		(block
-			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_MAX_DIST'" _value="modifiedAtbaRange" _unit="'km'" _userPrefsNum="_userPrefsNum")
+	(controller $Instance renderer='TP_TooltipTorpedoAmmoItem'
+		(bind enabled "torpedoAltTTX")
+		(args
+			_title			= 'IDS_SHIP_PARAM_TORPEDO_ALTERNATIVE_AMMO'
+			_torpedoAmmoTTX = "torpedoAltTTX"
+			_userPrefsNum	= "_userPrefsNum"
 		)
 	)
 )
 
-(def element TP_TooltipTorpedoItem(_shipTTX:gfx, _userPrefsNum:gfx=null)
+(def element TP_TooltipTorpedoAmmoItem(_title:str, _torpedoAmmoTTX:gfx, _userPrefsNum:gfx=null)
 	(scope
-		#Surface Torps
-		(var torpedoesTTX:gfx = "_shipTTX.torpedoes")
-		#normal torps
-		(var torpedoTTX:gfx = "torpedoesTTX ? torpedoesTTX.torpedo : null")
-		(var torpedoRange:number = "torpedoTTX ? torpedoTTX.maxDist.value : null")
-		(var torpedoDamage:number = "torpedoTTX ? torpedoTTX.damage.value : null")
-		#deepwater torps
-		(var torpedoDeepwaterTTX:gfx = "torpedoesTTX ? torpedoesTTX.torpedoDeepwater : null")
-		(var torpedoDeepwaterRange:number = "torpedoDeepwaterTTX ? torpedoDeepwaterTTX.maxDist.value : null")
-		(var torpedoDeepwaterDamage:number = "torpedoDeepwaterTTX ? torpedoDeepwaterTTX.damage.value : null")
-		(var torpedoDeepwaterCanHitClasses:array = "torpedoDeepwaterTTX ? torpedoDeepwaterTTX.canHitClasses : null")
-		#alt torps
-		(var torpedoAltTTX:gfx = "torpedoesTTX ? torpedoesTTX.torpedoAlt : null")
-		(var torpedoAltRange:number = "torpedoAltTTX ? torpedoAltTTX.maxDist.value : null")
-		(var torpedoAltDamage:number = "torpedoAltTTX ? torpedoAltTTX.damage.value : null")
-		#reload
-		(var torpdoReload:number = "torpedoesTTX ? torpedoesTTX.reloadTime.value : null")
+		(var torpedoTTX:gfx = "_torpedoAmmoTTX ? _torpedoAmmoTTX.torpedo : null")
+		(var range:number = "_torpedoAmmoTTX ? _torpedoAmmoTTX.maxDist.value : 0")
+		(var damage:number = "_torpedoAmmoTTX ? _torpedoAmmoTTX.damage.value : 0")
+		(var canHitClasses:array = "_torpedoAmmoTTX && _torpedoAmmoTTX.canHitClasses ? _torpedoAmmoTTX.canHitClasses : null")
+	)
 
-		#Submarine torps
+	(class $TP_FullWidth)
+
+	(element TP_TooltipShipConfigSubTitleItem _subTitle="_title")
+
+	(block
+		(class $TP_FullWidth)
+
+		(element TP_TooltipShipConfigSubTextItem _subText="'IDS_SHIP_PARAM_MAX_DIST'" _value="range" _unit="'km'" _userPrefsNum="_userPrefsNum")
+		(element TP_TooltipShipConfigSubTextItem _subText="'IDS_SHIP_PARAM_DAMAGE'" _value="damage" _roundDigit=0 _userPrefsNum="_userPrefsNum")
+		(controller $Instance renderer='TP_TooltipShipConfigClassIconsItem'
+			(bind enabled "canHitClasses && canHitClasses.length > 0")
+			(args _title="'IDS_SHIP_PARAM_TORPEDOES_AFFECTED_SHIPS'" _canHitClasses="canHitClasses" _userPrefsNum="_userPrefsNum")
+		)
+
+		(block
+			(style
+				(position = "absolute")
+				(height = 100%)
+				(left = 15px)
+			)
+			(element VerticalDivider)
+		)
+	)
+)
+
+(def element TP_TooltipTorpedoesGroupItem(_shipTTX:gfx, _userPrefsNum:gfx=null)
+	(scope
+		# Submarine Torps
 		(var torpedoGroupsTTX:gfx = "_shipTTX.torpedoGroups")
-		#normal torps
+		# Normal Torps
 		(var subTorpedoTTX:gfx = "torpedoGroupsTTX ? torpedoGroupsTTX.torpedo : null")
-		(var subTorpedoRange:number = "subTorpedoTTX ? subTorpedoTTX.maxDist.value : null")
-		(var subTorpedoDamage:number = "subTorpedoTTX ? subTorpedoTTX.damage.value : null")
-		#deepwater torps
+		# Deepwater Torps
 		(var subTorpedoDeepwaterTTX:gfx = "torpedoGroupsTTX ? torpedoGroupsTTX.torpedoDeepwater : null")
-		(var subTorpedoDeepwaterRange:number = "subTorpedoDeepwaterTTX ? subTorpedoDeepwaterTTX.maxDist.value : null")
-		(var subTorpedoDeepwaterDamage:number = "subTorpedoDeepwaterTTX ? subTorpedoDeepwaterTTX.damage.value : null")
-		(var subTorpedoDeepwaterCanHitClasses:number = "subTorpedoDeepwaterTTX ? subTorpedoDeepwaterTTX.canHitClasses : null")
-		#alt torps
+		# Alt Torps
 		(var subTorpedoAltTTX:gfx = "torpedoGroupsTTX ? torpedoGroupsTTX.torpedoAlt : null")
-		(var subTorpedoAltRange:number = "subTorpedoAltTTX ? subTorpedoAltTTX.maxDist.value : null")
-		(var subTorpedoAltDamage:number = "subTorpedoAltTTX ? subTorpedoAltTTX.damage.value : null")
-		#forward reload
+		# Forward Reload
 		(var torpdoBowReload:number = "(torpedoGroupsTTX && torpedoGroupsTTX.bowGroup) ? torpedoGroupsTTX.bowGroup.reloadTime.value : null")
 		(var torpdoBowLoaders:number = "(torpedoGroupsTTX && torpedoGroupsTTX.bowGroup) ? torpedoGroupsTTX.bowGroup.numLoaders.value : null")
-		#stern reload
+		# Stern Reload
 		(var torpdoSternReload:number = "(torpedoGroupsTTX && torpedoGroupsTTX.sternGroup) ? torpedoGroupsTTX.sternGroup.reloadTime.value : null")
 		(var torpdoSternLoaders:number = "(torpedoGroupsTTX && torpedoGroupsTTX.sternGroup) ? torpedoGroupsTTX.sternGroup.numLoaders.value : null")
 	)
 
-	(style
-		(align = "middle|center")
+	(class $TP_FullWidth)
+
+	(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_SHOT_DELAY'" _value="torpdoBowReload" _unit="'s'" _userPrefsNum="_userPrefsNum")
+
+	(controller $Instance renderer='TP_TooltipTorpedoAmmoItem'
+		(bind enabled "subTorpedoTTX")
+		(args
+			_title			= 'IDS_SHIP_PARAM_TORPEDO_AMMO'
+			_torpedoAmmoTTX = "subTorpedoTTX"
+			_userPrefsNum	= "_userPrefsNum"
+		)
 	)
 
-	(bind visible "torpedoesTTX || torpedoGroupsTTX")
-
-	(block
-		(style
-			(vgap = "TP_TOOLTIP_ELEMENTS_VGAP")
+	(controller $Instance renderer='TP_TooltipTorpedoAmmoItem'
+		(bind enabled "subTorpedoDeepwaterTTX")
+		(args
+			_title			= 'IDS_SHIP_PARAM_TORPEDO_DEEPWATER_AMMO'
+			_torpedoAmmoTTX = "subTorpedoDeepwaterTTX"
+			_userPrefsNum	= "_userPrefsNum"
 		)
+	)
 
-		(element TP_TooltipShipConfigTitleItem _title="'IDS_SHIP_PARAM_TORPEDOES'")
-
-		(block
-			(bind visible "torpedoesTTX")
-			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_TORPEDO_AMMO'" _value="torpedoRange" _unit="'km'" _userPrefsNum="_userPrefsNum")
-			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_TORPEDO_DEEPWATER_AMMO'" _value="torpedoDeepwaterRange" _unit="'km'" _userPrefsNum="_userPrefsNum")
-			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_TORPEDO_ALTERNATIVE_AMMO'" _value="torpedoAltRange" _unit="'km'" _userPrefsNum="_userPrefsNum")
-		)
-
-		(block
-			(bind visible "torpedoesTTX")
-			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_TORPEDO_AMMO'" _value="torpedoDamage" _roundDigit=0 _userPrefsNum="_userPrefsNum")
-			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_TORPEDO_DEEPWATER_AMMO'" _value="torpedoDeepwaterDamage" _roundDigit=0 _userPrefsNum="_userPrefsNum")
-			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_TORPEDO_ALTERNATIVE_AMMO'" _value="torpedoAltDamage" _roundDigit=0 _userPrefsNum="_userPrefsNum")
-		)
-
-		(block
-			(bind visible "torpedoGroupsTTX")
-			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_TORPEDO_AMMO'" _value="subTorpedoRange" _unit="'km'" _userPrefsNum="_userPrefsNum")
-			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_TORPEDO_DEEPWATER_AMMO'" _value="subTorpedoDeepwaterRange" _unit="'km'" _userPrefsNum="_userPrefsNum")
-			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_TORPEDO_ALTERNATIVE_AMMO'" _value="subTorpedoAltRange" _unit="'km'" _userPrefsNum="_userPrefsNum")
-		)
-
-		(block
-			(bind visible "torpedoGroupsTTX")
-			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_TORPEDO_AMMO'" _value="subTorpedoDamage" _roundDigit=0 _userPrefsNum="_userPrefsNum")
-			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_TORPEDO_DEEPWATER_AMMO'" _value="subTorpedoDeepwaterDamage" _roundDigit=0 _userPrefsNum="_userPrefsNum")
-			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_TORPEDO_ALTERNATIVE_AMMO'" _value="subTorpedoAltDamage" _roundDigit=0 _userPrefsNum="_userPrefsNum")
-		)
-
-		(block
-			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_SHOT_DELAY'" _value="torpdoReload" _unit="'s'" _userPrefsNum="_userPrefsNum")
-			(element TP_TooltipShipConfigTextItem _title="'Bow Group Reload'" _value="torpdoBowReload" _unit="'s'" _userPrefsNum="_userPrefsNum")
-			(element TP_TooltipShipConfigTextItem _title="'Stern Group Reload'" _value="torpdoSternReload" _unit="'s'" _userPrefsNum="_userPrefsNum")
-		)
-
-		(block
-			(bind visible "torpedoGroupsTTX")
-			(element TP_TooltipShipConfigTextItem _title="'Bow Group Loaders'" _value="torpdoBowLoaders" _roundDigit=0 _userPrefsNum="_userPrefsNum")
-			(element TP_TooltipShipConfigTextItem _title="'Stern Group Loaders'" _value="torpdoSternLoaders" _roundDigit=0 _userPrefsNum="_userPrefsNum")
-		)
-
-		(hblock
-			(bind visible "torpedoDeepwaterTTX || subTorpedoDeepwaterTTX")
-			(element TP_TooltipShipConfigClassIconsItem _title="'IDS_SHIP_PARAM_TORPEDOES_AFFECTED_SHIPS'" _canHitClasses="torpedoDeepwaterCanHitClasses" _userPrefsNum="_userPrefsNum")
-			(element TP_TooltipShipConfigClassIconsItem _title="'IDS_SHIP_PARAM_TORPEDOES_AFFECTED_SHIPS'" _canHitClasses="subTorpedoDeepwaterCanHitClasses" _userPrefsNum="_userPrefsNum")
+	(controller $Instance renderer='TP_TooltipTorpedoAmmoItem'
+		(bind enabled "subTorpedoAltTTX")
+		(args
+			_title			= 'IDS_SHIP_PARAM_TORPEDO_ALTERNATIVE_AMMO'
+			_torpedoAmmoTTX = "subTorpedoAltTTX"
+			_userPrefsNum	= "_userPrefsNum"
 		)
 	)
 )
@@ -1871,34 +1984,27 @@
 		(var auras:array = "airDefenseTTX ? airDefenseTTX.auras : []")
 	)
 
-	(style
-		(align = "middle|center")
-	)
-
-	(bind visible "airDefenseTTX")
+	(class $TP_FullWidth)
 
 	(block
-		(style
-			(vgap = "TP_TOOLTIP_ELEMENTS_VGAP")
-		)
+		(class $TP_FullWidth)
+		(class $TP_TooltipSectionMargin)
+		(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_AIR_DEFENSE'" _value="integralValue" _roundDigit=0 _userPrefsNum="_userPrefsNum")
+	)
 
-		(element TP_TooltipShipConfigTitleItem _title="'IDS_SHIP_PARAM_AIR_DEFENSE'")
+	(block
+		(class $TP_FullWidth)
+		(class $TP_TooltipSectionMargin)
+		(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_MAX_DIST'" _value="maxRange" _unit="'km'" _userPrefsNum="_userPrefsNum")
+		(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_AA_EXPL_COUNT'" _value="bubble" _roundDigit=0 _userPrefsNum="_userPrefsNum")
+	)
 
-		(block
-			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_AIR_DEFENSE'" _value="integralValue" _roundDigit=0 _userPrefsNum="_userPrefsNum")
-		)
-
-		(block
-			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_MAX_DIST'" _value="maxRange" _unit="'km'" _userPrefsNum="_userPrefsNum")
-			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_AA_EXPL_COUNT'" _value="bubble" _roundDigit=0 _userPrefsNum="_userPrefsNum")
-		)
-
-		(reverse
-			(controller $Repeat renderer='TP_TooltipShipConfigTextItem'
-				(bind enabled "auras.length > 0")
-				(bind count "auras.length")
-				(args _title="'IDS_SHIP_PARAM_AA_AVERAGE_DAMAGE_' + toUpper(auras[$index].type)" _value="auras[$index].damage.value" _roundDigit=0 _userPrefsNum="_userPrefsNum")
-			)
+	(reverse
+		(class $TP_FullWidth)
+		(controller $Repeat renderer='TP_TooltipShipConfigTextItem'
+			(bind enabled "auras.length > 0")
+			(bind count "auras.length")
+			(args _title="'IDS_SHIP_PARAM_AA_AVERAGE_DAMAGE_' + toUpper(auras[$index].type)" _value="auras[$index].damage.value" _roundDigit=0 _userPrefsNum="_userPrefsNum")
 		)
 	)
 )
@@ -1916,27 +2022,20 @@
 		(var piercing:number = "(projectile && !isDepthCharge) ? projectile.piercing.value : null")
 	)
 
-	(style
-		(align = "middle|center")
-	)
-
-	(bind visible "airSupportTTX")
+	(class $TP_FullWidth)
 
 	(block
-		(style
-			(vgap = "TP_TOOLTIP_ELEMENTS_VGAP")
-		)
-
-		(element TP_TooltipShipConfigTitleItem _title="'IDS_SHIP_PARAM_AIR_SUPPORT'")
-
-		(block
-			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_MAX_DIST'" _value="range" _unit="'km'" _userPrefsNum="_userPrefsNum")
-			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_SHOT_DELAY'" _value="reload" _unit="'s'" _userPrefsNum="_userPrefsNum")
-			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_AIR_SUPPORT_NUM_SQUADRONS'" _value="numSquadrons" _roundDigit=0 _unit=null _userPrefsNum="_userPrefsNum")
-
-			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_DAMAGE'" _value="damage" _unit=null _roundDigit=0 _userPrefsNum="_userPrefsNum")
-			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_ARTILLERY_ALPHA_PIERCING'" _value="piercing" _roundDigit=0 _unit="'mm'" _userPrefsNum="_userPrefsNum")
-		)
+		(class $TP_FullWidth)
+		(class $TP_TooltipSectionMargin)
+		(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_MAX_DIST'" _value="range" _unit="'km'" _userPrefsNum="_userPrefsNum")
+		(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_SHOT_DELAY'" _value="reload" _unit="'s'" _userPrefsNum="_userPrefsNum")
+		(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_AIR_SUPPORT_NUM_SQUADRONS'" _value="numSquadrons" _roundDigit=0 _unit=null _userPrefsNum="_userPrefsNum")
+	)
+	(block
+		(class $TP_FullWidth)
+		(class $TP_TooltipSectionMargin)
+		(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_DAMAGE'" _value="damage" _unit=null _roundDigit=0 _userPrefsNum="_userPrefsNum")
+		(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_ARTILLERY_ALPHA_PIERCING'" _value="piercing" _roundDigit=0 _unit="'mm'" _userPrefsNum="_userPrefsNum")
 	)
 )
 
@@ -1950,56 +2049,47 @@
 		(var damage:number = "depthChargesTTX ? depthChargesTTX.damage.value : null")
 	)
 
-	(style
-		(align = "middle|center")
-	)
-
-	(bind visible "depthChargesTTX")
+	(class $TP_FullWidth)
 
 	(block
-		(style
-			(vgap = "TP_TOOLTIP_ELEMENTS_VGAP")
-		)
+		(class $TP_FullWidth)
+		(class $TP_TooltipSectionMargin)
 
-		(element TP_TooltipShipConfigTitleItem _title="'IDS_SHIP_PARAM_DEPTH_CHARGE'")
-
-		(block
-			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_SHOT_DELAY'" _value="reload" _unit="'s'" _userPrefsNum="_userPrefsNum")
-			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_DAMAGE'" _value="damage" _unit=null _roundDigit=0 _userPrefsNum="_userPrefsNum")
-			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_DEPTH_CHARGE_MAX_PACKS'" _value="numCharges" _roundDigit=0 _unit=null _userPrefsNum="_userPrefsNum")
-			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_DEPTH_CHARGE_NUM_BOMBS_IN_PACK'" _value="numBombs" _roundDigit=0 _unit=null _userPrefsNum="_userPrefsNum")
-		)
+		(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_SHOT_DELAY'" _value="reload" _unit="'s'" _userPrefsNum="_userPrefsNum")
+		(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_DAMAGE'" _value="damage" _unit=null _roundDigit=0 _userPrefsNum="_userPrefsNum")
+		(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_DEPTH_CHARGE_MAX_PACKS'" _value="numCharges" _roundDigit=0 _unit=null _userPrefsNum="_userPrefsNum")
+		(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_DEPTH_CHARGE_NUM_BOMBS_IN_PACK'" _value="numBombs" _roundDigit=0 _unit=null _userPrefsNum="_userPrefsNum")
 	)
 )
 
-(def element TP_TooltipMobilityItem(_shipTTX:gfx, _userPrefsNum:gfx=null)
+(def element TP_TooltipSurfaceMobilityItem(_shipTTX:gfx, _userPrefsNum:gfx=null)
 	(scope
-		#surface speed
+		# Surface Speed
 		(var mobilityTTX:gfx = "_shipTTX.mobility")
 		(var surfaceSpeed:number = "mobilityTTX ? mobilityTTX.speed.value : null")
+	)
 
-		#underwater speed
+	(class $TP_FullWidth)
+
+	(block
+		(class $TP_FullWidth)
+
+		(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_MAXSPEED'" _value="surfaceSpeed" _unit="'kts'" _userPrefsNum="_userPrefsNum")			
+	)
+)
+
+(def element TP_TooltipUnderwaterMobilityItem(_shipTTX:gfx, _userPrefsNum:gfx=null)
+	(scope
+		# Underwater Speed
 		(var underwaterMobilityTTX:gfx = "_shipTTX.underwaterMobility")
 		(var underwaterSpeed:number = "underwaterMobilityTTX ? underwaterMobilityTTX.speed.value : null")
 	)
 
-	(style
-		(align = "middle|center")
-	)
-
-	(bind visible "mobilityTTX || underwaterMobilityTTX")
+	(class $TP_FullWidth)
 
 	(block
-		(style
-			(vgap = "TP_TOOLTIP_ELEMENTS_VGAP")
-		)
-
-		(element TP_TooltipShipConfigTitleItem _title="'IDS_SHIP_PARAM_MAXSPEED'")
-
-		(block
-			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_MOBILITY'" _value="surfaceSpeed" _unit="'kts'" _userPrefsNum="_userPrefsNum")
-			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_UNDERWATER_MOBILITY'" _value="underwaterSpeed" _unit="'kts'" _userPrefsNum="_userPrefsNum")
-		)
+		(class $TP_FullWidth)
+		(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_MAX_SPEED_UNDER_WATER'" _value="underwaterSpeed" _unit="'kts'" _userPrefsNum="_userPrefsNum")
 	)
 )
 
@@ -2039,24 +2129,13 @@
 		#---------------------
 	)
 
-	(style
-		(align = "middle|center")
-	)
-
-	(bind visible "visibilityTTX")
+	(class $TP_FullWidth)
 
 	(block
-		(style
-			(vgap = "TP_TOOLTIP_ELEMENTS_VGAP")
-		)
-
-		(element TP_TooltipShipConfigTitleItem _title="'IDS_SHIP_PARAM_DETECTION'")
-
-		(block
-			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_VISIBILITY_DIST_BY_SHIP'" _value="modifiedVisibilityByShip" _unit="'km'" _userPrefsNum="_userPrefsNum")
-			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_VISIBILITY_DIST_BY_GK_IN_SMOKE_BATTLE'" _value="visibilityByShipSmoke" _unit="'km'" _userPrefsNum="_userPrefsNum")
-			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_VISIBILITY_DIST_BY_PLANE'" _value="modifiedVisibilityByPlane" _unit="'km'" _userPrefsNum="_userPrefsNum")
-		)
+		(class $TP_FullWidth)
+		(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_VISIBILITY_DIST_BY_SHIP'" _value="modifiedVisibilityByShip" _unit="'km'" _userPrefsNum="_userPrefsNum")
+		(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_VISIBILITY_DIST_BY_GK_IN_SMOKE_BATTLE'" _value="visibilityByShipSmoke" _unit="'km'" _userPrefsNum="_userPrefsNum")
+		(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_VISIBILITY_DIST_BY_PLANE'" _value="modifiedVisibilityByPlane" _unit="'km'" _userPrefsNum="_userPrefsNum")
 	)
 )
 
@@ -2083,23 +2162,35 @@
 	)
 
 	(bind visible "_title")
+
 	(style
-		(marginBottom = 2px)
-		#(width = 45px)
-		#(bind width "isUnitVisible ? TP_SHIPCONFIG_ELEMENT_WIDTH.WITH_UNIT : TP_SHIPCONFIG_ELEMENT_WIDTH.NO_UNIT")
-		(align = "center|middle")
+		(width = 100%)
+		(paddingLeft = "TP_TOOLTIP_PADDINGS.HEADER")
+		(marginBottom = 5px)
 	)
-	(hblock
-		(style
-			#(marginRight = "XS")
-		)
-		(tf
-			(class $TextDefaultBoldNM)
-			(style
-				(marginRight = "XS")
-			)
-			(bind text "_title")
-		)
+
+	(tf
+		(class $TextDefaultBoldNM)
+		(bind text "_title")
+	)
+)
+
+(def element TP_TooltipShipConfigSubTitleItem (_subTitle:str, _userPrefsNum:gfx=null)
+	(scope
+	)
+
+	(style
+		(width = 100%)
+		(paddingLeft = "TP_TOOLTIP_PADDINGS.SUB_HEADER")
+		(marginTop = 3px)
+		(marginBottom = 3px)
+	)
+
+	(bind visible "_subTitle")
+
+	(tf
+		(class $TextDefaultBoldNM)
+		(bind text "_subTitle")
 	)
 )
 
@@ -2108,30 +2199,69 @@
 		(var isValueVisible:bool = "_value || _showZero")
 	)
 
-	(style
-		(marginBottom = 5px)
-		(marginLeft = 20px)
-	)
 	(bind visible "isValueVisible")
+
+	(style
+		(width = 100%)
+		(flow = "Flow.HORIZONTAL")
+		(paddingLeft = "TP_TOOLTIP_PADDINGS.TEXT")
+		(marginBottom = 3px)
+	)
+
+	(tf
+		(class $TextDefaultNM)
+		(bind text "tr(_title) + ':'")
+		(style
+			(width = "100% - TP_TOOLTIP_PADDINGS.SUB_TEXT")
+		)
+	)
 	(hblock
 		(style
-			(marginRight = "XS")
-			(align = "middle|center")
+			(width = 35%)
 		)
 		(tf
 			(class $TextDefaultNM)
+			(bind text "formatFloatingPoint(_value, _roundDigit)")
+		)
+		(tf
+			(bind visible "_unit")
+			(class $TextDefaultNM)
+			(bind text "_unit")
+			(alpha = "TC")
 			(style
-				(marginRight = "XS")
-				(width = 200)
-				(leading = -4px)
+				(marginLeft = "XS")
 			)
-			(bind text "tr(_title) + ': '")
+		)
+	)
+)
+
+(def element TP_TooltipShipConfigSubTextItem (_subText:str, _value:number, _unit:str=null, _showZero:bool=false, _roundDigit:number="1.0", _userPrefsNum:gfx=null)
+	(scope
+		(var isValueVisible:bool = "_value || _showZero")
+	)
+
+	(style
+		(width = 100%)
+		(flow = "Flow.HORIZONTAL")
+		(paddingLeft = "TP_TOOLTIP_PADDINGS.SUB_TEXT")
+		(marginBottom = 3px)
+	)
+
+	(bind visible "isValueVisible")
+
+	(tf
+		(class $TextDefaultNM)
+		(bind text "tr(_subText) + ':'")
+		(style
+			(width = "100% - TP_TOOLTIP_PADDINGS.SUB_TEXT")
+		)
+	)
+	(hblock
+		(style
+			(width = 35%)
 		)
 		(tf
 			(class $TextDefaultNM)
-			(style
-				(marginRight = "XS")
-			)
 			(bind text "isValueVisible ? formatFloatingPoint(_value, _roundDigit) : ''")
 		)
 		(tf
@@ -2140,7 +2270,7 @@
 			(bind text "_unit")
 			(alpha = "TC")
 			(style
-				(width = "30px")
+				(marginLeft = "XS")
 			)
 		)
 	)
@@ -2152,28 +2282,25 @@
 	)
 
 	(style
-		(marginBottom = 5px)
-		(marginLeft = 20px)
+		(width = 100%)
+		(flow = "Flow.HORIZONTAL")
+		(align = "middle|center")
+		(paddingLeft = "TP_TOOLTIP_PADDINGS.TEXT")
 	)
+
 	(bind visible "isVisible")
-	(hblock
+
+	(tf
+		(class $TextDefaultNM)
+		(bind text "tr(_title) + ': '")
 		(style
-			(align = "middle|center")
+			(width = "100% - TP_TOOLTIP_PADDINGS.TEXT")
 		)
-		(tf
-			(class $TextDefaultNM)
-			(style
-				(marginRight = "XS")
-				(width = 180px)
-				(leading = -4px)
-			)
-			(bind text "tr(_title) + ': '")
-		)
-		(controller $Repeat renderer='TP_ClassIconItem'
-			(bind enabled "isVisible")
-			(bind count "_canHitClasses.length")
-			(args _className="_canHitClasses[$index]")
-		)
+	)
+	(controller $Repeat renderer='TP_ClassIconItem'
+		(bind enabled "isVisible")
+		(bind count "_canHitClasses.length")
+		(args _className="_canHitClasses[$index]")
 	)
 )
 
