@@ -2002,15 +2002,34 @@
 
 (def element TP_TooltipAirSupportItem(_shipTTX:gfx, _userPrefsNum:gfx=null)
 	(scope
-		#AirSupport
+		# AirSupport
 		(var airSupportTTX:gfx = "_shipTTX.airSupport")
 		(var range:number = "airSupportTTX ? airSupportTTX.maxDist.value : null")
 		(var reload:number = "airSupportTTX ? airSupportTTX.reloadTime.value : null")
-		(var numSquadrons:number = "airSupportTTX ? airSupportTTX.numSquadrons.value : null")
-		(var isDepthCharge:bool = "airSupportTTX ? airSupportTTX.type == 'DEPTHCHARGE' : null")
-		(var projectile:gfx = "airSupportTTX ? isDepthCharge ? airSupportTTX.bomber.bombDW : airSupportTTX.bomber.bombHE : null")
-		(var damage:number = "projectile ? projectile.damage.value : null")
-		(var piercing:number = "(projectile && !isDepthCharge) ? projectile.piercing.value : null")
+		
+		(var bomberHE:gfx = "airSupportTTX ? airSupportTTX.bomberHE : null")
+		(var bomberAP:gfx = "airSupportTTX ? airSupportTTX.bomberAP : null")
+		(var bomberDC:gfx = "airSupportTTX ? airSupportTTX.bomberDC : null")
+
+		(var planesHE:number = "bomberHE ? bomberHE.chargesNum.value : 0")
+		(var planesAP:number = "bomberAP ? bomberAP.chargesNum.value : 0")
+		(var planesDC:number = "bomberDC ? bomberDC.chargesNum.value : 0")
+		(var numSquadrons:number = "max(planesHE, planesAP, planesDC)")
+
+		(var bombHE:gfx = "bomberHE ? bomberHE.bombHE : null")
+		(var bombAP:gfx = "bomberHE ? bomberHE.bombAP : null")
+		(var bombDC:gfx = "bomberHE ? bomberHE.bombDC : null")
+
+		(var damageHE:number = "bombHE ? bombHE.damage.value : null")
+		(var damageAP:number = "bombAP ? bombAP.damage.value : null")
+		(var damageDC:number = "bombDC ? bombDC.damage.value : null")
+
+		(var numBombsHE:number = "bombHE ? bombHE.numBombs.value : null")
+		(var numBombsAP:number = "bombAP ? bombAP.numBombs.value : null")
+		(var numBombsDC:number = "bombDC ? bombDC.numBombs.value : null")
+
+		(var piercingHE:number = "bombHE ? bombHE.piercing.value : null")
+		(var burnHE:number = "bombHE ? bombHE.burnChance.value : null")
 	)
 
 	(class $TP_FullWidth)
@@ -2022,11 +2041,31 @@
 		(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_SHOT_DELAY'" _value="reload" _unit="'s'" _userPrefsNum="_userPrefsNum")
 		(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_AIR_SUPPORT_NUM_SQUADRONS'" _value="numSquadrons" _roundDigit=0 _unit=null _userPrefsNum="_userPrefsNum")
 	)
+
 	(block
 		(class $TP_FullWidth)
-		(class $TP_TooltipSectionMargin)
-		(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_DAMAGE'" _value="damage" _unit=null _roundDigit=0 _userPrefsNum="_userPrefsNum")
-		(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_ARTILLERY_ALPHA_PIERCING'" _value="piercing" _roundDigit=0 _unit="'mm'" _userPrefsNum="_userPrefsNum")
+		(bind visible "bomberHE")
+
+		(element TP_TooltipShipConfigSubTitleItem _subTitle="'IDS_SHIP_PARAM_AIR_SUPPORT_SQUADRONS_HE'")
+		(block
+			(class $TP_FullWidth)
+			(class $TP_TooltipSectionMargin)
+			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_DAMAGE'" _value="damageHE" _unit=null _roundDigit=0 _userPrefsNum="_userPrefsNum")
+			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_AIR_SUPPORT_BOMB_PIERCING_HE'" _value="piercingHE" _roundDigit=0 _unit="'mm'" _userPrefsNum="_userPrefsNum")
+			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_AIR_SUPPORT_BOMB_BURN_PROB_HE'" _value="burnHE" _roundDigit=0 _unit="'%'" _userPrefsNum="_userPrefsNum")
+		)
+	)
+
+	(block
+		(class $TP_FullWidth)
+		(bind visible "bomberDC")
+
+		(element TP_TooltipShipConfigSubTitleItem _subTitle="'IDS_SHIP_PARAM_AIR_SUPPORT_SQUADRONS_DEPTHCHARGE'")
+		(block
+			(class $TP_FullWidth)
+			(class $TP_TooltipSectionMargin)
+			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_DAMAGE'" _value="damageDC" _unit=null _roundDigit=0 _userPrefsNum="_userPrefsNum")
+		)
 	)
 )
 
