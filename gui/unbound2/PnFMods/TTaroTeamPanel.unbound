@@ -1743,33 +1743,63 @@
 
 	(block
 		(bind visible "altFire")
+
+		(element TP_TooltipShipConfigTitleItem _title="'IDS_SHIP_PARAM_BURST_FIRE_NAME'" _indent="TP_TOOLTIP_INDENTS.SUB_HEADER")
 		(class $TP_FullWidth)
 		(class $TP_TooltipSectionMargin)
-		(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_BURST_FIRE_SALVO_COUNT'" _value="altFireShots" _roundDigit=0 _unit=null _userPrefsNum="_userPrefsNum")
-		(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_BURST_FIRE_RELOAD_TIME'" _value="altFireReload" _unit="'s'" _userPrefsNum="_userPrefsNum")
+		(block
+			(class $TP_FullWidth)
+			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_BURST_FIRE_SALVO_COUNT'" _value="altFireShots" _roundDigit=0 _unit=null  _indent="TP_TOOLTIP_INDENTS.SUB_TEXT" _userPrefsNum="_userPrefsNum")
+			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_BURST_FIRE_RELOAD_TIME'" _value="altFireReload" _unit="'s'" _indent="TP_TOOLTIP_INDENTS.SUB_TEXT" _userPrefsNum="_userPrefsNum")
+		)
 	)
 
 	(block
+		(bind visible "ammoHE")
+
+		(element TP_TooltipShipConfigTitleItem _title="'IDS_SHIP_PARAM_AMMO_HE'" _indent="TP_TOOLTIP_INDENTS.SUB_HEADER")
 		(class $TP_FullWidth)
 		(class $TP_TooltipSectionMargin)
-		(element TP_TooltipShipConfigTextItem _title="'HE DPM'" _value="damagePerMinHE" _roundDigit=0 _unit=null _userPrefsNum="_userPrefsNum")
-		(element TP_TooltipShipConfigTextItem _title="'SAP DPM'" _value="damagePerMinCS" _roundDigit=0 _unit=null _userPrefsNum="_userPrefsNum")
-		(element TP_TooltipShipConfigTextItem _title="'AP DPM'" _value="damagePerMinAP" _roundDigit=0 _unit=null _userPrefsNum="_userPrefsNum")
+		(block
+			(class $TP_FullWidth)
+			(element TP_TooltipShipConfigTextItem _title="'DPM'" _value="damagePerMinHE" _roundDigit=0 _unit=null  _indent="TP_TOOLTIP_INDENTS.SUB_TEXT" _userPrefsNum="_userPrefsNum")
+			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_ARTILLERY_ALPHA_PIERCING'" _value="pircingHE" _roundDigit=0 _unit="'mm'" _indent="TP_TOOLTIP_INDENTS.SUB_TEXT" _userPrefsNum="_userPrefsNum")
+		)
 	)
 
 	(block
+		(bind visible "ammoCS")
+
+		(element TP_TooltipShipConfigTitleItem _title="'IDS_SHIP_PARAM_AMMO_CS'" _indent="TP_TOOLTIP_INDENTS.SUB_HEADER")
 		(class $TP_FullWidth)
 		(class $TP_TooltipSectionMargin)
-		(element TP_TooltipShipConfigTextItem _title="'HE Penetration'" _value="pircingHE" _unit="'mm'" _roundDigit=0 _userPrefsNum="_userPrefsNum")
-		(element TP_TooltipShipConfigTextItem _title="'SAP Penetration'" _value="pircingCS" _unit="'mm'" _roundDigit=0 _userPrefsNum="_userPrefsNum")
-		(element TP_TooltipShipConfigTextItem _title="'AP Penetration'" _value="pircingAP" _unit="'mm'" _roundDigit=0 _userPrefsNum="_userPrefsNum")
+		(block
+			(class $TP_FullWidth)
+			(element TP_TooltipShipConfigTextItem _title="'DPM'" _value="damagePerMinCS" _roundDigit=0 _unit=null  _indent="TP_TOOLTIP_INDENTS.SUB_TEXT" _userPrefsNum="_userPrefsNum")
+			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_ARTILLERY_ALPHA_PIERCING'" _value="pircingCS" _roundDigit=0 _unit="'mm'" _indent="TP_TOOLTIP_INDENTS.SUB_TEXT" _userPrefsNum="_userPrefsNum")
+		)
+	)
+
+	(block
+		(bind visible "ammoAP")
+
+		(element TP_TooltipShipConfigTitleItem _title="'IDS_SHIP_PARAM_AMMO_AP'" _indent="TP_TOOLTIP_INDENTS.SUB_HEADER")
+		(class $TP_FullWidth)
+		(class $TP_TooltipSectionMargin)
+		(block
+			(class $TP_FullWidth)
+			(element TP_TooltipShipConfigTextItem _title="'DPM'" _value="damagePerMinAP" _roundDigit=0 _unit=null  _indent="TP_TOOLTIP_INDENTS.SUB_TEXT" _userPrefsNum="_userPrefsNum")
+			(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_ARTILLERY_ALPHA_PIERCING'" _value="pircingAP" _roundDigit=0 _unit="'mm'" _indent="TP_TOOLTIP_INDENTS.SUB_TEXT" _userPrefsNum="_userPrefsNum")
+		)
 	)
 )
 
 (def element TP_TooltipAtbaItem(_shipTTX:gfx, _avatarEntity:gfx, _isRealParams:bool, _userPrefsNum:gfx=null)
 	(scope
 		(var artilleryTTX:gfx = "_shipTTX.artillery")
-		(var range:number = "artilleryTTX ? artilleryTTX.atbaMaxDist.value : null")
+		(var atbaTTX:array = "artilleryTTX ? artilleryTTX.atba : []")
+		(var numOfAtbaGuns:number = "atbaTTX.length")
+		(var range:number = "numOfAtbaGuns > 0 ? artilleryTTX.atbaMaxDist.value : null")
 
 		# Fix for skill---------------------
 		(var selfPlayer:gfx = "$datahub.getSingleEntity(CC.playerAvatar)")
@@ -1795,8 +1825,21 @@
 		#---------------------
 
 		# Fix-----------------
-		(var modifiedAtbaRange:number = "range * rangeModifier") #CAPTAIN SKILL FIX
+		(var modifiedAtbaRange:number = "range * rangeModifier") # CAPTAIN SKILL FIX
 		#---------------------
+
+		(var atba1:gfx = "numOfAtbaGuns > 0 ? atbaTTX[0] : null")
+		(var dpm1:number = "atba1 ? atba1.numBarrels.value * atba1.numGuns.value * atba1.ammoList[0].damage.value * (60 / atba1.reloadTime.value) : 0")
+		(var atba2:gfx = "numOfAtbaGuns > 1 ? atbaTTX[1] : null")
+		(var dpm2:number = "atba2 ? atba2.numBarrels.value * atba2.numGuns.value * atba2.ammoList[0].damage.value * (60 / atba2.reloadTime.value) : 0")
+		(var atba3:gfx = "numOfAtbaGuns > 2 ? atbaTTX[2] : null")
+		(var dpm3:number = "atba3 ? atba3.numBarrels.value * atba3.numGuns.value * atba3.ammoList[0].damage.value * (60 / atba3.reloadTime.value) : 0")
+		(var atba4:gfx = "numOfAtbaGuns > 3 ? atbaTTX[3] : null")
+		(var dpm4:number = "atba4 ? atba4.numBarrels.value * atba4.numGuns.value * atba4.ammoList[0].damage.value * (60 / atba4.reloadTime.value) : 0")
+		(var atba5:gfx = "numOfAtbaGuns > 4 ? atbaTTX[4] : null")
+		(var dpm5:number = "atba5 ? atba5.numBarrels.value * atba5.numGuns.value * atba5.ammoList[0].damage.value * (60 / atba5.reloadTime.value) : 0")
+
+		(var atbaDPM:number = "(dpm1 + dpm2 + dpm3 + dpm4 + dpm5) * 0.33")
 	)
 
 	(class $TP_FullWidth)
@@ -1805,6 +1848,7 @@
 		(class $TP_FullWidth)
 		(class $TP_TooltipSectionMargin)
 		(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_MAX_DIST'" _value="modifiedAtbaRange" _unit="'km'" _userPrefsNum="_userPrefsNum")
+		(element TP_TooltipShipConfigTextItem _title="'DPM'" _value="atbaDPM" _roundDigit=0 _userPrefsNum="_userPrefsNum")
 	)
 )
 
@@ -1820,6 +1864,17 @@
 		(var torpedoAltTTX:gfx = "torpedoesTTX ? torpedoesTTX.torpedoAlt : null")
 		# Reload
 		(var reload:number = "torpedoesTTX ? torpedoesTTX.reloadTime.value : null")
+
+		(var launchers:array = "torpedoesTTX ? torpedoesTTX.launchers : []")
+		(var numOfLaunchers:number = "launchers.length")
+
+		(var launcher1:gfx = "numOfLaunchers > 0 ? launchers[0] : null")
+		(var num1:str = "launcher1 ? subst('%dx%d', [launcher1.numGuns.value, launcher1.numBarrels.value]) : ''")
+		(var launcher2:gfx = "numOfLaunchers > 1 ? launchers[1] : null")
+		(var num2:str = "launcher2 ? subst(', %dx%d', [launcher2.numGuns.value, launcher2.numBarrels.value]) : ''")
+		(var launcher3:gfx = "numOfLaunchers > 2 ? launchers[2] : null")
+		(var num3:str = "launcher3 ? subst(', %dx%d', [launcher3.numGuns.value, launcher3.numBarrels.value]) : ''")
+		(var launcherNumText:str = "num1 + num2 + num3")
 	)
 
 	(class $TP_FullWidth)
@@ -1828,6 +1883,7 @@
 		(class $TP_FullWidth)
 		(class $TP_TooltipSectionMargin)
 		(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_SHOT_DELAY'" _value="reload" _unit="'s'" _userPrefsNum="_userPrefsNum")
+		(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_TORPEDO_GUN'" _text="launcherNumText" _userPrefsNum="_userPrefsNum")
 	)
 
 	(controller $Instance renderer='TP_TooltipTorpedoAmmoItem'
@@ -1963,8 +2019,9 @@
 		(controller $Repeat renderer='TP_TooltipShipConfigTextItem'
 			(bind enabled "auras.length > 0")
 			(bind count "auras.length")
-			(args _title="'IDS_SHIP_PARAM_AA_AVERAGE_DAMAGE_' + toUpper(auras[$index].type)" _value="auras[$index].damage.value" _roundDigit=0 _userPrefsNum="_userPrefsNum")
+			(args _title="'IDS_SHIP_PARAM_AA_AVERAGE_DAMAGE_' + toUpper(auras[$index].type)" _value="auras[$index].damage.value" _roundDigit=0 _indent="TP_TOOLTIP_INDENTS.SUB_TEXT" _userPrefsNum="_userPrefsNum")
 		)
+		(element TP_TooltipShipConfigTitleItem _title="'IDS_SHIP_PARAM_AA'" _indent="TP_TOOLTIP_INDENTS.SUB_HEADER")
 	)
 )
 
@@ -2181,9 +2238,9 @@
 	)
 )
 
-(def element TP_TooltipShipConfigTextItem (_title:str, _value:number, _unit:str=null, _roundDigit:number="1", _indent:number="TP_TOOLTIP_INDENTS.TEXT", _userPrefsNum:gfx=null)
+(def element TP_TooltipShipConfigTextItem (_title:str, _value:number=null, _text:str=null, _unit:str=null, _roundDigit:number="1", _indent:number="TP_TOOLTIP_INDENTS.TEXT", _userPrefsNum:gfx=null)
 	(scope
-		(var isValueVisible:bool = "_value")
+		(var isValueVisible:bool = "_value || _text")
 	)
 
 	(bind visible "isValueVisible")
@@ -2223,7 +2280,7 @@
 		)
 		(tf
 			(class $TextDefaultNM)
-			(bind text "formatFloatingPoint(_value, _roundDigit)")
+			(bind text "_value ? formatFloatingPoint(_value, _roundDigit) : _text")
 		)
 		(tf
 			(bind visible "_unit")
