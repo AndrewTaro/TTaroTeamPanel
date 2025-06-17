@@ -1574,17 +1574,19 @@
 
 		(macro IS_SPECTATOR_MODE)
 
-		#Classic TTX
-		(var ttxCollection:gfx = "$datahub.getCollection(CC.mods_ShipParamsInBattle)")
-		(var ttxEntity:gfx = "$datahub.getPrimaryEntity(CC.mods_ShipParamsInBattle, avatarId)" (event "ttxCollection.evAdded"))
+		# Classic TTX
+		(var ttxModWatcher:gfx = "$datahub.getPrimWatcher(CC.mods_ShipParamsInBattle, avatarId)")
+		(var ttxModEntity:gfx = "ttxModWatcher.entity" (event "ttxModWatcher.event"))
+		(var classicTTX:gfx = "ttxModEntity ? ttxModEntity.mods_ShipParamsInBattle.shipTTX : null")
 
 		#New TTX
-		(var shipBattleInfoCollection:gfx = "$datahub.getCollection(CC.shipBattleInfo)")
-		(var shipBattleInfoEntity:gfx = "$datahub.getPrimaryEntity(CC.shipBattleInfo, avatarId)" (event "shipBattleInfoCollection.evAdded"))
+		(var shipBattleInfoWatcher:gfx = "$datahub.getPrimWatcher(CC.shipBattleInfo, avatarId)")
+		(var shipBattleInfoEntity:gfx = "shipBattleInfoWatcher.entity" (event "shipBattleInfoWatcher.event"))
 		(var shipBattleInfo:gfx = "shipBattleInfoEntity ? shipBattleInfoEntity.shipBattleInfo : null" (event "shipBattleInfoEntity.shipBattleInfo.evChanged"))
+		(var newTTX:gfx = "shipBattleInfo ? shipBattleInfo.shipTTX : null" (event "shipBattleInfoEntity.shipBattleInfo.evChanged"))
 
-		(var isRealParams:bool = "shipBattleInfo ? shipBattleInfo.isRealParams : false")
-		(var shipTTX:gfx = "isRealParams ? shipBattleInfo.shipTTX : ttxEntity.mods_ShipParamsInBattle.shipTTX")
+		(var isRealParams:bool = "shipBattleInfo ? shipBattleInfo.isRealParams : false" (event "shipBattleInfoEntity.shipBattleInfo.evChanged"))
+		(var shipTTX:gfx = "isRealParams ? newTTX : classicTTX")
 
 		(macro TT_GET_PREF_BOOL _varName="'isOwnBuildOnly'"		_pref="TP_PREFS.HIDE_BUILD")
 		(var isBuildVisible:bool = "TT_BUILDVIEWER_INSTALLED && (isSpectatorTrainingMode || (!isOwnBuildOnly || isSelf))")
