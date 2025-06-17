@@ -1534,6 +1534,7 @@
 # Tooltip Items
 #--------------------------------------------------------------------------------
 (def constant TP_TOOLTIP_SHIPCONFIG_RENDERER_SETTINGS [
+	{renderer: 'TP_TooltipHealthItem',				ttxName: 'durability',			title: 'IDS_SHIP_PARAM_DURABILITY'},
 	{renderer: 'TP_TooltipMainGunItem',				ttxName: 'artillery',			title: 'IDS_SHIP_PARAM_ARTILLERY', 		ttxSubAttr: 'mainGun'},
 	{renderer: 'TP_TooltipAtbaItem',				ttxName: 'artillery',			title: 'IDS_SHIP_PARAM_ARTILLERY_ATBA',	ttxSubAttr: 'atba'},
 	{renderer: 'TP_TooltipTorpedoesItem',			ttxName: 'torpedoes',			title: 'IDS_SHIP_PARAM_TORPEDOES'},
@@ -1559,6 +1560,11 @@
 
 (def css $TP_TooltipSectionMargin()
 	(marginBottom = 5px)
+)
+
+(def css $TP_TooltipShipParameterText()
+	(extends $FontEnableReadability)
+	(extends $TextDefaultNM)
 )
 
 (def element TP_TooltipShipConfigurationsItem(_entity:gfx=null, _userPrefsNum:gfx=null)
@@ -1597,9 +1603,12 @@
 
 	(element TOOLTIP_SYSTEM_DEFAULT_CONTAINER $enabled="!isSpectatorTrainingMode"
 		(style
-			(width = 300px)
+			(width = 350px)
 		)
+		(bind visible "shipTTX || shipBattleInfo")
+		
 		(controller $Repeat renderer='TP_TooltipShipConfigRendererItem'
+			(bind enabled "shipTTX")
 			(bind count "TP_TOOLTIP_SHIPCONFIG_RENDERER_SETTINGS.length")
 			(args
 				_shipTTX		= "shipTTX"
@@ -1608,7 +1617,12 @@
 				_userPrefsNum	= "_userPrefsNum"
 			)
 		)
-		(element TP_TooltipConsumableItem _shipBattleInfo = "shipBattleInfo")
+		(controller $Instance renderer='TP_TooltipConsumableItem'
+			(bind enabled "shipBattleInfo")
+			(args 
+				_shipBattleInfo = "shipBattleInfo"
+			)
+		)
 	)
 	(block
 		(style
@@ -1678,6 +1692,79 @@
 			_isRealParams 	= "_isRealParams"
 			_userPrefsNum 	= "_userPrefsNum"
 		)
+	)
+)
+
+(def element TP_TooltipHealthItem(_shipTTX:gfx, _avatarEntity:gfx, _userPrefsNum:gfx=null)
+	(scope
+		(var durabilityTTX:gfx = "_shipTTX.durability")
+		(var ttxMaxHealth:number = "durabilityTTX ? durabilityTTX.health.value : 1")
+		(var torpProtection:number = "durabilityTTX ? durabilityTTX.ptz.value : 0")
+
+		(var healthComponent:gfx = "_avatarEntity && _avatarEntity.hasComponent(CC.health) ? _avatarEntity.health : null" (event "_avatarEntity.evAdded") (event "_avatarEntity.evRemoved"))
+		(var maxHealth:number = "healthComponent && healthComponent.max ? healthComponent.max : ttxMaxHealth" (event "healthComponent.evMaxChanged"))
+		(var isAlive:number = "healthComponent ? healthComponent.isAlive : false" (event "healthComponent.evIsAliveChanged"))
+		(var currentHealth:number = "healthComponent ? healthComponent.value * isAlive : maxHealth" (event "healthComponent.evValueChanged"))
+
+		(var healthPercent:number = "maxHealth ? currentHealth / maxHealth : 1")
+	)
+
+	(class $TP_FullWidth)
+	
+	(block
+		(class $TP_FullWidth)
+		(class $TP_TooltipSectionMargin)
+		# HP
+		(hblock
+			(class $TP_FullWidth)
+			(style
+				(align = "middle")
+				(marginBottom = 3px)
+				(paddingLeft = "TP_TOOLTIP_INDENTS.TEXT")
+			)
+			(hblock
+				(style
+					(width = 85%)
+				)
+				(tf
+					(class $TP_TooltipShipParameterText)
+					(text = '•')
+					(style
+						(marginRight = 5px)
+					)
+				)
+				(tf
+					(text = "tr('IDS_SHIP_PARAM_HEALTH')")
+					(class $TP_TooltipShipParameterText)
+				)
+			)
+			(hblock
+				(style
+					(width = 15%)
+					(align = "right")
+				)
+				(tf
+					(class $TP_TooltipShipParameterText)
+					(bind class "healthPercent > 0.8 ? '$FontColorHealth' : healthPercent > 0.3 ? '$FontColorWarning' : '$FontColorCritical'")
+					(bind text "formatSeparator(currentHealth)")
+				)
+				(tf
+					(class $TP_TooltipShipParameterText)
+					(text = '/')
+					(style
+						(alpha = "TC")
+						(marginLeft = 7px)
+						(marginRight = 7px)
+					)
+				)
+				(tf
+					(class $TP_TooltipShipParameterText)
+					(bind text "formatSeparator(maxHealth)")
+				)
+			)
+		)
+		#
+		(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_PTZDAMAGEPROB'" _value="torpProtection" _unit='%' _userPrefsNum="_userPrefsNum")
 	)
 )
 
@@ -2255,18 +2342,18 @@
 	(hblock
 		(style
 			(align = "middle")
-			(width = 90%)
+			(width = 85%)
 			(bind paddingLeft "_indent")
 		)
 		(tf
-			(class $TextDefaultNM)
+			(class $TP_TooltipShipParameterText)
 			(text = '•')
 			(style
 				(marginRight = 5px)
 			)
 		)
 		(tf
-			(class $TextDefaultNM)
+			(class $TP_TooltipShipParameterText)
 			(bind text "tr(_title) + ':'")
 			(style
 				(width = "100%")
@@ -2276,15 +2363,15 @@
 	)
 	(hblock
 		(style
-			(width = 10%)
+			(width = 15%)
 		)
 		(tf
-			(class $TextDefaultNM)
+			(class $TP_TooltipShipParameterText)
 			(bind text "_value ? formatFloatingPoint(_value, _roundDigit) : _text")
 		)
 		(tf
 			(bind visible "_unit")
-			(class $TextDefaultNM)
+			(class $TP_TooltipShipParameterText)
 			(bind text "_unit")
 			(alpha = "TC")
 			(style
