@@ -202,7 +202,7 @@
 	(element TP_HeaderItem _isAlly="true" _userPrefsNum="_userPrefsNum")
 
 	(controller $Repeat renderer='TP_PlayerItem'
-		(bind count "allyCollection ? allyCollection.items.length : 0")
+		(count = "allyItems ? allyItems.length : 0")
 		(args "allyItems" _isAlly="true" _userPrefsNum="_userPrefsNum")
 
 		(bindcall removeChildAt "$event[1]" (event "allyCollection.evRemoved"))
@@ -233,7 +233,7 @@
 	(element TP_HeaderItem _isAlly="false" _userPrefsNum="_userPrefsNum")
 
 	(controller $Repeat renderer='TP_PlayerItem'
-		(bind count "enemyCollection ? enemyCollection.items.length : 0")
+		(count = "enemyItems ? enemyItems.length : 0")
 		(args "enemyItems" _isAlly="false" _userPrefsNum="_userPrefsNum")
 
 		(bindcall removeChildAt "$event[1]" (event "enemyCollection.evRemoved"))
@@ -1704,9 +1704,11 @@
 		(var torpProtection:number = "durabilityTTX ? durabilityTTX.ptz.value : 0")
 
 		(var healthComponent:gfx = "_avatarEntity && _avatarEntity.hasComponent(CC.health) ? _avatarEntity.health : null" (event "_avatarEntity.evAdded") (event "_avatarEntity.evRemoved"))
-		(var maxHealth:number = "healthComponent && healthComponent.max ? healthComponent.max : ttxMaxHealth" (event "healthComponent.evMaxChanged"))
-		(var isAlive:number = "healthComponent ? healthComponent.isAlive : false" (event "healthComponent.evIsAliveChanged"))
-		(var currentHealth:number = "healthComponent ? healthComponent.value * isAlive : maxHealth" (event "healthComponent.evValueChanged"))
+		(var maxValue:number = "healthComponent ? healthComponent.max : 0" (event "healthComponent.evMaxChanged"))
+		(var maxHealth:number = "maxValue ? maxValue : ttxMaxHealth")
+		(var isAlive:number = "healthComponent ? healthComponent.isAlive : 0" (event "healthComponent.evIsAliveChanged"))
+		(var healthValue:number = "healthComponent ? healthComponent.value : 0" (event "healthComponent.evValueChanged"))
+		(var currentHealth:number = "healthValue == 0 && isAlive ? maxHealth : healthValue * isAlive")
 
 		(var healthPercent:number = "maxHealth ? currentHealth / maxHealth : 1")
 	)
