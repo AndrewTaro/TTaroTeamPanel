@@ -1063,7 +1063,8 @@
 
 		(var _markerEntity:gfx = "_entity")
 		(macro GET_MARKER_ENTITY_COMPONENT 'data')
-		(var consData:array = "dataComponent ? dataComponent.data.consMonitor : []" (event "dataComponent.evChanged"))
+		(var consData:gfx = "dataComponent ? dataComponent.data : null" (event "dataComponent.evChanged"))
+		(var consumables:array = "consData && null != consData.consMonitor ? consData.consMonitor : []")
 
 		(macro GET_MARKER_ENTITY_COMPONENT 'vehicle')
 		(var isShipVisible:bool = "vehicleComponent ? vehicleComponent : false")
@@ -1082,10 +1083,10 @@
 	(bind visible "isEnabled")
 
 	(controller $Repeat renderer='TP_SpecialConsumableRendererItem'
-		(bind enabled "isEnabled && consData.length > 0")
-		(bind count "consData.length")
+		(bind enabled "isEnabled && consumables.length > 0")
+		(bind count "consumables.length")
 		(args
-			_consData = "consData[$index]"
+			_consData = "consumables[$index]"
 		)
 	)
 )
