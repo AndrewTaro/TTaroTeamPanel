@@ -894,7 +894,7 @@
 		(var isAlive:bool = "healthComponent ? healthComponent.isAlive : false" (event "healthComponent.evIsAliveChanged"))
 		(var healthValue:number = "healthComponent ? healthComponent.value : 0" (event "healthComponent.evValueChanged"))
 		(var healthMax:number = "healthComponent ? healthComponent.max : 0" (event "healthComponent.evMaxChanged"))
-		(var healthRatio:number = "(isAlive && healthValue == 0) || (healthMax == 0) 
+		(var healthRatio:number = "(healthValue == 0) || (healthMax == 0) 
 										? 1
 										: healthValue / healthMax"
 		)
