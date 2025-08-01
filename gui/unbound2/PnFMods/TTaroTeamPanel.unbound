@@ -145,6 +145,8 @@
 		(macro TT_GET_PREF_NUMBER _varName="'posYModifier'" _pref="TP_PREFS.POS_OFFSET_MODIFIER")
 		(macro TT_GET_PREF_BOOL _varName="'isBlurMode'" _pref="TP_PREFS.BACKGROUND.MODE")
 
+		(macro IS_SPECTATOR_MODE)
+
 		(macro TT_GET_PREF_BOOL _varName="'isVisibleOnlyOnAlt'" _pref="TP_PREFS.ALL_ALT_VISIBLE")
 		(var camera:gfx = "$datahub.getSingleComponent(CC.camera)")
 		(var altVision:bool = "camera ? camera.altVision : false" (event "camera.evAltVisionChanged"))
@@ -160,6 +162,8 @@
 		(bind width "stageWidth")
 		(bind height "stageHeight")
 	)
+	(bind visible "!isSpectatorTrainingMode")
+
 	(controller $Instance renderer='DeclareBlurLayer'
 		(bind enabled "isBlurMode")
 		(exprs
