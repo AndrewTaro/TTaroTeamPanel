@@ -262,7 +262,7 @@
 		(element TP_PlayerDivisionItem 		_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
 		(element TP_PlayerInfoItem 			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
 		(element TP_PlayerClanIconItem 		_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
-		(element TP_ShipWeightItem 			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum" $enabled="MOD_TOURNAMENT_SHIPWEIGHT_DATA") #For tournament
+		(element TP_ShipWeightItem 			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum") #For tournament
 		(element TP_ShipNationItem 			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
 		(element TP_ShipTierItem 			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
 		(element TP_ShipIconItem 			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
@@ -444,7 +444,7 @@
 			(element TP_PlayerDivisionItem 		_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
 			(element TP_PlayerInfoItem 			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
 			(element TP_PlayerClanIconItem 		_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
-			(element TP_ShipWeightItem 			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum" $enabled="MOD_TOURNAMENT_SHIPWEIGHT_DATA") #For tournament
+			(element TP_ShipWeightItem 			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum") #For tournament
 			(element TP_ShipNationItem 			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
 			(element TP_ShipTierItem 			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
 			(element TP_ShipIconItem 			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
@@ -728,14 +728,19 @@
 (def element TP_ShipWeightItem(_entity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
 	(scope
 		(var shipEntity:gfx = "_entity ? _entity.avatar.ship.ref.ship : null" (event "_entity.avatar.evShipRefChanged"))
-		(var shipId:str = "shipEntity ? toString(shipEntity.id) : ''") #uint long
+		(var shipId:str = "shipEntity ? toString(shipEntity.id) : ''") # uint long
 
-		(var shipWeightData:dict = "shipId in MOD_TOURNAMENT_SHIPWEIGHT_DATA ? MOD_TOURNAMENT_SHIPWEIGHT_DATA[shipId] : {}")
+		(var swEntityWatcher:gfx = "$datahub.getPrimWatcher(CC.mods_DataComponent, 'modTournamentShipWeight_' + shipId)")
+		(var swEntity:gfx = "swEntityWatcher.entity" (event "swEntityWatcher.event"))
+		(var shipWeightData:dict = "swEntity ? swEntity.mods_DataComponent.data : {}" (event "swEntity.mods_DataComponent.evDataChanged"))
+		
+		(var weight:number = "'weight' in shipWeightData ? shipWeightData.weight : 0")
+		(var weightText:str = "_entity ? weight > 0 : ''")
 
-		# Weight
-		(var weight:number = "'WEIGHT' in shipWeightData ? shipWeightData.WEIGHT : 0")
-		(var weightText:str = "_entity ? weight : ''")
+		(var tournamentEntityWatcher:gfx = "$datahub.getPrimWatcher(CC.mods_DataComponent, 'modTournamentMode')")
+		(var tournamentModeEntity:gfx = "tournamentEntityWatcher.entity" (event "tournamentEntityWatcher.event"))
 	)
+	(bind visible "null != tournamentModeEntity")
 	(style
 		(width = 20px)
 		(align = "center")
@@ -923,11 +928,10 @@
 		(var shipEntity:gfx = "avatarComponent ? avatarComponent.ship.ref.ship : null" (event "avatarComponent.evShipRefChanged"))
 		(var shipId:str = "shipEntity ? toString(shipEntity.id) : ''")
 
-		(var shipWeights:dict = "{}" watch=false)
-		(bind shipWeights "MOD_TOURNAMENT_SHIPWEIGHT_DATA" $enabled="MOD_TOURNAMENT_SHIPWEIGHT_DATA") # Error supression
-		(var shipWeightData:dict = "shipId in shipWeights ? shipWeights[shipId] : {}")
-
-		(var isFlagShip:bool = "'FLAGSHIP' in shipWeightData ? shipWeightData.FLAGSHIP : false")
+		(var swEntityWatcher:gfx = "$datahub.getPrimWatcher(CC.mods_DataComponent, 'modTournamentShipWeight_' + shipId)")
+		(var swEntity:gfx = "swEntityWatcher.entity" (event "swEntityWatcher.event"))
+		(var shipWeightData:dict = "swEntity ? swEntity.mods_DataComponent.data : {}" (event "swEntity.mods_DataComponent.evDataChanged"))
+		(var isFlagShip:bool = "'isFlagship' in shipWeightData ? shipWeightData.isFlagship : false")
 		(var flagShipColorKey:str = "isAlly ? 'ally' : 'enemy'")
 
 		# Ship Restrictions
