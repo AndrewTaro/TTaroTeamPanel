@@ -735,7 +735,10 @@
 		(var shipWeightData:dict = "swEntity ? swEntity.mods_DataComponent.data : {}" (event "swEntity.mods_DataComponent.evDataChanged"))
 		
 		(var weight:number = "'weight' in shipWeightData ? shipWeightData.weight : 0")
-		(var weightText:str = "_entity && weight > 0 ? weight : '--'")
+		(var weightText:str = "weight > 0	? weight
+											: _entity	? '--'
+														: ''
+		")
 
 		(var tournamentEntityWatcher:gfx = "$datahub.getPrimWatcher(CC.mods_DataComponent, 'modTournamentMode')")
 		(var tournamentModeEntity:gfx = "tournamentEntityWatcher.entity" (event "tournamentEntityWatcher.event"))
