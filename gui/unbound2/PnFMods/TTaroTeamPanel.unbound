@@ -126,6 +126,19 @@
 	{renderer: 'TP_ShipConfigSubmarineConsumableItem',	prefSubKey: 'SUB_CONSUMABLE',		headerImage: 'url:../battle_hud/icon_frag/icon_frag_wave.png',				headerTitle: 'IDS_TITLE_CONSUMABLES',		headerDescriptions: ['IDS_DOCK_CONSUME_TITLE_PCY045_HYDROPHONE','IDS_DOCK_CONSUME_TITLE_PCY048_SUBMARINELOCATOR'], headerImageAlpha: 0.7},
 ])
 
+(def constant TP_PLAYERINFO_RENDERER_SETTINGS [
+	{renderer: 'TP_PlayerDivisionItem',					prefKey: ''},
+	{renderer: 'TP_PlayerInfoItem',						prefKey: ''},
+	{renderer: 'TP_PlayerClanIconItem',					prefKey: 'CLAN_ICON'},
+	{renderer: 'TP_ShipWeightItem',						prefKey: ''},
+	{renderer: 'TP_ShipNationItem',						prefKey: 'SHIP_NATION'},
+	{renderer: 'TP_ShipTierItem',						prefKey: 'SHIP_TIER'},
+	{renderer: 'TP_ShipIconItem',						prefKey: 'SHIP_ICON'},
+	{renderer: 'TP_ShipDetectionItem',					prefKey: ''}, # So it can still display correct detection status even when the setting is turned on during a battle
+	{renderer: 'TP_PlayerKillCountItem',				prefKey: 'KILL_COUNT'},
+
+])
+
 (def css $TP_ShipConfigText()
 	(extends $TextDefault13NM)
 	(extends $FontEnableReadability)
@@ -246,7 +259,7 @@
 (def element TP_HeaderItem (_isAlly:bool=false, _userPrefsNum:gfx=null)
 	(scope
 		# To suppress error
-		(var _entity:gfx = "null")
+		(var _markerEntity:gfx = "null")
 	)
 	(style
 		(bind flow "_isAlly ? Flow.HORIZONTAL : Flow.REVERSE_HORIZONTAL")
@@ -259,22 +272,17 @@
 		(style
 			(bind flow "_isAlly ? Flow.HORIZONTAL : Flow.REVERSE_HORIZONTAL")
 		)
-		(element TP_PlayerDivisionItem 		_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
-		(element TP_PlayerInfoItem 			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
-		(element TP_PlayerClanIconItem 		_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
-		(element TP_ShipWeightItem 			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum") #For tournament
-		(element TP_ShipNationItem 			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
-		(element TP_ShipTierItem 			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
-		(element TP_ShipIconItem 			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
-		(element TP_ShipDetectionItem		_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
-		(element TP_PlayerKillCountItem 	_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
+
+		(controller $Repeat renderer='TP_PlayerInfoRendererItem' count="TP_PLAYERINFO_RENDERER_SETTINGS.length"
+			(args
+				_markerEntity	= "_markerEntity"
+				_isAlly			= "_isAlly"
+				_userPrefsNum	= "_userPrefsNum"
+			)
+		)
 	)
 	#
 
-	# TODO
-	# I really should move all these strings to constant
-	# Maybe repace with repeat as well
-	#
 	(block
 		(style
 			(bind flow "_isAlly ? Flow.HORIZONTAL : Flow.REVERSE_HORIZONTAL")
@@ -324,16 +332,19 @@
 		(event evMouseOver)
 		(event evMouseOut)
 
-		(var _entity:gfx = "_items[$index]" watch=false)
-		(var _index:number = "indexOf(_entity, _items)")
-		(var healthComponent:gfx = "_entity.hasComponent(CC.health) ? _entity.health : null" (event "_entity.evAdded")(event "_entity.evRemoved"))
+		(var _markerEntity:gfx = "_items[$index]" watch=false)
+		(var _index:number = "indexOf(_markerEntity, _items)")
+
+		# Health
+		(macro GET_MARKER_ENTITY_COMPONENT 'health')
 		(var isAlive:bool = "healthComponent ? healthComponent.isAlive : false" (event "healthComponent.evIsAliveChanged"))
-		#For tooltip
+
+		# For tooltip
 		(event evHideInfotip)
-		(event evMenuItemClicked) #maybe unnecessary?
+		(event evMenuItemClicked) # maybe unnecessary?
 		(var selfPlayer:gfx = "$datahub.getSingleEntity(CC.playerAvatar)")
-		(var isSelf:bool = "selfPlayer.id == _entity.id")
-		(var isBot:bool = "_entity && _entity.avatar.isBot")
+		(var isSelf:bool = "selfPlayer.id == _markerEntity.id")
+		(var isBot:bool = "_markerEntity && _markerEntity.avatar.isBot")
 		(var isContextMenuAvailable:bool = "!(isSelf || isBot)")
 		(var mouse:gfx = "$datahub.getSingleComponent(CC.mouse)")
 		(var isMouseActive:bool = "mouse.active" (event "mouse.evActiveChanged"))
@@ -432,7 +443,7 @@
 			)
 		)
 
-		(element TP_ShipHealthBarItem _entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
+		(element TP_ShipHealthBarItem _markerEntity="_markerEntity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
 
 		(hblock
 			(style
@@ -441,31 +452,31 @@
 				(bind flow "_isAlly ? Flow.HORIZONTAL : Flow.REVERSE_HORIZONTAL")
 				(hitTest = false)
 			)
-			(element TP_PlayerDivisionItem 		_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
-			(element TP_PlayerInfoItem 			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
-			(element TP_PlayerClanIconItem 		_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
-			(element TP_ShipWeightItem 			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum") #For tournament
-			(element TP_ShipNationItem 			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
-			(element TP_ShipTierItem 			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
-			(element TP_ShipIconItem 			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
-			(element TP_ShipDetectionItem		_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
-			(element TP_PlayerKillCountItem 	_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
-			(element TP_ShipConfigurationsItem 	_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
-			(element TP_ShipConsumablesItem		_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum" $enabled="TT_CONSUMABLESMONITOR_INSTALLED")
-			(element TP_ShipDamageItem			_entity="_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum" $enabled="TT_DAMAGEMONITOR_INSTALLED")
+
+			(controller $Repeat renderer='TP_PlayerInfoRendererItem' count="TP_PLAYERINFO_RENDERER_SETTINGS.length"
+				(args
+					_markerEntity	= "_markerEntity"
+					_isAlly			= "_isAlly"
+					_userPrefsNum	= "_userPrefsNum"
+				)
+			)
+
+			(element TP_ShipConfigurationsItem 	_markerEntity="_markerEntity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
+			(element TP_ShipConsumablesItem		_markerEntity="_markerEntity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum" $enabled="TT_CONSUMABLESMONITOR_INSTALLED")
+			(element TP_ShipDamageItem			_markerEntity="_markerEntity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum" $enabled="TT_DAMAGEMONITOR_INSTALLED")
 		)
 
 		# Tooltip for Detailed Ship Stats
 		(controller $Tooltip
 			(renderer = 'TP_TooltipShipConfigurationsItem')
-			(args "_entity" _userPrefsNum="_userPrefsNum")
+			(args "_markerEntity" _userPrefsNum="_userPrefsNum")
 			(macro TP_TOOLTIP_BEHAVIOUR "_isAlly")
 		)
 
 		# Context Menu for Report/Compliment/Division
 		(controller $Tooltip (renderer = 'ContextMenuPlayer')
 			(bind enabled "isContextMenuAvailable")
-			(args _playerEntity="_entity" _selfPlayer="selfPlayer")
+			(args _playerEntity="_markerEntity" _selfPlayer="selfPlayer")
 			(macro DEFAULT_MENU_BEHAVIOUR "evHideInfotip" "1")
 			(cache=false)
 		)
@@ -474,8 +485,25 @@
 	(element TP_HorizontalDividerTwoPx)
 )
 
+(def element TP_PlayerInfoRendererItem(_markerEntity:gfx, _isAlly:bool=false, _userPrefsNum:gfx=null)
+	(scope
+		(var settings:dict = "TP_PLAYERINFO_RENDERER_SETTINGS[$index]")
+		(var pref:dict = "settings.prefKey in TP_PREFS ? TP_PREFS[settings.prefKey] : null")
+		(macro TT_GET_NULLABLE_PREF_BOOL	_varName="'isEnabled'"	_nullablePref="pref"	_default="true")
+	)
+	(controller $Instance
+		(bind enabled "isEnabled")
+		(bind renderer "settings.renderer")
+		(args
+			_markerEntity	= "_markerEntity"
+			_isAlly			= "_isAlly"
+			_userPrefsNum	= "_userPrefsNum"
+		)
+	)
+)
+
 # Player Info
-(def element TP_PlayerInfoItem (_entity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
+(def element TP_PlayerInfoItem (_markerEntity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
 	(scope
 		#bar width
 		(macro TT_GET_PREF_NUMBER _varName="'widthScale'" _pref="TP_PREFS.HEALTHBAR_WIDTH")
@@ -496,14 +524,15 @@
 			(width = 100%)
 			(vgap = 2px)
 		)
-		(element TP_PlayerNameWithTagItem 	"_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
-		(element TP_ShipNameItem 			"_entity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
+		(element TP_PlayerNameWithTagItem 	"_markerEntity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
+		(element TP_ShipNameItem 			"_markerEntity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
 	)
 )
 
-(def element TP_PlayerDivisionItem (_entity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
+(def element TP_PlayerDivisionItem (_markerEntity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
 	(scope
-		(var divisionMemberComponent:gfx = "_entity && _entity.hasComponent(CC.divisionMember) ? _entity.divisionMember : null" (event "_entity.evAdded")(event "_entity.evRemoved"))
+		(macro GET_MARKER_ENTITY_COMPONENT 'divisionMember')
+
 		(var divisionSign:number = "divisionMemberComponent ? divisionMemberComponent.divisionSign : null" (event "divisionMemberComponent.evDivisionChanged"))
 		(var isInSameDivision:bool = "divisionMemberComponent ? divisionMemberComponent.isInSameDivision : false" (event "divisionMemberComponent.evDivisionChanged"))
 		(var division:number = "divisionMemberComponent ? divisionMemberComponent.division : 0" (event "divisionMemberComponent.evDivisionChanged"))
@@ -511,10 +540,10 @@
 		(var isDivisionHidden:bool = "divisionMemberComponent ? divisionMemberComponent.divisionHidden : false" (event "divisionMemberComponent.evDivisionHiddenChanged"))
 		(var divisionIconIndex:number = "isInSameDivision ? (divisionSign + 1) : (divisionSign + 1 + 10)")
 
-		(var contactComponent:gfx = "_entity && _entity.hasComponent(CC.contact) ? _entity.contact : null" (event "_entity.evAdded")(event "_entity.evRemoved"))
+		(macro GET_MARKER_ENTITY_COMPONENT 'contact')
 		(var isIgnored:bool = "contactComponent ? contactComponent.isIgnored : false" (event "contactComponent.evIsIgnoredChanged"))
 
-		(var avatarComponent:gfx = "_entity ? _entity.avatar : null")
+		(var avatarComponent:gfx = "_markerEntity ? _markerEntity.avatar : null")
 		(var isMuted:bool = "avatarComponent ? avatarComponent.mute : false" (event "avatarComponent.evMuteChanged"))
 
 		(var isTextChatMuted:bool = "isMuted || isIgnored")
@@ -546,9 +575,9 @@
 	)
 )
 
-(def element TP_PlayerClanIconItem (_entity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
+(def element TP_PlayerClanIconItem (_markerEntity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
 	(scope
-		(var clanComponent:gfx = "_entity && _entity.hasComponent(CC.clanman) ? _entity.clanman : null")
+		(var clanComponent:gfx = "_markerEntity && _markerEntity.hasComponent(CC.clanman) ? _markerEntity.clanman : null")
 		(var clanId:number = "clanComponent ? clanComponent.clanId : null" (event "clanComponent.evClanIdChanged"))
 		(var clanEntity:gfx = "$datahub.getPrimaryEntity(CC.clan, clanId)")
 		(var clanName:str = "clanEntity ? clanEntity.clan.tag : null" (event "clanEntity.clan.evTagChanged"))
@@ -569,20 +598,15 @@
 	)
 )
 
-(def element TP_PlayerNameWithTagItem (_entity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
+(def element TP_PlayerNameWithTagItem (_markerEntity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
 	(scope
-		(macro TT_GET_PREF_BOOL _varName="'isClanNameVisible'" _pref="TP_PREFS.CLAN_NAME")
-		(var isInClan:bool = "_entity ? _entity.hasComponent(CC.clanman) : false")
-		(var clanComponent:gfx = "isInClan ? _entity.clanman : null")
-		(var clanId:number = "clanComponent ? clanComponent.clanId : null" (event "clanComponent.evClanIdChanged"))
-		(var clanEntity:gfx = "$datahub.getPrimaryEntity(CC.clan, clanId)")
-		(var clanName:str = "clanEntity ? clanEntity.clan.tag : null" (event "clanEntity.clan.evTagChanged"))
-		(var clanNameWithBrackets:str = "isInClan && isClanNameVisible ? '[' + clanName + ']' : ''")
-
 		(macro TT_GET_PREF_BOOL _varName="'isPlayerNameVisible'" _pref="TP_PREFS.PLAYER_NAME")
-		(var pureName:str = "(isPlayerNameVisible && _entity) ? _entity.avatar.pureName : ' '")
+		(macro TT_GET_PREF_BOOL _varName="'isClanNameVisible'" _pref="TP_PREFS.CLAN_NAME")
 
-		(macro TP_GET_MARKER_DATA "_entity")
+		(macro TP_GET_MARKER_DATA)
+		(var playerName:str = "avatarComponent.isBot || isClanNameVisible ? avatarComponent.name
+																		  : avatarComponent.pureName
+		")
 
 		(var colorClass:str = "isGolden ? '$FontColorGolden' : '$FontColorWhite' ")
 		(var fontColor:number = "FONT_CLASS_TO_COLOR[colorClass]")
@@ -593,7 +617,7 @@
 		(bind align "_isAlly ? left|middle : right|middle")
 	)
 
-	(bind visible "isClanNameVisible || isPlayerNameVisible")
+	(bind visible "isPlayerNameVisible && _markerEntity")
 
 	(tf
 		(class $TextDefault13NM)
@@ -605,13 +629,13 @@
 			(bind textColor "fontColor")
 			(bind textAlign "_isAlly ? left : right")
 		)
-		(bind text "clanNameWithBrackets + pureName")
+		(bind text "playerName")
 	)
 )
 
-(def element TP_PlayerKillCountItem (_entity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
+(def element TP_PlayerKillCountItem (_markerEntity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
 	(scope
-		(var killCount:number = "_entity ? _entity.avatar.frags : 0" (event "_entity.avatar.evFragsChanged"))
+		(var killCount:number = "_markerEntity ? _markerEntity.avatar.frags : 0" (event "_markerEntity.avatar.evFragsChanged"))
 		(macro TT_GET_PREF_BOOL _varName="'isPlayerKillCountVisible'" _pref="TP_PREFS.KILL_COUNT")
 	)
 	(style
@@ -627,9 +651,9 @@
 )
 
 # Ship Info
-(def element TP_ShipIconItem(_entity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
+(def element TP_ShipIconItem(_markerEntity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
 	(scope
-		(macro TP_GET_MARKER_DATA "_entity")
+		(macro TP_GET_MARKER_DATA)
 		(macro TT_GET_PREF_BOOL _varName="'isShipIconStatusColor'" _pref="TP_PREFS.SHIP_ICON_STATUS")
 		(var isIconGolden:bool = "isGolden && isShipIconStatusColor")
 		(var isIconTkStatus:bool = "tkStatus && isShipIconStatusColor")
@@ -671,11 +695,11 @@
 	)
 )
 
-(def element TP_ShipNameItem(_entity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
+(def element TP_ShipNameItem(_markerEntity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
 	(scope
-		(var shipEntity:gfx = "_entity ? _entity.avatar.ship.ref.ship : null" (event "_entity.avatar.evShipRefChanged"))
+		(var shipEntity:gfx = "_markerEntity ? _markerEntity.avatar.ship.ref.ship : null" (event "_markerEntity.avatar.evShipRefChanged"))
 		(var shipName:str = "shipEntity ? tr(shipEntity.nameIDS) : ''") #IDS_PASB518
-		(macro TP_GET_ISAFK _entity="_entity")
+		(macro TP_GET_ISAFK _markerEntity="_markerEntity")
 		(macro TT_GET_PREF_BOOL _varName="'isShipNameVisible'" _pref="TP_PREFS.SHIP_NAME")
 		
 		(var colorClass:str = "	isAFK		? '$FontColorOrange' :
@@ -705,9 +729,9 @@
 	)
 )
 
-(def element TP_ShipNationItem(_entity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
+(def element TP_ShipNationItem(_markerEntity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
 	(scope
-		(var shipEntity:gfx = "_entity ? _entity.avatar.ship.ref.ship : null" (event "_entity.avatar.evShipRefChanged"))
+		(var shipEntity:gfx = "_markerEntity ? _markerEntity.avatar.ship.ref.ship : null" (event "_markerEntity.avatar.evShipRefChanged"))
 		(var flagName:str = "shipEntity ? shipEntity.flagName : ''") #IDS_PASB518
 		(macro TT_GET_PREF_BOOL _varName="'isShipNationVisible'" _pref="TP_PREFS.SHIP_NATION")
 	)
@@ -725,9 +749,9 @@
 )
 
 # For Tournamnet
-(def element TP_ShipWeightItem(_entity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
+(def element TP_ShipWeightItem(_markerEntity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
 	(scope
-		(var shipEntity:gfx = "_entity ? _entity.avatar.ship.ref.ship : null" (event "_entity.avatar.evShipRefChanged"))
+		(var shipEntity:gfx = "_markerEntity ? _markerEntity.avatar.ship.ref.ship : null" (event "_markerEntity.avatar.evShipRefChanged"))
 		(var shipId:str = "shipEntity ? toString(shipEntity.id) : ''") # uint long
 
 		(var swEntityWatcher:gfx = "$datahub.getPrimWatcher(CC.mods_DataComponent, 'modTournamentShipWeight_' + shipId)")
@@ -736,7 +760,7 @@
 		
 		(var weight:number = "'weight' in shipWeightData ? shipWeightData.weight : 0")
 		(var weightText:str = "weight > 0	? weight
-											: _entity	? '--'
+											: _markerEntity	? '--'
 														: ''
 		")
 
@@ -755,11 +779,11 @@
 	)
 )
 
-(def element TP_ShipDamageItem(_entity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
+(def element TP_ShipDamageItem(_markerEntity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
 	(scope
 		(event evShow)
 
-		(var avatarId:str = "_entity ? _entity.avatar.id : 0")
+		(var avatarId:str = "_markerEntity ? _markerEntity.avatar.id : 0")
 
 		(macro IS_SPECTATOR_MODE)
 
@@ -806,9 +830,9 @@
 )
 #
 
-(def element TP_ShipTierItem(_entity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
+(def element TP_ShipTierItem(_markerEntity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
 	(scope
-		(var shipEntity:gfx = "_entity ? _entity.avatar.ship.ref.ship : null" (event "_entity.avatar.evShipRefChanged"))
+		(var shipEntity:gfx = "_markerEntity ? _markerEntity.avatar.ship.ref.ship : null" (event "_markerEntity.avatar.evShipRefChanged"))
 		(var levelRome:str = "shipEntity ? shipEntity.levelRome : ''") #IDS_PASB518
 		(macro TT_GET_PREF_BOOL _varName="'isShipTierVisible'" _pref="TP_PREFS.SHIP_TIER")
 		(macro TT_GET_PREF_BOOL _varName="'isPremiumHighlighted'" _pref="TP_PREFS.PREMIUM_TIER")
@@ -831,11 +855,9 @@
 	)
 )
 
-(def element TP_ShipDetectionItem(_entity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
+(def element TP_ShipDetectionItem(_markerEntity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
 	(scope
 		# I should really rewrite this section because it's so dented
-
-		(var _markerEntity:gfx = "_entity")
 
 		#map visible		
 		(macro GET_MARKER_ENTITY_COMPONENT 'visibility')
@@ -873,7 +895,7 @@
 	)
 	(style
 		(align = "center|middle")
-		(bind alpha "_entity ? 1.0 : 0.0")
+		(bind alpha "_markerEntity ? 1.0 : 0.0")
 		(width = "14")
 	)
 	(bind visible "isShipDetectionVisible")
@@ -888,11 +910,8 @@
 	)
 )
 
-(def element TP_ShipHealthBarItem(_entity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
+(def element TP_ShipHealthBarItem(_markerEntity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
 	(scope
-		# Entity
-		(var _markerEntity:gfx = "_entity")
-
 		# Multi Teams
 		(var customElementsVisibilityComponent:gfx = "$datahub.getSingleEntity(CC.customElementsVisibility)")
 		(var enabledElements:number = "customElementsVisibilityComponent ? customElementsVisibilityComponent.customElementsVisibility.enabledElements : null" (event "customElementsVisibilityComponent.customElementsVisibility.evChanged"))
@@ -1065,11 +1084,9 @@
 )
 
 # Active Consumables Info: wip
-(def element TP_ShipConsumablesItem(_entity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
+(def element TP_ShipConsumablesItem(_markerEntity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
 	(scope
 		(macro TT_GET_PREF_BOOL _varName="'isTeamConsumableVisible'" _pref="TP_PREFS.TEAM_CONSUMABLES")
-
-		(var _markerEntity:gfx = "_entity")
 		(macro GET_MARKER_ENTITY_COMPONENT 'data')
 		(var consData:gfx = "dataComponent ? dataComponent.data : null" (event "dataComponent.evChanged"))
 		(var consumables:array = "consData && null != consData.consMonitor ? consData.consMonitor : []")
@@ -1121,9 +1138,9 @@
 #--------------------------------------------------------------------------------
 # TTXs
 #--------------------------------------------------------------------------------
-(def element TP_ShipConfigurationsItem(_entity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
+(def element TP_ShipConfigurationsItem(_markerEntity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
 	(scope
-		(var avatarId:number = "_entity ? _entity.avatar.id : 0")
+		(var avatarId:number = "_markerEntity ? _markerEntity.avatar.id : 0")
 
 		#Classic TTX
 		(var ttxCollection:gfx = "$datahub.getCollection(CC.mods_ShipParamsInBattle)")
@@ -1152,7 +1169,7 @@
 		(controller $Repeat renderer='TP_ShipConfigRendererItem' count="TP_SHIPCONFIG_RENDERER_SETTINGS.length"
 			(args
 				_shipTTX	  = "shipTTX"
-				_avatarEntity = "_entity"
+				_markerEntity = "_markerEntity"
 				_isRealParams = "isRealParams"
 				_userPrefsNum = "_userPrefsNum"
 			)
@@ -1160,7 +1177,7 @@
 	)
 )
 
-(def element TP_ShipConfigRendererItem(_shipTTX:gfx, _avatarEntity:gfx, _isRealParams:bool, _userPrefsNum:gfx=null)
+(def element TP_ShipConfigRendererItem(_shipTTX:gfx, _markerEntity:gfx, _isRealParams:bool, _userPrefsNum:gfx=null)
 	(scope
 		(var settings:dict = "TP_SHIPCONFIG_RENDERER_SETTINGS[$index]")
 
@@ -1181,7 +1198,7 @@
 		(bind enabled "isEnabled")
 		(args
 			_shipTTX	  = "_shipTTX"
-			_avatarEntity = "_avatarEntity"
+			_markerEntity = "_markerEntity"
 			_isRealParams = "_isRealParams"
 			_userPrefsNum = "_userPrefsNum"
 		)
@@ -1259,14 +1276,14 @@
 	(macro TP_SHIPCONFIG_TEXT_ITEM _value="subTorpedoAltRange"		_unit="'km'"	_isEnabled="subTorpedoAltRange")
 )
 
-(def element TP_ShipConfigAtbaItem(_shipTTX:gfx, _avatarEntity:gfx, _isRealParams:bool, _userPrefsNum:gfx=null)
+(def element TP_ShipConfigAtbaItem(_shipTTX:gfx, _markerEntity:gfx, _isRealParams:bool, _userPrefsNum:gfx=null)
 	(scope
 		(var artilleryTTX:gfx = "_shipTTX ? _shipTTX.artillery : null")
 		(var range:number = "artilleryTTX ? artilleryTTX.atbaMaxDist.value : null")
 		
 		#fix for skill---------------------
 		(var selfPlayer:gfx = "$datahub.getSingleEntity(CC.playerAvatar)")
-		(var avatarComponent:gfx = "_avatarEntity.avatar")
+		(var avatarComponent:gfx = "_markerEntity.avatar")
 
 		#shipId -> ownShip (ship in port) -> crewId (crew on board) -> crewSkill (check crew has skill)
 		(var isSelf:bool = "selfPlayer ? selfPlayer.avatar.id == avatarComponent.id : false")
@@ -1359,11 +1376,11 @@
 	(macro TP_SHIPCONFIG_TEXT_ITEM _value="underwaterSpeed"	_unit="'kts'"	_isEnabled="isUnderwaterMobilityVisible && underwaterSpeed")
 )
 
-(def element TP_ShipConfigVisibilityItem(_shipTTX:gfx, _avatarEntity:gfx, _isRealParams:bool, _userPrefsNum:gfx=null)
+(def element TP_ShipConfigVisibilityItem(_shipTTX:gfx, _markerEntity:gfx, _isRealParams:bool, _userPrefsNum:gfx=null)
 	(scope
 		#fix for skill---------------------
 		(var selfPlayer:gfx = "$datahub.getSingleEntity(CC.playerAvatar)")
-		(var avatarComponent:gfx = "_avatarEntity.avatar")
+		(var avatarComponent:gfx = "_markerEntity.avatar")
 
 		#shipId -> ownShip (ship in port) -> crewId (crew on board) -> crewSkill (check crew has skill)
 		(var isSelf:bool = "selfPlayer ? selfPlayer.avatar.id == avatarComponent.id : false")
@@ -1402,9 +1419,9 @@
 	(macro TP_SHIPCONFIG_TEXT_ITEM _value="modifiedVisibilityByPlane"	_unit="'km'"	_isEnabled="isVisibilityByPlaneVisible")
 )
 
-(def element TP_ShipConfigSurfaceConsumableItem(_shipTTX:gfx, _avatarEntity:gfx, _userPrefsNum:gfx=null)
+(def element TP_ShipConfigSurfaceConsumableItem(_shipTTX:gfx, _markerEntity:gfx, _userPrefsNum:gfx=null)
 	(scope
-		(var avatarId:str = "_avatarEntity ? toString(_avatarEntity.avatar.id) : ''")
+		(var avatarId:str = "_markerEntity ? toString(_markerEntity.avatar.id) : ''")
 		(var consumableEntityWatcher:gfx = "$datahub.getPrimWatcher(CC.mods_DataComponent, TP_COMPONENT_KEY_CONSUMABLE_RANGES)")
 		(var consumableEntity:gfx = "consumableEntityWatcher.entity" (event "consumableEntityWatcher.event"))
 		(var consumableDataComponent:gfx = "consumableEntity ? consumableEntity.mods_DataComponent : null" (event "consumableEntity.evAdded"))
@@ -1421,9 +1438,9 @@
 	(macro TP_SHIPCONFIG_TEXT_ITEM _value="radarRange"	_unit="'km'"	_isEnabled="isRadarRangeVisible")
 )
 
-(def element TP_ShipConfigSubmarineConsumableItem(_shipTTX:gfx, _avatarEntity:gfx, _userPrefsNum:gfx=null)
+(def element TP_ShipConfigSubmarineConsumableItem(_shipTTX:gfx, _markerEntity:gfx, _userPrefsNum:gfx=null)
 	(scope
-		(var avatarId:str = "_avatarEntity ? toString(_avatarEntity.avatar.id) : ''")
+		(var avatarId:str = "_markerEntity ? toString(_markerEntity.avatar.id) : ''")
 		(var consumableEntityWatcher:gfx = "$datahub.getPrimWatcher(CC.mods_DataComponent, TP_COMPONENT_KEY_CONSUMABLE_RANGES)")
 		(var consumableEntity:gfx = "consumableEntityWatcher.entity" (event "consumableEntityWatcher.event"))
 		(var consumableDataComponent:gfx = "consumableEntity ? consumableEntity.mods_DataComponent : null" (event "consumableEntity.evAdded"))
@@ -1576,10 +1593,11 @@
 	(extends $TextDefaultNM)
 )
 
-(def element TP_TooltipShipConfigurationsItem(_entity:gfx=null, _userPrefsNum:gfx=null)
+(def element TP_TooltipShipConfigurationsItem(_markerEntity:gfx=null, _userPrefsNum:gfx=null)
 	(scope
-		(var avatarId:number = "_entity ? _entity.avatar.id : 0")
-		(var isSelf:bool = "_entity ? _entity.hasComponent(CC.playerAvatar) : false" (event "_entity.evAdded")(event "_entity.evRemoved"))
+		(var avatarId:number = "_markerEntity ? _markerEntity.avatar.id : 0")
+		(macro GET_MARKER_ENTITY_COMPONENT 'relation')
+		(var isSelf:bool = "relationComponent && relationComponent.value == SC.Battle.PLAYER_RELATION.SELF" (event "relationComponent.evChanged"))
 
 		(macro IS_SPECTATOR_MODE)
 
@@ -1623,7 +1641,7 @@
 			(bind count "TP_TOOLTIP_SHIPCONFIG_RENDERER_SETTINGS.length")
 			(args
 				_shipTTX		= "shipTTX"
-				_avatarEntity	= "_entity"
+				_markerEntity	= "_markerEntity"
 				_isRealParams	= "isRealParams"
 				_userPrefsNum	= "_userPrefsNum"
 			)
@@ -1642,20 +1660,20 @@
 		(controller $Instance renderer='TP_BuildViewerItem'
 			(bind enabled "isBuildVisible")
 			(args
-				_entity			= "_entity"
+				_markerEntity			= "_markerEntity"
 				_userPrefsNum	= "_userPrefsNum"
 			)
 		)
 		(controller $Instance renderer='TP_DamageMonitorItem'
 			(bind enabled "isDamageVisible")
-			(args _entity = "_entity")
+			(args _markerEntity = "_markerEntity")
 		)
 	)
 )
 
-(def element TP_BuildViewerItem(_entity:gfx, _userPrefsNum:gfx=null)
+(def element TP_BuildViewerItem(_markerEntity:gfx, _userPrefsNum:gfx=null)
 	(scope
-		(var vehicleId:str = "_entity && _entity.hasComponent(CC.vehicleInfo) ? toString(_entity.vehicleInfo.id) : ''" (event "_entity.evAdded"))
+		(var vehicleId:str = "_markerEntity && _markerEntity.hasComponent(CC.vehicleInfo) ? toString(_markerEntity.vehicleInfo.id) : ''" (event "_markerEntity.evAdded"))
 	)
 	(style
 		(align = "middle|center")
@@ -1663,9 +1681,9 @@
 	(element BV_BuildPanelElement _vehicleId="vehicleId")
 )
 
-(def element TP_DamageMonitorItem(_entity:gfx)
+(def element TP_DamageMonitorItem(_markerEntity:gfx)
 	(scope
-		(var avatarId:str = "_entity ? _entity.avatar.id : ''")
+		(var avatarId:str = "_markerEntity ? _markerEntity.avatar.id : ''")
 	)
 	(style
 		(align = "middle|center")
@@ -1673,7 +1691,7 @@
 	(element DMonitor_DamagePanelElement _targetAvatarId="avatarId")
 )
 
-(def element TP_TooltipShipConfigRendererItem(_shipTTX:gfx, _avatarEntity:gfx, _isRealParams:bool, _userPrefsNum:gfx=null)
+(def element TP_TooltipShipConfigRendererItem(_shipTTX:gfx, _markerEntity:gfx, _isRealParams:bool, _userPrefsNum:gfx=null)
 	(scope
 		(var settings:dict = "TP_TOOLTIP_SHIPCONFIG_RENDERER_SETTINGS[$index]")
 		(var subAttr:str = "'ttxSubAttr' in settings ? settings.ttxSubAttr : null")
@@ -1699,20 +1717,20 @@
 		(bind enabled "isTTXAvailable")
 		(args
 			_shipTTX	  	= "_shipTTX"
-			_avatarEntity 	= "_avatarEntity"
+			_markerEntity 	= "_markerEntity"
 			_isRealParams 	= "_isRealParams"
 			_userPrefsNum 	= "_userPrefsNum"
 		)
 	)
 )
 
-(def element TP_TooltipHealthItem(_shipTTX:gfx, _avatarEntity:gfx, _userPrefsNum:gfx=null)
+(def element TP_TooltipHealthItem(_shipTTX:gfx, _markerEntity:gfx, _userPrefsNum:gfx=null)
 	(scope
 		(var durabilityTTX:gfx = "_shipTTX.durability")
 		(var ttxMaxHealth:number = "durabilityTTX ? durabilityTTX.health.value : 1")
 		(var torpProtection:number = "durabilityTTX ? durabilityTTX.ptz.value : 0")
 
-		(var healthComponent:gfx = "_avatarEntity && _avatarEntity.hasComponent(CC.health) ? _avatarEntity.health : null" (event "_avatarEntity.evAdded") (event "_avatarEntity.evRemoved"))
+		(macro GET_MARKER_ENTITY_COMPONENT 'health')
 		(var maxValue:number = "healthComponent ? healthComponent.max : 0" (event "healthComponent.evMaxChanged"))
 		(var maxHealth:number = "maxValue ? maxValue : ttxMaxHealth")
 		(var isAlive:number = "healthComponent ? healthComponent.isAlive : 0" (event "healthComponent.evIsAliveChanged"))
@@ -1894,7 +1912,7 @@
 	)
 )
 
-(def element TP_TooltipAtbaItem(_shipTTX:gfx, _avatarEntity:gfx, _isRealParams:bool, _userPrefsNum:gfx=null)
+(def element TP_TooltipAtbaItem(_shipTTX:gfx, _markerEntity:gfx, _isRealParams:bool, _userPrefsNum:gfx=null)
 	(scope
 		(var artilleryTTX:gfx = "_shipTTX.artillery")
 		(var atbaTTX:array = "artilleryTTX ? artilleryTTX.atba : []")
@@ -1903,7 +1921,7 @@
 
 		# Fix for skill---------------------
 		(var selfPlayer:gfx = "$datahub.getSingleEntity(CC.playerAvatar)")
-		(var avatarComponent:gfx = "_avatarEntity.avatar")
+		(var avatarComponent:gfx = "_markerEntity.avatar")
 
 		# shipId -> ownShip (ship in port) -> crewId (crew on board) -> crewSkill (check crew has skill)
 		(var isSelf:bool = "selfPlayer ? selfPlayer.avatar.id == avatarComponent.id : false")
@@ -2251,10 +2269,10 @@
 	)
 )
 
-(def element TP_TooltipVisibilityItem(_shipTTX:gfx, _avatarEntity:gfx, _isRealParams:bool, _userPrefsNum:gfx=null)
+(def element TP_TooltipVisibilityItem(_shipTTX:gfx, _markerEntity:gfx, _isRealParams:bool, _userPrefsNum:gfx=null)
 	(scope
 		#fix for skill---------------------
-		(var avatarComponent:gfx = "_avatarEntity ? _avatarEntity.avatar : null")
+		(var avatarComponent:gfx = "_markerEntity ? _markerEntity.avatar : null")
 		(var selfPlayer:gfx = "$datahub.getSingleEntity(CC.playerAvatar)")
 
 		#shipId -> ownShip (ship in port) -> crewId (crew on board) -> crewSkill (check crew has skill)
@@ -2457,12 +2475,12 @@
 	(var name="_varName" type=bool value="_prefValue == TP_DISPLAY_MODES.ADAPTIVE ? altVision : _prefValue")
 )
 
-(def macro TP_GET_ISAFK (_entity:expression)
+(def macro TP_GET_ISAFK (_markerEntity:expression)
 	# Returns isAFK:bool
 	#
 	# Entity
 	(macro IS_SPECTATOR_MODE)
-	(macro TP_GET_MARKER_DATA _entity="_entity")
+	(macro TP_GET_MARKER_DATA)
 	(var isBot:bool = "avatarComponent ? avatarComponent.isBot : true")
 	(var isLoadedInBattle:bool = "avatarComponent ? avatarComponent.isLoadedInBattle : true" (event "avatarComponent.evIsLoadedInBattleChanged"))
 	(var isAFK:bool = "isAlive && !isSpectatorTrainingMode && !isSelf && !isBot && !isLoadedInBattle")
@@ -2512,16 +2530,18 @@
 	)
 )
 
-(def macro TP_GET_MARKER_DATA (_entity:expression)
-	(var avatarComponent:gfx = "_entity ? _entity.avatar : null")
-	(var divisionMemberComponent:gfx = "_entity ? _entity.divisionMember : null")
+(def macro TP_GET_MARKER_DATA ()
+	# Require `_markerEntity:gfx` in the scope
+	(macro GET_MARKER_ENTITY_COMPONENT 'avatar')
+	(macro GET_MARKER_ENTITY_COMPONENT 'divisionMember')
+	(macro GET_MARKER_ENTITY_COMPONENT 'relation')
+	(macro GET_MARKER_ENTITY_COMPONENT 'health')
 	(var subType:str = "avatarComponent ? avatarComponent.shipType : ''" (event "avatarComponent.evShipTypeChanged"))
 	(var shipType:str = "toLower(subType)")
-	(var relationComponent:gfx = "_entity ? _entity.relation : null")
 	(var isSelf:bool = "relationComponent && relationComponent.value == SC.Battle.PLAYER_RELATION.SELF" (event "relationComponent.evChanged"))
 	(var isAlly:bool = "relationComponent && relationComponent.value == SC.Battle.PLAYER_RELATION.ALLY" (event "relationComponent.evChanged"))
 	(var isEnemy:bool = "relationComponent && relationComponent.value == SC.Battle.PLAYER_RELATION.ENEMY" (event "relationComponent.evChanged"))
-	(var isAlive:bool = "_entity && _entity.hasComponent(CC.health) && _entity.health.isAlive" (event "_entity.health.evIsAliveChanged") (event "_entity.evAdded") (event "_entity.evRemoved"))
+	(var isAlive:bool = "healthComponent && healthComponent.isAlive" (event "healthComponent.evIsAliveChanged"))
 	(var tkStatus:bool = "avatarComponent && avatarComponent.tkStatus" (event "avatarComponent.evTeamkillStatusChanged"))
 	(var isInSameDivision:bool = "divisionMemberComponent && divisionMemberComponent.isInSameDivision" (event "divisionMemberComponent.evDivisionChanged"))
 	(var isGolden:bool = "isInSameDivision || isSelf")
