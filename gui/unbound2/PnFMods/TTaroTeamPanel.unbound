@@ -51,12 +51,12 @@
 	},
 	# AutoSpy
 	{
-		Auxiliary:	{redOffset: -184, greenOffset: -134, blueOffset: -234, alphaOffset: -128},
-		AirCarrier:	{redOffset: -134, greenOffset: -134, blueOffset: -134, alphaOffset: -128},
-		Battleship:	{redOffset: -234, greenOffset: -184, blueOffset: -154, alphaOffset: -128},
-		Cruiser:	{redOffset: -89,  greenOffset: -159, blueOffset: -234, alphaOffset: -128},
-		Destroyer: 	{redOffset: -184, greenOffset: -134, blueOffset: -184, alphaOffset: -128},
-		Submarine:	{redOffset: -224, greenOffset: -224, blueOffset: -224, alphaOffset: -128},
+		Auxiliary:	{redOffset:  -92, greenOffset:  -67, blueOffset: -117, alphaOffset: 0},
+		AirCarrier:	{redOffset:  -67, greenOffset:  -67, blueOffset:  -67, alphaOffset: 0},
+		Battleship:	{redOffset: -117, greenOffset:  -92, blueOffset:  -77, alphaOffset: 0},
+		Cruiser:	{redOffset:  -45, greenOffset:  -80, blueOffset: -117, alphaOffset: 0},
+		Destroyer: 	{redOffset:  -92, greenOffset:  -67, blueOffset:  -92, alphaOffset: 0},
+		Submarine:	{redOffset: -112, greenOffset: -112, blueOffset: -112, alphaOffset: 0},
 	},
 	# Roslich
 	{
@@ -78,12 +78,12 @@
 	},
 	# Hakabase
 	{
-		Auxiliary:	{redOffset: -184, greenOffset: -134, blueOffset: -234, alphaOffset:  -70},
-		AirCarrier:	{redOffset: -226, greenOffset:   -7, blueOffset:   21, alphaOffset:  -70},
-		Battleship:	{redOffset:   21, greenOffset: -234, blueOffset: -234, alphaOffset:  -70},
-		Cruiser:	{redOffset:	  21, greenOffset: 	 21, blueOffset: -234, alphaOffset:  -70},
-		Destroyer: 	{redOffset:	-234, greenOffset: 	 21, blueOffset: -234, alphaOffset:  -70},
-		Submarine:	{redOffset:   21, greenOffset: -234, blueOffset:  -81, alphaOffset:  -70},
+		Auxiliary:	{redOffset: -134, greenOffset:  -98, blueOffset: -171, alphaOffset: 0},
+		AirCarrier:	{redOffset: -165, greenOffset:   -5, blueOffset:   15, alphaOffset: 0},
+		Battleship:	{redOffset:   15, greenOffset: -171, blueOffset: -171, alphaOffset: 0},
+		Cruiser:	{redOffset:	  15, greenOffset: 	 15, blueOffset: -171, alphaOffset: 0},
+		Destroyer: 	{redOffset:	-171, greenOffset: 	 15, blueOffset: -171, alphaOffset: 0},
+		Submarine:	{redOffset:   15, greenOffset: -171, blueOffset:  -59, alphaOffset: 0},
 	},
 ])
 (def constant TP_CONCEALMENT_SKILL_ID {
@@ -249,8 +249,6 @@
 	(style
 		(position = "absolute")
 		(right = 0)
-		(align="right")
-		(pivotX = 100%)
 	)
 	(macro BIND_FAIR_SCALE "sizeScale")
 
@@ -717,7 +715,16 @@
 		(var colorPreset:dict = "(TP_SHIP_ICON_COLOR_PRESET.length > shipIconColorIndex) ? TP_SHIP_ICON_COLOR_PRESET[shipIconColorIndex] : null")
 		(var colorDict:dict = "(isColorAvailable && colorPreset) ? colorPreset[subType] : {}")
 
+		(macro TT_GET_PREF_BOOL _varName="'isPremiumHighlighted'" _pref="TP_PREFS.PREMIUM_TIER")
+
+		(var shipEntity:gfx = "_markerEntity ? _markerEntity.avatar.ship.ref.ship : null" (event "_markerEntity.avatar.evShipRefChanged"))
+		(var isPremium:bool = "shipEntity ? shipEntity.isPremium : false")
+
 		(var iconUrl:str = "'url:../battle_hud/markers/ship/' + iconName + '.png'")
+		(var bgIconUrl:str = "
+			isPremium && isPremiumHighlighted ? 'url:../service_kit/ship_classes/icon_default_' + shipType + '_special.png'
+											  : 'url:../service_kit/ship_classes/icon_default_' + shipType + '.png'
+		")
 	)
 
 	(style
@@ -735,7 +742,19 @@
 		(block
 			(class $FullsizeAbsolute)
 			(style
-				(bind backgroundImage "iconUrl")
+				(bind backgroundImage "bgIconUrl")
+				(filters
+					(dropShadow
+						(distance = 0)
+						(angle = 0)
+						(color = 0x0)
+						(alpha = 0.85)
+						(blurX = 2.0)
+						(blurY = 2.0)
+						(strength = 1.0)
+						(quality = 1)
+					)
+				)
 			)
 		)
 		(block
