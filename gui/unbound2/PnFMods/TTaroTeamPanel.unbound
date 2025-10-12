@@ -325,16 +325,20 @@
 		(var altVision:bool = "camera ? camera.altVision : false" (event "camera.evAltVisionChanged"))
 
 		(macro TT_GET_PREF_NUMBER	_varName="'displayMode'"	_pref="TP_PREFS[settings.prefSubKey].DISPLAY_MODE")
-		(macro TP_GET_DISPLAY_MODE	_varName="'isEnabled'"		_prefValue="displayMode")
+		(macro TP_GET_DISPLAY_MODE	_varName="'isVisible'"		_prefValue="displayMode")
+		(var isEnabled:bool = "displayMode != TP_DISPLAY_MODES.DISABLE")
 	)
-	(bind visible "isEnabled")
+	(bind visible "isVisible")
 
-	(element TP_ShipConfigImageItem
-		_iconPath		= "settings.headerImage"
-		_alpha			= "headerAlpha"
-		_tooltipTitle	= "settings.headerTitle"
-		_tooltipTexts	= "settings.headerDescriptions"
-		_userPrefsNum	= "_userPrefsNum"
+	(controller $Instance renderer='TP_ShipConfigImageItem'
+		(bind enabled "isEnabled")
+		(args
+			_iconPath		= "settings.headerImage"
+			_alpha			= "headerAlpha"
+			_tooltipTitle	= "settings.headerTitle"
+			_tooltipTexts	= "settings.headerDescriptions"
+			_userPrefsNum	= "_userPrefsNum"
+		)
 	)
 )
 
@@ -792,7 +796,7 @@
 	)
 )
 
-# For Tournamnet
+# For Tournament
 (def element TP_ShipWeightItem(_markerEntity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
 	(scope
 		(var shipEntity:gfx = "_markerEntity ? _markerEntity.avatar.ship.ref.ship : null" (event "_markerEntity.avatar.evShipRefChanged"))
@@ -927,6 +931,8 @@
 		(var isAlive:bool = "healthComponent ? healthComponent.isAlive : false" (event "healthComponent.evIsAliveChanged"))
 		(macro TT_GET_PREF_BOOL _varName="'isShipDetectionEnabled'" _pref="TP_PREFS.SHIP_DETECTION")
 
+		(var isValid:bool = "_markerEntity && isAlive && (isDetected || wasDetected)")
+
 		(var settingKey:str = "isDetected ? 'DETECTED' : 'INVISIBLE'")
 		(var setting:dict = "TP_DETECTION_CIRCLE_SETTINGS[settingKey]")
 	)
@@ -936,7 +942,7 @@
 	)
 	(bind visible "isShipDetectionEnabled")
 	(block
-		(bind visible "_markerEntity && isAlive && (isDetected || wasDetected)")
+		(bind visible "isValid")
 		(controller $Sector
 			(bind colors "setting.COLORS")
 			(bind alphas "setting.ALPHAS")
@@ -1369,21 +1375,13 @@
 
 (def element TP_ShipConfigBatteryItem(_shipTTX:gfx)
 	(scope
-		(var batteryTTX:gfx = "_shipTTX.mods_ShipParamsInBattle.shipTTX.battery")
+		(var batteryTTX:gfx = "_shipTTX ? _shipTTX.battery : null")
 		(var capacity:number = "batteryTTX ? batteryTTX.capacity.value : null")
+		(var regeneration:number = "batteryTTX ? batteryTTX.regeneration.value : null")
 	)
 
-	(style
-		(bind alpha "batteryTTX ? 1.0 : 0.0")
-		(width = "TP_SHIPCONFIG_ELEMENT_WIDTH.WITH_UNIT")
-	)
-
-	(style
-		(align = "middle|center")
-	)
-	(block
-		(element TP_ShipConfigTextItem _value="capacity" _unit="'s'" _userPrefsNum="_userPrefsNum")
-	)
+	(macro TP_SHIPCONFIG_TEXT_ITEM _value="capacity"		_unit="'s'"		_isEnabled="false")
+	(macro TP_SHIPCONFIG_TEXT_ITEM _value="regeneration"	_unit="''"		_isEnabled="false")
 )
 
 (def element TP_ShipConfigMobilityItem(_shipTTX:gfx, _userPrefsNum:gfx=null)
@@ -1589,6 +1587,7 @@
 #--------------------------------------------------------------------------------
 (def constant TP_TOOLTIP_SHIPCONFIG_RENDERER_SETTINGS [
 	{renderer: 'TP_TooltipHealthItem',				ttxName: 'durability',			title: 'IDS_SHIP_PARAM_DURABILITY'},
+	{renderer: 'TP_TooltipBatteryItem',				ttxName: 'battery',				title: 'IDS_SHIP_PARAM_BATTERY'},
 	{renderer: 'TP_TooltipMainGunItem',				ttxName: 'artillery',			title: 'IDS_SHIP_PARAM_ARTILLERY', 		ttxSubAttr: 'mainGun'},
 	{renderer: 'TP_TooltipAtbaItem',				ttxName: 'artillery',			title: 'IDS_SHIP_PARAM_ARTILLERY_ATBA',	ttxSubAttr: 'atba'},
 	{renderer: 'TP_TooltipTorpedoesItem',			ttxName: 'torpedoes',			title: 'IDS_SHIP_PARAM_TORPEDOES'},
@@ -1602,7 +1601,7 @@
 ])
 
 (def constant TP_TOOLTIP_INDENTS {
-	HEADER: 0,
+	HEADER: 0px,
 	SUB_HEADER: 10px,
 	TEXT: 5px,
 	SUB_TEXT: 15px,
@@ -1827,6 +1826,31 @@
 	)
 )
 
+(def element TP_TooltipBatteryItem(_shipTTX:gfx, _markerEntity:gfx, _userPrefsNum:gfx=null)
+	(scope
+		# Battery
+		(var batteryTTX:gfx = "_shipTTX.battery")
+		(var capacity:number = "batteryTTX ? batteryTTX.capacity.value : null")
+		(var regeneration:number = "batteryTTX ? batteryTTX.regeneration.value : null")
+
+		# Battery Component gets unloaded once the submarines go dark.
+		# And I can't control when this tooltip is activated. It can be generated
+		#	- While submarine is spotted	: in this case the real value can be retrieved.
+		#	- Or while they are not visible	: in which case, only the TTX value is available despite the submarine was spotted and visible.
+		# so it's impossible to consistently reflecting the last spotted status.
+		# so just display the TTX value
+	)
+
+	(class $TP_FullWidth)
+
+	(block
+		(class $TP_FullWidth)
+		(class $TP_TooltipSectionMargin)
+		(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_BATTERY_MAX_CAPACITY'" _value="capacity" _unit="'s'" _userPrefsNum="_userPrefsNum")
+		(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_BATTERY_REGEN_RATE'" _value="regeneration" _unit="'s/s'" _userPrefsNum="_userPrefsNum")
+	)
+)
+
 (def element TP_TooltipMainGunItem(_shipTTX:gfx, _userPrefsNum:gfx=null)
 	(scope
 		(var artilleryTTX:gfx = "_shipTTX.artillery")
@@ -1887,9 +1911,7 @@
 		(element TP_TooltipShipConfigTextItem _title="overmatchTranslation" _value="overmatch" _roundDigit=0 _unit="'mm'" _userPrefsNum="_userPrefsNum")
 	)
 
-	(block
-		(bind visible "altFire")
-
+	(block $enabled="altFire"
 		(element TP_TooltipShipConfigTitleItem _title="'IDS_SHIP_PARAM_BURST_FIRE_NAME'" _indent="TP_TOOLTIP_INDENTS.SUB_HEADER")
 		(class $TP_FullWidth)
 		(class $TP_TooltipSectionMargin)
@@ -1900,9 +1922,7 @@
 		)
 	)
 
-	(block
-		(bind visible "ammoHE")
-
+	(block $enabled="ammoHE"
 		(element TP_TooltipShipConfigTitleItem _title="'IDS_SHIP_PARAM_AMMO_HE'" _indent="TP_TOOLTIP_INDENTS.SUB_HEADER")
 		(class $TP_FullWidth)
 		(class $TP_TooltipSectionMargin)
@@ -1913,9 +1933,7 @@
 		)
 	)
 
-	(block
-		(bind visible "ammoCS")
-
+	(block $enabled="ammoCS"
 		(element TP_TooltipShipConfigTitleItem _title="'IDS_SHIP_PARAM_AMMO_CS'" _indent="TP_TOOLTIP_INDENTS.SUB_HEADER")
 		(class $TP_FullWidth)
 		(class $TP_TooltipSectionMargin)
@@ -1926,9 +1944,7 @@
 		)
 	)
 
-	(block
-		(bind visible "ammoAP")
-
+	(block $enabled="ammoAP"
 		(element TP_TooltipShipConfigTitleItem _title="'IDS_SHIP_PARAM_AMMO_AP'" _indent="TP_TOOLTIP_INDENTS.SUB_HEADER")
 		(class $TP_FullWidth)
 		(class $TP_TooltipSectionMargin)
@@ -2065,6 +2081,8 @@
 		(var torpedoTTX:gfx = "_torpedoAmmoTTX ? _torpedoAmmoTTX.torpedo : null")
 		(var range:number = "_torpedoAmmoTTX ? _torpedoAmmoTTX.maxDist.value : 0")
 		(var damage:number = "_torpedoAmmoTTX ? _torpedoAmmoTTX.damage.value : 0")
+		(var visibility:number = "_torpedoAmmoTTX ? _torpedoAmmoTTX.visibility.value : 0")
+		(var speed:number = "_torpedoAmmoTTX ? _torpedoAmmoTTX.speed.value : 0")
 		(var canHitClasses:array = "_torpedoAmmoTTX && _torpedoAmmoTTX.canHitClasses ? _torpedoAmmoTTX.canHitClasses : null")
 	)
 
@@ -2077,6 +2095,8 @@
 		(class $TP_FullWidth)
 		(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_MAX_DIST'" _value="range" _unit="'km'" _indent="TP_TOOLTIP_INDENTS.SUB_TEXT" _userPrefsNum="_userPrefsNum")
 		(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_DAMAGE'" _value="damage" _roundDigit=0 _indent="TP_TOOLTIP_INDENTS.SUB_TEXT" _userPrefsNum="_userPrefsNum")
+		(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_TORPEDO_VISIBILITY_DIST'" _value="visibility" _unit='km' _indent="TP_TOOLTIP_INDENTS.SUB_TEXT" _userPrefsNum="_userPrefsNum")
+		(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_TORPEDO_SPEED'" _value="speed" _unit='km' _indent="TP_TOOLTIP_INDENTS.SUB_TEXT" _userPrefsNum="_userPrefsNum")
 		(controller $Instance renderer='TP_TooltipShipConfigClassIconsItem'
 			(bind enabled "canHitClasses && canHitClasses.length > 0")
 			(args _title="'IDS_SHIP_PARAM_TORPEDOES_AFFECTED_SHIPS'" _canHitClasses="canHitClasses" _indent="TP_TOOLTIP_INDENTS.SUB_TEXT" _userPrefsNum="_userPrefsNum")
@@ -2214,9 +2234,8 @@
 		(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_AIR_SUPPORT_NUM_SQUADRONS'" _value="numSquadrons" _roundDigit=0 _unit=null _userPrefsNum="_userPrefsNum")
 	)
 
-	(block
+	(block $enabled="bomberHE"
 		(class $TP_FullWidth)
-		(bind visible "bomberHE")
 
 		(element TP_TooltipShipConfigTitleItem _title="'IDS_SHIP_PARAM_AIR_SUPPORT_SQUADRONS_HE'" _indent="TP_TOOLTIP_INDENTS.SUB_HEADER")
 		(block
@@ -2228,9 +2247,8 @@
 		)
 	)
 
-	(block
+	(block $enabled="bomberDC"
 		(class $TP_FullWidth)
-		(bind visible "bomberDC")
 
 		(element TP_TooltipShipConfigTitleItem _title="'IDS_SHIP_PARAM_AIR_SUPPORT_SQUADRONS_DEPTHCHARGE'" _indent="TP_TOOLTIP_INDENTS.SUB_HEADER")
 		(block
@@ -2364,7 +2382,9 @@
 
 (def element TP_TooltipShipConfigTitleItem (_title:str, _indent:number="TP_TOOLTIP_INDENTS.HEADER", _userPrefsNum:gfx=null)
 	(scope
-		(var className:str = "_indent == TP_TOOLTIP_INDENTS.HEADER ? '$TextDefaultBold17NM' : '$TextDefaultBoldNM'")
+		(var isTopLevel:bool = "_indent == TP_TOOLTIP_INDENTS.HEADER")
+		(var className:str = "isTopLevel ? '$TextDefaultBold17NM' : '$TextDefaultBoldNM'")
+		(var divider:str = "isTopLevel ? 'HorizontalDividerTwoPx' : 'HorizontalDivider'")
 	)
 
 	(bind visible "_title")
@@ -2373,14 +2393,20 @@
 		(width = 100%)
 		(marginBottom = 5px)
 		(bind paddingLeft "_indent")
+		(flow = "Flow.HORIZONTAL")
+		(align = "middle|center")
 	)
 
 	(tf
 		(bind class "className")
 		(bind text "_title")
 		(style
-			(width = 100%)
+			(marginRight = 8px)
 		)
+	)
+
+	(controller $Instance
+		(bind renderer "divider")
 	)
 )
 
@@ -2394,7 +2420,8 @@
 	(style
 		(width = 100%)
 		(flow = "Flow.HORIZONTAL")
-		(marginBottom = 3px)
+		(marginBottom = 2px)
+		(marginTop = 2px)
 		(align = "middle")
 	)
 
@@ -2415,7 +2442,7 @@
 			(class $TP_TooltipShipParameterText)
 			(bind text "tr(_title) + ':'")
 			(style
-				(width = "100%")
+				(width = 100%)
 				(leading = -5)
 			)
 		)
@@ -2423,6 +2450,7 @@
 	(hblock
 		(style
 			(width = 15%)
+			(align = "middle|right")
 		)
 		(tf
 			(class $TP_TooltipShipParameterText)
@@ -2442,56 +2470,79 @@
 
 (def element TP_TooltipShipConfigClassIconsItem (_title:str, _canHitClasses:array, _indent:number="TP_TOOLTIP_INDENTS.TEXT", _userPrefsNum:gfx=null)
 	(scope
-		(var isVisible:bool = "_canHitClasses && _canHitClasses.length > 0")
+		(var length:number = "_canHitClasses ? _canHitClasses.length : 0")
+		(var isValueVisible:bool = "length")
+		(var substMap:dict = "{
+			'AirCarrier'	: 'url:../battle_hud/markers/ship/icon_white_aircarrier.png',
+			'Battleship'	: 'url:../battle_hud/markers/ship/icon_white_battleship.png',
+			'Cruiser'		: 'url:../battle_hud/markers/ship/icon_white_cruiser.png',
+			'Destroyer'	: 'url:../battle_hud/markers/ship/icon_white_destroyer.png',
+			'Submarine'	: 'url:../battle_hud/markers/ship/icon_white_submarine.png',
+			'Auxiliary'	: 'url:../battle_hud/markers/ship/icon_white_auxiliary.png'
+		}")
+		(var baseText:str = "'[%s]'")
+		(var sourceText:str = "
+			(length >= 1 ? _canHitClasses[0] : '') + 
+			(length >= 2 ? _canHitClasses[1] : '') + 
+			(length >= 3 ? _canHitClasses[2] : '') + 
+			(length >= 4 ? _canHitClasses[3] : '') +
+			(length >= 5 ? _canHitClasses[4] : '') + 
+			(length >= 6 ? _canHitClasses[5] : '')
+		")
+		# It can be repeat+tf instead, but I guess concatanating str is better than creating 6 tfs
+		# Not that it affects anything tho
 	)
+
+	(bind visible "isValueVisible")
 
 	(style
 		(width = 100%)
 		(flow = "Flow.HORIZONTAL")
-		(marginBottom = 3px)
+		(marginBottom = 2px)
+		(marginTop = 2px)
 		(align = "middle")
 	)
 
 	(hblock
 		(style
 			(align = "middle")
-			(width = 90%)
+			(width = 85%)
 			(bind paddingLeft "_indent")
 		)
 		(tf
-			(class $TextDefaultNM)
+			(class $TP_TooltipShipParameterText)
 			(text = '•')
 			(style
 				(marginRight = 5px)
 			)
 		)
 		(tf
-			(class $TextDefaultNM)
+			(class $TP_TooltipShipParameterText)
 			(bind text "tr(_title) + ':'")
 			(style
-				(width = "100%")
+				(width = 100%)
 				(leading = -5)
 			)
 		)
 	)
 	(hblock
 		(style
-			(width = 35%)
+			(width = 15%)
 			(align = "middle|right")
-			(marginLeft = -50%)
+			(height = 100%)
 		)
-		(controller $Repeat renderer='TP_ClassIconItem'
-			(bind enabled "isVisible")
-			(bind count "_canHitClasses.length")
-			(args _className="_canHitClasses[$index]")
+		(tf
+			(class $TP_TooltipShipParameterText)
+			(style
+				(letterSpacing = -4px)
+			)
+			(bindcall substitute
+				imageOffset=5
+				substitutionMap="substMap"
+				sourceText="sourceText"
+				init=true
+			)
 		)
-	)
-)
-
-(def element TP_ClassIconItem (_className:str) layout=true
-	(style
-		(width = 27px) (height = 0) (marginTop = -25px)
-		(bind backgroundImage "'url:../service_kit/ship_classes/icon_default_' + toLower(_className) + '.png'")
 	)
 )
 
