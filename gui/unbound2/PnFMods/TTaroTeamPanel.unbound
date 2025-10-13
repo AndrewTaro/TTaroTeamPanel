@@ -623,6 +623,9 @@
 # Player Info
 (def element TP_PlayerInfoForHealthBarItem (_markerEntity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
 	(scope
+		(macro TT_GET_PREF_BOOL _varName="'isPlayerNameVisible'"	_pref="TP_PREFS.PLAYER_NAME")
+		(macro TT_GET_PREF_BOOL _varName="'isShipNameVisible'"		_pref="TP_PREFS.SHIP_NAME")
+		(var mTop:number = "isPlayerNameVisible && !isShipNameVisible ? 0px : -1px")
 	)
 
 	(class $Fullsize)
@@ -638,9 +641,14 @@
 		(style
 			(vgap = 2px)
 			(align = "center|middle")
+			(bind marginTop "mTop") # To align texts to the baseline
 		)
-		(element TP_PlayerNameWithTagItem 	"_markerEntity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
-		(element TP_ShipNameItem 			"_markerEntity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
+		(element TP_PlayerNameWithTagItem 	_markerEntity="_markerEntity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum"
+			(bind visible "isPlayerNameVisible")
+		)
+		(element TP_ShipNameItem 			_markerEntity="_markerEntity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum"
+			(bind visible "isShipNameVisible")
+		)
 	)
 )
 
@@ -713,7 +721,6 @@
 
 (def element TP_PlayerNameWithTagItem (_markerEntity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
 	(scope
-		(macro TT_GET_PREF_BOOL _varName="'isPlayerNameVisible'" _pref="TP_PREFS.PLAYER_NAME")
 		(macro TT_GET_PREF_BOOL _varName="'isClanNameVisible'" _pref="TP_PREFS.CLAN_NAME")
 
 		(macro TP_GET_MARKER_DATA)
@@ -730,7 +737,7 @@
 		(bind align "_isAlly ? left|middle : right|middle")
 	)
 
-	(bind visible "isPlayerNameVisible && _markerEntity")
+	(bind visible "_markerEntity")
 
 	(tf
 		(class $TextDefault13NM)
@@ -838,7 +845,6 @@
 		(var shipEntity:gfx = "_markerEntity ? _markerEntity.avatar.ship.ref.ship : null" (event "_markerEntity.avatar.evShipRefChanged"))
 		(var shipName:str = "shipEntity ? tr(shipEntity.nameIDS) : ''") # IDS_PASB518
 		(macro TP_GET_ISAFK _markerEntity="_markerEntity")
-		(macro TT_GET_PREF_BOOL _varName="'isShipNameVisible'" _pref="TP_PREFS.SHIP_NAME")
 		
 		(var colorClass:str = "	isAFK		? '$FontColorOrange' :
 								isGolden	? '$FontColorGolden' :
@@ -847,8 +853,6 @@
 		)
 		(var fontColor:number = "FONT_CLASS_TO_COLOR[colorClass]")
 	)
-
-	(bind visible "isShipNameVisible")
 
 	(style
 		(bind align "_isAlly ? left|middle : right|middle")
@@ -1103,6 +1107,8 @@
 											: TWO_TEAMS_COLOR_TRANSFORMS[relationStr]"
 		)
 		(var bgAlpha:number = "alphaScale <= 0 ? 0 : 0.8")
+
+		(var barDirection:number = "_isAlly ? 1 : -1")
 	)
 
 	(style
@@ -1113,6 +1119,11 @@
 
 	(block
 		(class $FullsizeAbsolute)
+		(style
+			(bind scaleX "barDirection")
+			(pivotX = 50%)
+			(left = 0%)
+		)
 		
 		(block
 			(class $FullsizeAbsolute)
