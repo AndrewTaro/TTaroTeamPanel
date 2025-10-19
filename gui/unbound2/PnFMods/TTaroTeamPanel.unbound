@@ -5,9 +5,14 @@
 	HEIGHT: 27px
 })
 (def constant TP_SHIPCONFIG_ELEMENT_WIDTH {
-	WITH_UNIT: 48,
-	NO_UNIT: 32
+	WITH_UNIT: 48px,
+	NO_UNIT: 32px
 })
+(def constant TP_HEADER_SIZE {
+	PLAYER_INFO: 16px,
+	SHIP_CONFIG: 24px
+})
+
 (def constant TP_DEFAULT_HEIGHT "160px")
 (def constant TP_DIVISION_ELEMENT_WIDTH "20px")
 (def constant TP_CONFIG_ELEMENTS_VGAP "3px")
@@ -128,15 +133,15 @@
 })
 
 (def constant TP_SHIPCONFIG_RENDERER_SETTINGS [
-	{renderer: 'TP_ShipConfigVisibilityItem',			prefSubKey: 'VISIBILITY',			headerImage: 'url:../crew_commander/skills/detection_visibility_range.png',	headerTitle: 'IDS_SHIP_PARAM_DETECTION',	headerDescriptions: ['IDS_SHIP_PARAM_VISIBILITY_DIST_BY_SHIP','IDS_SHIP_PARAM_VISIBILITY_DIST_BY_PLANE'], dropShadow: true},
-	{renderer: 'TP_ShipConfigMobilityItem',				prefSubKey: 'SPEED',				headerImage: 'url:../battle_hud/lower_log_modifiers/speedCoef.png',			headerTitle: 'IDS_SHIP_PARAM_MAXSPEED',		headerDescriptions: ['IDS_SHIP_PARAM_MOBILITY','IDS_SHIP_PARAM_UNDERWATER_MOBILITY'], dropShadow: true},
-	{renderer: 'TP_ShipConfigAirSupportItem',			prefSubKey: 'AIRSUPPORT',			headerImage: 'url:../battle_hud/icon_frag/icon_frag_bomb.png',				headerTitle: 'IDS_SHIP_PARAM_AIR_SUPPORT',	headerDescriptions: ['IDS_SHIP_PARAM_MAX_DIST','IDS_SHIP_PARAM_SHOT_DELAY']},
-	{renderer: 'TP_ShipConfigAirDefenseItem',			prefSubKey: 'ANTIAIR',				headerImage: 'url:../battle_hud/lower_log_modifiers/AAAuraDamage.png',		headerTitle: 'IDS_SHIP_PARAM_AIR_DEFENSE',	headerDescriptions: ['IDS_SHIP_PARAM_MAX_DIST','IDS_SHIP_PARAM_AIR_DEFENSE'], dropShadow: true},
-	{renderer: 'TP_ShipConfigAtbaItem',					prefSubKey: 'ATBA',					headerImage: 'url:../battle_hud/icon_frag/icon_frag_atba.png',				headerTitle: 'IDS_SHIP_PARAM_ATBA',			headerDescriptions: ['IDS_SHIP_PARAM_MAX_DIST']},
-	{renderer: 'TP_ShipConfigArtilleryItem',			prefSubKey: 'ARTILLERY',			headerImage: 'url:../modules/icon_module_Artillery.png',					headerTitle: 'IDS_SHIP_PARAM_MAIN_GUN',		headerDescriptions: ['IDS_SHIP_PARAM_MAX_DIST','IDS_SHIP_PARAM_SHOT_DELAY'], dropShadow: true},
-	{renderer: 'TP_ShipConfigTorpedoItem',				prefSubKey: 'TORPEDO',				headerImage: 'url:../modules/icon_module_Torpedoes.png',					headerTitle: 'IDS_SHIP_PARAM_TORPEDOES',	headerDescriptions: ['IDS_SHIP_PARAM_MAX_DIST'], dropShadow: true},
-	{renderer: 'TP_ShipConfigSurfaceConsumableItem',	prefSubKey: 'SURFACE_CONSUMABLE',	headerImage: 'url:../battle_hud/icon_frag/icon_frag_wave.png',				headerTitle: 'IDS_TITLE_CONSUMABLES',		headerDescriptions: ['IDS_DOCK_CONSUME_TITLE_PCY008_SONARSEARCH','IDS_DOCK_CONSUME_TITLE_PCY019_RLSSEARCH']},
-	{renderer: 'TP_ShipConfigSubmarineConsumableItem',	prefSubKey: 'SUB_CONSUMABLE',		headerImage: 'url:../battle_hud/icon_frag/icon_frag_wave.png',				headerTitle: 'IDS_TITLE_CONSUMABLES',		headerDescriptions: ['IDS_DOCK_CONSUME_TITLE_PCY045_HYDROPHONE','IDS_DOCK_CONSUME_TITLE_PCY048_SUBMARINELOCATOR']},
+	{renderer: 'TP_ShipConfigVisibilityItem',			prefSubKey: 'VISIBILITY',			headerImage: 'url:../ttaro_team_panel/concealment.png',				headerTitle: 'IDS_SHIP_PARAM_DETECTION',	headerDescriptions: ['IDS_SHIP_PARAM_VISIBILITY_DIST_BY_SHIP','IDS_SHIP_PARAM_VISIBILITY_DIST_BY_PLANE']},
+	{renderer: 'TP_ShipConfigMobilityItem',				prefSubKey: 'SPEED',				headerImage: 'url:../ttaro_team_panel/speed.png',					headerTitle: 'IDS_SHIP_PARAM_MAXSPEED',		headerDescriptions: ['IDS_SHIP_PARAM_MOBILITY','IDS_SHIP_PARAM_UNDERWATER_MOBILITY']},
+	{renderer: 'TP_ShipConfigAirSupportItem',			prefSubKey: 'AIRSUPPORT',			headerImage: 'url:../ttaro_team_panel/air_support.png',				headerTitle: 'IDS_SHIP_PARAM_AIR_SUPPORT',	headerDescriptions: ['IDS_SHIP_PARAM_MAX_DIST','IDS_SHIP_PARAM_SHOT_DELAY']},
+	{renderer: 'TP_ShipConfigAirDefenseItem',			prefSubKey: 'ANTIAIR',				headerImage: 'url:../ttaro_team_panel/anti_air.png',				headerTitle: 'IDS_SHIP_PARAM_AIR_DEFENSE',	headerDescriptions: ['IDS_SHIP_PARAM_MAX_DIST','IDS_SHIP_PARAM_AIR_DEFENSE']},
+	{renderer: 'TP_ShipConfigAtbaItem',					prefSubKey: 'ATBA',					headerImage: 'url:../ttaro_team_panel/secondary_gun.png',			headerTitle: 'IDS_SHIP_PARAM_ATBA',			headerDescriptions: ['IDS_SHIP_PARAM_MAX_DIST']},
+	{renderer: 'TP_ShipConfigArtilleryItem',			prefSubKey: 'ARTILLERY',			headerImage: 'url:../ttaro_team_panel/main_gun.png',				headerTitle: 'IDS_SHIP_PARAM_MAIN_GUN',		headerDescriptions: ['IDS_SHIP_PARAM_MAX_DIST','IDS_SHIP_PARAM_SHOT_DELAY']},
+	{renderer: 'TP_ShipConfigTorpedoItem',				prefSubKey: 'TORPEDO',				headerImage: 'url:../ttaro_team_panel/torpedo.png',					headerTitle: 'IDS_SHIP_PARAM_TORPEDOES',	headerDescriptions: ['IDS_SHIP_PARAM_MAX_DIST']},
+	{renderer: 'TP_ShipConfigSurfaceConsumableItem',	prefSubKey: 'SURFACE_CONSUMABLE',	headerImage: 'url:../ttaro_team_panel/surface_consumables.png',		headerTitle: 'IDS_TITLE_CONSUMABLES',		headerDescriptions: ['IDS_DOCK_CONSUME_TITLE_PCY008_SONARSEARCH','IDS_DOCK_CONSUME_TITLE_PCY019_RLSSEARCH']},
+	{renderer: 'TP_ShipConfigSubmarineConsumableItem',	prefSubKey: 'SUB_CONSUMABLE',		headerImage: 'url:../ttaro_team_panel/submarine_consumables.png',	headerTitle: 'IDS_TITLE_CONSUMABLES',		headerDescriptions: ['IDS_DOCK_CONSUME_TITLE_PCY045_HYDROPHONE','IDS_DOCK_CONSUME_TITLE_PCY048_SUBMARINELOCATOR']},
 ])
 
 (def constant TP_PLAYERINFO_RENDERER_SETTINGS [
@@ -147,8 +152,8 @@
 	{renderer: 'TP_ShipTierItem',						enablePrefKey: 'SHIP_TIER',		baseWidth: "MS"},
 	{renderer: 'TP_ShipIconItem',						enablePrefKey: 'SHIP_ICON',		baseWidth: 20px}, # Actual width of the icon is 20px. Without this, there would be unnecessary visual margins on both sides.
 	# {renderer: 'TP_ShipWeightItem',						enablePrefKey: '',				baseWidth: "MS"}, # TODO: Do something about this. The visibility of this element is controlled inside of it, not its renderer parent.
-	{renderer: 'TP_ShipDetectionItem',					enablePrefKey: '',				baseWidth: "M",	headerImage: 'url:../service_kit/icons/icon_hidden_content.png', headerImageCt: {redOffset: 70, greenOffset: 70, blueOffset: 70}, dropShadow: true}, # So it can still display correct detection status even when the setting is turned on during a battle
-	{renderer: 'TP_PlayerKillCountItem',				enablePrefKey: 'KILL_COUNT',	baseWidth: "M", headerImage: 'bitmap:icon_stat_frag_tiny'},
+	{renderer: 'TP_ShipDetectionItem',					enablePrefKey: 'SHIP_DETECTION',headerTitle: 'IDS_HELP_DETECTION_INDICATORS',			headerDescriptions: ['IDS_HELP_ENEMY_DETECT'],				baseWidth: "M",	headerImage: 'url:../ttaro_team_panel/detection.png'},
+	{renderer: 'TP_PlayerKillCountItem',				enablePrefKey: 'KILL_COUNT',	headerTitle: 'IDS_DESTROYED_ENEMY_SHIPS_RESULT_SCREEN',	headerDescriptions: ['IDS_DESTROYED_ENEMY_SHIPS_TOOLTIP'],	baseWidth: "M", headerImage: 'bitmap:icon_stat_frag_tiny'},
 ])
 
 (def css $TP_ShipConfigText()
@@ -273,39 +278,30 @@
 
 		(macro TT_GET_PREF_BOOL _varName="'isUnitVisible'" _pref="TP_PREFS.UNITS_VISIBLE")
 		(var shipConfigHeaderWidth:number = "isUnitVisible ? TP_SHIPCONFIG_ELEMENT_WIDTH.WITH_UNIT : TP_SHIPCONFIG_ELEMENT_WIDTH.NO_UNIT")
+
+		(var battleDataEntity:gfx = "$datahub.getSingleEntity(CC.battleData)")
+		(var gameModeId:number = "battleDataEntity.battleInfo.gameModeId")
+		(var isScenarioMode:bool = "SC.Battle.GAME_MODE.PVE == gameModeId")
+		(var isScenarioEnemy:bool = "isScenarioMode && !_isAlly")
 	)
 	(style
 		(bind flow "_isAlly ? Flow.HORIZONTAL : Flow.REVERSE_HORIZONTAL")
 		(align = "center|middle")
-		#(height = 0)
-		(marginTop = "-TP_PLAYER_ROW_SIZE.HEIGHT")
+		(marginTop = "-TP_PLAYER_ROW_SIZE.HEIGHT - 4px")
 	)
 	
-	(block
-		(style
-			(bind flow "_isAlly ? Flow.HORIZONTAL : Flow.REVERSE_HORIZONTAL")
-		)
-
-		(controller $Repeat renderer='TP_PlayerInfoHeaderRendererItem' count="TP_PLAYERINFO_RENDERER_SETTINGS.length"
-			(args
-				_isAlly 		= "_isAlly"
-				_userPrefsNum	= "_userPrefsNum"
-			)
+	(controller $Repeat renderer='TP_PlayerInfoHeaderRendererItem' count="TP_PLAYERINFO_RENDERER_SETTINGS.length"
+		(args
+			_isAlly 		= "_isAlly"
+			_userPrefsNum	= "_userPrefsNum"
 		)
 	)
-	#
 
-	(block
-		(style
-			(bind flow "_isAlly ? Flow.HORIZONTAL : Flow.REVERSE_HORIZONTAL")
-			(hitTest = true)
-		)
-
-		(controller $Repeat renderer='TP_ShipConfigHeaderRendererItem' count="TP_SHIPCONFIG_RENDERER_SETTINGS.length"
-			(args
-				_width			= "shipConfigHeaderWidth"
-				_userPrefsNum	= "_userPrefsNum"
-			)
+	(controller $Repeat renderer='TP_ShipConfigHeaderRendererItem' count="TP_SHIPCONFIG_RENDERER_SETTINGS.length"
+		(bind enabled "!isScenarioEnemy")
+		(args
+			_width			= "shipConfigHeaderWidth"
+			_userPrefsNum	= "_userPrefsNum"
 		)
 	)
 
@@ -334,11 +330,10 @@
 		(macro TT_GET_NULLABLE_PREF_NUMBER	_varName="'widthScale'"	_nullablePref="widthPref"	_default="1")
 		(var width:number = "baseWidth * widthScale")
 
-		(var ct:dict = "'headerImageCt' in setting ? setting.headerImageCt : {}")
+		(var tooltipTitle:str = "'headerTitle' in setting ? setting.headerTitle : ''")
+		(var tooltipDescs:array = "'headerDescriptions' in setting ? setting.headerDescriptions : []")
 
 		(var headerImage:str = "'headerImage' in setting ? setting.headerImage : ''")
-
-		(var isDropShadowEnabled:bool = "'dropShadow' in setting ? setting.dropShadow : false")
 	)
 	(style
 		(align = "middle|center")
@@ -355,23 +350,23 @@
 			(block
 				(style
 					(bind backgroundImage "headerImage")
-					(width = 16px)
-					(height = 16px)
+					(width = "TP_HEADER_SIZE.PLAYER_INFO")
+					(height = "TP_HEADER_SIZE.PLAYER_INFO")
 					(backgroundSize = "fill")
-					(filters $enabled="isDropShadowEnabled"
-						(dropShadow
-							(distance = 0)
-							(angle = 0)
-							(color = 0x000000)
-							(alpha = 0.85)
-							(blurX = 2.0)
-							(blurY = 2.0)
-							(strength = 1.0)
-							(quality = 1)
-						)
-					)
 				)
-				(bind colorTransform "ct")
+			)
+			(controller $Tooltip
+				(renderer = TP_HeaderHintTooltip)
+				(bind enabled "tooltipTitle")
+				(args
+					_tooltipTitle = "tooltipTitle"
+					_tooltipTexts = "tooltipDescs"
+				)
+				(align = "top|center")
+				(position = "border")
+				(offset	= [0, 10])
+				(screenBoundsOffset = {left:10, top:10, right:10, bottom:10})
+				(macro SIMPLE_TOOLTIP_ANIMATION)
 			)
 		)
 	)
@@ -396,6 +391,67 @@
 			_setting		= "setting"
 			_width			= "_width"
 			_userPrefsNum	= "_userPrefsNum"
+		)
+	)
+)
+
+(def element TP_ShipConfigHeaderImageItem (_setting:dict, _width:number="TP_SHIPCONFIG_ELEMENT_WIDTH.WITH_UNIT", _userPrefsNum:gfx=null)
+	(scope
+		(var tooltipTitle:str = "'headerTitle' in _setting ? _setting.headerTitle : ''")
+		(var tooltipDescs:array = "'headerDescriptions' in _setting ? _setting.headerDescriptions : []")
+		(var iconPath:str = "'headerImage' in _setting ? _setting.headerImage : ''")
+	)
+	(style
+		(bind width "_width")
+		(align = "middle|center")
+	)
+	(block
+		(style
+			(height = "TP_HEADER_SIZE.SHIP_CONFIG")
+			(width = "TP_HEADER_SIZE.SHIP_CONFIG")
+			(bind backgroundImage "iconPath")
+			(backgroundSize = "fill")
+		)
+	)
+
+	(controller $Tooltip
+		(renderer = TP_HeaderHintTooltip)
+		(bind enabled "tooltipTitle")
+		(args
+			_tooltipTitle = "tooltipTitle"
+			_tooltipTexts = "tooltipDescs"
+		)
+		(align = "top|center")
+		(position = "border")
+		(offset	= [0, 10])
+		(screenBoundsOffset = {left:10, top:10, right:10, bottom:10})
+		(macro SIMPLE_TOOLTIP_ANIMATION)
+	)
+)
+
+(def element TP_HeaderHintTooltip(_tooltipTitle:str, _tooltipTexts:array=[]) layout=true
+	(style (width = "200px") (hitTest = false))
+
+	(macro TOOLTIP_SYSTEM_DEFAULT_BACKGROUND)
+
+	(element TOOLTIP_SYSTEM_DEFAULT_CONTAINER
+		(element TooltipSystemHeaderSubheaderText
+			_headerText="_tooltipTitle"
+		)
+
+		(element TooltipSystemHorizontalDivider)
+
+		(controller $Repeat
+			(renderer='TooltipSystemStatusLine')
+			(bind count "_tooltipTexts.length")
+			(args
+				_text="_tooltipTexts[$index]"
+			)
+			(exprs
+				(style
+					(bind marginTop "$index == 0 ? 0 : 5px")
+				)
+			)
 		)
 	)
 )
@@ -537,14 +593,12 @@
 				)
 			)
 
-			(block
-				(controller $Instance renderer='TP_ShipConfigurationsItem'
-					(bind enabled "_isAlly || !isScenarioBot")
-					(args
-						_markerEntity	= "_markerEntity"
-						_isAlly			= "_isAlly"
-						_userPrefsNum	= "_userPrefsNum"
-					)
+			(controller $Instance renderer='TP_ShipConfigurationsItem'
+				(bind enabled "_isAlly || !isScenarioBot")
+				(args
+					_markerEntity	= "_markerEntity"
+					_isAlly			= "_isAlly"
+					_userPrefsNum	= "_userPrefsNum"
 				)
 			)
 
@@ -782,8 +836,6 @@
 			"
 		)
 
-		(var iconName:str = "'icon_' + markerColorName + '_' + shipType")
-
 		(macro TT_GET_PREF_NUMBER _varName="'shipIconColorIndex'" _pref="TP_PREFS.SHIP_ICON_COLOR")
 		(var isColorAvailable:bool = "!(isIconGolden || isIconTkStatus)")
 		(var colorPreset:dict = "(TP_SHIP_ICON_COLOR_PRESET.length > shipIconColorIndex) ? TP_SHIP_ICON_COLOR_PRESET[shipIconColorIndex] : null")
@@ -794,11 +846,8 @@
 		(var shipEntity:gfx = "_markerEntity ? _markerEntity.avatar.ship.ref.ship : null" (event "_markerEntity.avatar.evShipRefChanged"))
 		(var isPremium:bool = "shipEntity ? shipEntity.isPremium : false")
 
-		(var iconUrl:str = "'url:../battle_hud/markers/ship/' + iconName + '.png'")
-		(var bgIconUrl:str = "
-			isPremium && isPremiumHighlighted ? 'url:../service_kit/ship_classes/icon_default_' + shipType + '_special.png'
-											  : 'url:../service_kit/ship_classes/icon_default_' + shipType + '.png'
-		")
+		(var iconUrl:str = "'url:../battle_hud/markers/ship/icon_' + markerColorName + '_' + shipType + '.png'")
+		(var isPremiumIconVisible:bool = "isPremium && isPremiumHighlighted")
 	)
 
 	(style
@@ -812,24 +861,22 @@
 			(bind scaleX "_isAlly ? 1.0 : -1.0")
 			(pivotX = "50%")
 		)
+		# Premium Icon
+		(block
+			(bind visible "isPremiumIconVisible")
+			(class $FullsizeAbsolute)
+			(style
+				(backgroundImage = 'url:../ttaro_team_panel/premium_indicator.png')
+			)
+		)
+		# For Clear Contour
 		(block
 			(class $FullsizeAbsolute)
 			(style
-				(bind backgroundImage "bgIconUrl")
-				(filters
-					(dropShadow
-						(distance = 0)
-						(angle = 0)
-						(color = 0x0)
-						(alpha = 0.85)
-						(blurX = 2.0)
-						(blurY = 2.0)
-						(strength = 1.0)
-						(quality = 1)
-					)
-				)
+				(bind backgroundImage "iconUrl")
 			)
 		)
+		# CT
 		(block
 			(class $FullsizeAbsolute)
 			(bind colorTransform "colorDict")
@@ -1015,7 +1062,6 @@
 
 		(macro GET_MARKER_ENTITY_COMPONENT 'health')
 		(var isAlive:bool = "healthComponent ? healthComponent.isAlive : false" (event "healthComponent.evIsAliveChanged"))
-		(macro TT_GET_PREF_BOOL _varName="'isShipDetectionEnabled'" _pref="TP_PREFS.SHIP_DETECTION")
 
 		(var isValid:bool = "_markerEntity && isAlive && (isDetected || wasDetected)")
 
@@ -1025,7 +1071,6 @@
 	(style
 		(align = "center|middle")
 	)
-	(bind visible "isShipDetectionEnabled")
 	(block
 		(bind visible "isValid")
 		(controller $Sector
@@ -1282,19 +1327,18 @@
 		(var altVision:bool = "camera ? camera.altVision : false" (event "camera.evAltVisionChanged"))
 	)
 
-	(hblock
-		(style
-			(align = "middle|center")
-			(bind flow "_isAlly ? Flow.HORIZONTAL : Flow.REVERSE_HORIZONTAL")
-			(height = "TP_PLAYER_ROW_SIZE.HEIGHT")
-		)
-		(controller $Repeat renderer='TP_ShipConfigRendererItem' count="TP_SHIPCONFIG_RENDERER_SETTINGS.length"
-			(args
-				_shipTTX	  = "shipTTX"
-				_markerEntity = "_markerEntity"
-				_isRealParams = "isRealParams"
-				_userPrefsNum = "_userPrefsNum"
-			)
+	(style
+		(align = "middle|center")
+		(bind flow "_isAlly ? Flow.HORIZONTAL : Flow.REVERSE_HORIZONTAL")
+		(height = 100%)
+	)
+
+	(controller $Repeat renderer='TP_ShipConfigRendererItem' count="TP_SHIPCONFIG_RENDERER_SETTINGS.length"
+		(args
+			_shipTTX	  = "shipTTX"
+			_markerEntity = "_markerEntity"
+			_isRealParams = "isRealParams"
+			_userPrefsNum = "_userPrefsNum"
 		)
 	)
 )
@@ -1313,7 +1357,7 @@
 		(macro TT_GET_PREF_BOOL _varName="'isUnitVisible'" _pref="TP_PREFS.UNITS_VISIBLE")
 	)
 
-	(bind visible "isVisible")	
+	(bind visible "isVisible")
 
 	(controller $Instance
 		(bind renderer "settings.renderer")
@@ -1333,7 +1377,7 @@
 )
 
 # This will reduce unnecessary textfields
-(def macro TP_SHIPCONFIG_TEXT_ITEM(_value:expression, _unit:expression, _isEnabled:expression)
+(def macro TP_SHIPCONFIG_TEXT_ITEM(_value:expression, _unit:expression, _isEnabled:expression, _roundDigit:expression="1")
 	(block
 		(style
 			(width = 100%)
@@ -1341,9 +1385,10 @@
 		(controller $Instance renderer='TP_ShipConfigTextItem'
 			(bind enabled "_isEnabled")
 			(args
-				_value="null == _value ? 0 : _value" # Without null check, the log will start crying about Invalid cast type
-				_unit="_unit"
-				_userPrefsNum="_userPrefsNum"
+				_value			= "null == _value ? 0 : _value" # Without null check, the log will start crying about Invalid cast type
+				_unit			= "_unit"
+				_userPrefsNum	= "_userPrefsNum"
+				_roundDigit		= "_roundDigit"
 			)
 		)
 	)
@@ -1444,7 +1489,7 @@
 	)
 
 	(macro TP_SHIPCONFIG_TEXT_ITEM _value="range"			_unit="'km'"	_isEnabled="isAntiAirRangeVisible")
-	(macro TP_SHIPCONFIG_TEXT_ITEM _value="integralValue"	_unit="'AA'"	_isEnabled="isAntiAirRatingVisible")
+	(macro TP_SHIPCONFIG_TEXT_ITEM _value="integralValue"	_unit="'AA'"	_isEnabled="isAntiAirRatingVisible" _roundDigit="0")
 )
 
 (def element TP_ShipConfigAirSupportItem(_shipTTX:gfx, _userPrefsNum:gfx=null)
@@ -1570,91 +1615,20 @@
 	(macro TP_SHIPCONFIG_TEXT_ITEM _value="radarRange"	_unit="'km'"	_isEnabled="isSubRadarRangeVisible")
 )
 
-# Image Item
-(def element TP_ShipConfigHeaderImageItem (_setting:dict, _width:number="TP_SHIPCONFIG_ELEMENT_WIDTH.WITH_UNIT", _userPrefsNum:gfx=null)
-	(scope
-		(var tooltipTitle:str = "'headerTitle' in _setting ? _setting.headerTitle : ''")
-		(var tooltipDescs:array = "'headerDescriptions' in _setting ? _setting.headerDescriptions : []")
-		(var iconPath:str = "'headerImage' in _setting ? _setting.headerImage : ''")
-		(var isDropShadowEnabled:bool = "'dropShadow' in _setting ? _setting.dropShadow : false")
-	)
-	(style
-		(bind width "_width")
-		(align = "middle|center")
-	)
-	(block
-		(style
-			(height = 20px)
-			(width = 20px)
-			(bind backgroundImage "iconPath")
-			(backgroundSize = "fill")
-			(filters $enabled="isDropShadowEnabled"
-				(dropShadow
-					(distance = 0)
-					(angle = 0)
-					(color = 0x0)
-					(alpha = 0.85)
-					(blurX = 2.0)
-					(blurY = 2.0)
-					(strength = 1.0)
-					(quality = 1)
-				)
-			)
-		)
-	)
-
-	(controller $Tooltip layout=true
-		(renderer='TP_ShipConfigTooltipHint')
-		(args
-			_tooltipTitle="tooltipTitle"
-			_tooltipTexts="tooltipDescs"
-		)
-		(align="top|center")
-		(position="border")
-		(offset=[0, 10])
-		(screenBoundsOffset={left:10, top:10, right:10, bottom:10})
-		(macro SIMPLE_TOOLTIP_ANIMATION)
-	)
-)
-
-(def element TP_ShipConfigTooltipHint(_tooltipTitle:str, _tooltipTexts:array=[]) layout=true
-	(style (width = "200px") (hitTest = false))
-
-	(macro TOOLTIP_SYSTEM_DEFAULT_BACKGROUND)
-
-	(element TOOLTIP_SYSTEM_DEFAULT_CONTAINER
-		(element TooltipSystemHeaderSubheaderText
-			_headerText="_tooltipTitle"
-		)
-
-		(element TooltipSystemHorizontalDivider)
-
-		(controller $Repeat
-			(renderer='TooltipSystemStatusLine')
-			(bind count "_tooltipTexts.length")
-			(args
-				_text="_tooltipTexts[$index]"
-			)
-			(exprs
-				(style
-					(bind marginTop "$index == 0 ? 0 : 5px")
-				)
-			)
-		)
-	)
-)
-
 # Text Item
 (def element TP_ShipConfigTextItem (_value:number, _unit:str='', _roundDigit:number="1.0", _userPrefsNum:gfx=null)
 	(scope
 		(var isValueVisible:bool = "_value")
 		(macro TT_GET_PREF_BOOL _varName="'isUnitVisible'" _pref="TP_PREFS.UNITS_VISIBLE")
 		(macro TT_GET_PREF_BOOL _varName="'isBoldFont'"    _pref="TP_PREFS.STATS_BOLD_FONT")
+
+		(var roundDigit:number = "_value >= 100 ? 0 : _roundDigit")
+		(var valueText:str = "formatFloatingPoint(_value, roundDigit)")
 	)
 
 	(style
 		(width = 100%)
-		(align = "right")
+		(align = "center")
 		(bind alpha "isValueVisible ? 1 : 0")
 		(flow = "Flow.HORIZONTAL")
 		(marginTop = 1px)
@@ -1663,13 +1637,13 @@
 	(tf
 		(bind class "isBoldFont ? '$TP_ShipConfigTextBold' : '$TP_ShipConfigText'")
 		(style
-			(bind marginRight "isUnitVisible ? XS : S")
 			(textAlign = "right")
-			(width = 100%)
+			(width = 26px)
+			# max width of the text (e.g. '99.9') is 26px.
 			# Without width and textAlign there is one fucking pixel misalignment on some texts
 			# This is cursed
 		)
-		(bind text "formatFloatingPoint(_value, _roundDigit)")
+		(bind text "valueText")
 	)
 	(tf
 		(bind visible "isUnitVisible")
@@ -1678,7 +1652,8 @@
 		(alpha = "TC")
 		(style
 			(width = "20px")
-			(marginRight = "XS")
+			(marginLeft = "XS")
+			(marginRight = "-S") # Not center but this makes it *visually look* centered.
 		)
 	)
 )
