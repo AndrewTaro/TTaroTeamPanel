@@ -132,18 +132,6 @@
 	}
 })
 
-(def constant TP_SHIPCONFIG_RENDERER_SETTINGS [
-	{renderer: 'TP_ShipConfigVisibilityItem',			prefSubKey: 'VISIBILITY',			headerImage: 'url:../ttaro_team_panel/concealment.png',				headerTitle: 'IDS_SHIP_PARAM_DETECTION',	headerDescriptions: ['IDS_SHIP_PARAM_VISIBILITY_DIST_BY_SHIP','IDS_SHIP_PARAM_VISIBILITY_DIST_BY_PLANE']},
-	{renderer: 'TP_ShipConfigMobilityItem',				prefSubKey: 'SPEED',				headerImage: 'url:../ttaro_team_panel/speed.png',					headerTitle: 'IDS_SHIP_PARAM_MAXSPEED',		headerDescriptions: ['IDS_SHIP_PARAM_MOBILITY','IDS_SHIP_PARAM_UNDERWATER_MOBILITY']},
-	{renderer: 'TP_ShipConfigAirSupportItem',			prefSubKey: 'AIRSUPPORT',			headerImage: 'url:../ttaro_team_panel/air_support.png',				headerTitle: 'IDS_SHIP_PARAM_AIR_SUPPORT',	headerDescriptions: ['IDS_SHIP_PARAM_MAX_DIST','IDS_SHIP_PARAM_SHOT_DELAY']},
-	{renderer: 'TP_ShipConfigAirDefenseItem',			prefSubKey: 'ANTIAIR',				headerImage: 'url:../ttaro_team_panel/anti_air.png',				headerTitle: 'IDS_SHIP_PARAM_AIR_DEFENSE',	headerDescriptions: ['IDS_SHIP_PARAM_MAX_DIST','IDS_SHIP_PARAM_AIR_DEFENSE']},
-	{renderer: 'TP_ShipConfigAtbaItem',					prefSubKey: 'ATBA',					headerImage: 'url:../ttaro_team_panel/secondary_gun.png',			headerTitle: 'IDS_SHIP_PARAM_ATBA',			headerDescriptions: ['IDS_SHIP_PARAM_MAX_DIST']},
-	{renderer: 'TP_ShipConfigArtilleryItem',			prefSubKey: 'ARTILLERY',			headerImage: 'url:../ttaro_team_panel/main_gun.png',				headerTitle: 'IDS_SHIP_PARAM_MAIN_GUN',		headerDescriptions: ['IDS_SHIP_PARAM_MAX_DIST','IDS_SHIP_PARAM_SHOT_DELAY']},
-	{renderer: 'TP_ShipConfigTorpedoItem',				prefSubKey: 'TORPEDO',				headerImage: 'url:../ttaro_team_panel/torpedo.png',					headerTitle: 'IDS_SHIP_PARAM_TORPEDOES',	headerDescriptions: ['IDS_SHIP_PARAM_MAX_DIST']},
-	{renderer: 'TP_ShipConfigSurfaceConsumableItem',	prefSubKey: 'SURFACE_CONSUMABLE',	headerImage: 'url:../ttaro_team_panel/surface_consumables.png',		headerTitle: 'IDS_TITLE_CONSUMABLES',		headerDescriptions: ['IDS_DOCK_CONSUME_TITLE_PCY008_SONARSEARCH','IDS_DOCK_CONSUME_TITLE_PCY019_RLSSEARCH']},
-	{renderer: 'TP_ShipConfigSubmarineConsumableItem',	prefSubKey: 'SUB_CONSUMABLE',		headerImage: 'url:../ttaro_team_panel/submarine_consumables.png',	headerTitle: 'IDS_TITLE_CONSUMABLES',		headerDescriptions: ['IDS_DOCK_CONSUME_TITLE_PCY045_HYDROPHONE','IDS_DOCK_CONSUME_TITLE_PCY048_SUBMARINELOCATOR']},
-])
-
 (def constant TP_PLAYERINFO_RENDERER_SETTINGS [
 	# Width is defined here so that the header items can be aligned too.
 	{renderer: 'TP_ShipHealthBarAndInfoItem',			enablePrefKey: '',				baseWidth: "TP_PLAYER_ROW_SIZE.WIDTH",	widthPrefKey: 'HEALTHBAR_WIDTH'},
@@ -154,6 +142,18 @@
 	# {renderer: 'TP_ShipWeightItem',						enablePrefKey: '',				baseWidth: "MS"}, # TODO: Do something about this. The visibility of this element is controlled inside of it, not its renderer parent.
 	{renderer: 'TP_ShipDetectionItem',					enablePrefKey: 'SHIP_DETECTION',headerTitle: 'IDS_HELP_DETECTION_INDICATORS',			headerDescriptions: ['IDS_HELP_ENEMY_DETECT'],				baseWidth: "M",	headerImage: 'url:../ttaro_team_panel/detection.png'},
 	{renderer: 'TP_PlayerKillCountItem',				enablePrefKey: 'KILL_COUNT',	headerTitle: 'IDS_DESTROYED_ENEMY_SHIPS_RESULT_SCREEN',	headerDescriptions: ['IDS_DESTROYED_ENEMY_SHIPS_TOOLTIP'],	baseWidth: "M", headerImage: 'bitmap:icon_stat_frag_tiny'},
+])
+
+(def constant TP_SHIPCONFIG_RENDERER_SETTINGS [
+	{renderer: 'TP_ShipConfigVisibilityItem',			enablePrefKey: 'VISIBILITY',			subPrefKeys: ['SURFACE', 'AIR'],					headerImage: 'url:../ttaro_team_panel/concealment.png',				headerTitle: 'IDS_SHIP_PARAM_DETECTION',	headerDescriptions: ['IDS_SHIP_PARAM_VISIBILITY_DIST_BY_SHIP','IDS_SHIP_PARAM_VISIBILITY_DIST_BY_PLANE']},
+	{renderer: 'TP_ShipConfigMobilityItem',				enablePrefKey: 'SPEED',					subPrefKeys: ['SURFACE', 'UNDERWATER'],				headerImage: 'url:../ttaro_team_panel/speed.png',					headerTitle: 'IDS_SHIP_PARAM_MAXSPEED',		headerDescriptions: ['IDS_SHIP_PARAM_MOBILITY','IDS_SHIP_PARAM_UNDERWATER_MOBILITY']},
+	{renderer: 'TP_ShipConfigAirSupportItem',			enablePrefKey: 'AIRSUPPORT',			subPrefKeys: ['RANGE', 'RELOAD'],					headerImage: 'url:../ttaro_team_panel/air_support.png',				headerTitle: 'IDS_SHIP_PARAM_AIR_SUPPORT',	headerDescriptions: ['IDS_SHIP_PARAM_MAX_DIST','IDS_SHIP_PARAM_SHOT_DELAY']},
+	{renderer: 'TP_ShipConfigAirDefenseItem',			enablePrefKey: 'ANTIAIR',				subPrefKeys: ['RANGE', 'RATE'],						headerImage: 'url:../ttaro_team_panel/anti_air.png',				headerTitle: 'IDS_SHIP_PARAM_AIR_DEFENSE',	headerDescriptions: ['IDS_SHIP_PARAM_MAX_DIST','IDS_SHIP_PARAM_AIR_DEFENSE']},
+	{renderer: 'TP_ShipConfigAtbaItem',					enablePrefKey: 'ATBA',					subPrefKeys: ['RANGE'],								headerImage: 'url:../ttaro_team_panel/secondary_gun.png',			headerTitle: 'IDS_SHIP_PARAM_ATBA',			headerDescriptions: ['IDS_SHIP_PARAM_MAX_DIST']},
+	{renderer: 'TP_ShipConfigArtilleryItem',			enablePrefKey: 'ARTILLERY',				subPrefKeys: ['RANGE', 'RELOAD'],					headerImage: 'url:../ttaro_team_panel/main_gun.png',				headerTitle: 'IDS_SHIP_PARAM_MAIN_GUN',		headerDescriptions: ['IDS_SHIP_PARAM_MAX_DIST','IDS_SHIP_PARAM_SHOT_DELAY']},
+	{renderer: 'TP_ShipConfigTorpedoItem',				enablePrefKey: 'TORPEDO',				subPrefKeys: ['RANGE'],								headerImage: 'url:../ttaro_team_panel/torpedo.png',					headerTitle: 'IDS_SHIP_PARAM_TORPEDOES',	headerDescriptions: ['IDS_SHIP_PARAM_MAX_DIST']},
+	{renderer: 'TP_ShipConfigSurfaceConsumableItem',	enablePrefKey: 'SURFACE_CONSUMABLE',	subPrefKeys: ['HYDRO_RANGE', 'RADAR_RANGE'],		headerImage: 'url:../ttaro_team_panel/surface_consumables.png',		headerTitle: 'IDS_TITLE_CONSUMABLES',		headerDescriptions: ['IDS_DOCK_CONSUME_TITLE_PCY008_SONARSEARCH','IDS_DOCK_CONSUME_TITLE_PCY019_RLSSEARCH']},
+	{renderer: 'TP_ShipConfigSubmarineConsumableItem',	enablePrefKey: 'SUB_CONSUMABLE',		subPrefKeys: ['SUB_HYDRO_RANGE', 'SUB_RADAR_RANGE'],headerImage: 'url:../ttaro_team_panel/submarine_consumables.png',	headerTitle: 'IDS_TITLE_CONSUMABLES',		headerDescriptions: ['IDS_DOCK_CONSUME_TITLE_PCY045_HYDROPHONE','IDS_DOCK_CONSUME_TITLE_PCY048_SUBMARINELOCATOR']},
 ])
 
 (def css $TP_ShipConfigText()
@@ -375,13 +375,21 @@
 (def element TP_ShipConfigHeaderRendererItem(_width:number, _userPrefsNum:gfx=null)
 	(scope
 		(var setting:dict = "TP_SHIPCONFIG_RENDERER_SETTINGS[$index]")
+		(var pref:dict = "TP_PREFS[setting.enablePrefKey]")
 
 		(var camera:gfx = "$datahub.getSingleComponent(CC.camera)")
 		(var altVision:bool = "camera ? camera.altVision : false" (event "camera.evAltVisionChanged"))
 
-		(macro TT_GET_PREF_NUMBER	_varName="'displayMode'"	_pref="TP_PREFS[setting.prefSubKey].DISPLAY_MODE")
+		(macro TT_GET_PREF_NUMBER	_varName="'displayMode'"	_pref="pref.DISPLAY_MODE")
 		(macro TP_GET_DISPLAY_MODE	_varName="'isVisible'"		_prefValue="displayMode")
-		(var isEnabled:bool = "displayMode != TP_DISPLAY_MODES.DISABLE")
+
+		# Max TTX values for a section must be capped at 2.
+		(var prefKey1:str = "setting.subPrefKeys			? setting.subPrefKeys[0] : ''")
+		(var prefKey2:str = "setting.subPrefKeys.length > 1 ? setting.subPrefKeys[1] : ''")
+		(macro TT_GET_PREF_BOOL				_varName="'isPref1Enabled'" _pref="pref[prefKey1]")
+		(macro TT_GET_NULLABLE_PREF_BOOL	_varName="'isPref2Enabled'" _nullablePref="pref[prefKey2]" _default="false")
+
+		(var isEnabled:bool = "(displayMode != TP_DISPLAY_MODES.DISABLE) && (isPref1Enabled || isPref2Enabled)")
 	)
 	(bind visible "isVisible")
 
@@ -1345,10 +1353,16 @@
 
 (def element TP_ShipConfigRendererItem(_shipTTX:gfx, _markerEntity:gfx, _isRealParams:bool, _userPrefsNum:gfx=null)
 	(scope
-		(var settings:dict = "TP_SHIPCONFIG_RENDERER_SETTINGS[$index]")
+		(var setting:dict = "TP_SHIPCONFIG_RENDERER_SETTINGS[$index]")
+		(var pref:dict = "TP_PREFS[setting.enablePrefKey]")
 
-		(macro TT_GET_PREF_NUMBER _varName="'displayMode'" _pref="TP_PREFS[settings.prefSubKey].DISPLAY_MODE")
-		(var isEnabled:bool = "displayMode != TP_DISPLAY_MODES.DISABLE")
+		(macro TT_GET_PREF_NUMBER 			_varName="'displayMode'"	_pref="pref.DISPLAY_MODE")
+		(var prefKey1:str = "setting.subPrefKeys			? setting.subPrefKeys[0] : ''")
+		(var prefKey2:str = "setting.subPrefKeys.length > 1 ? setting.subPrefKeys[1] : ''")
+		(macro TT_GET_PREF_BOOL				_varName="'isPref1Enabled'" _pref="pref[prefKey1]")
+		(macro TT_GET_NULLABLE_PREF_BOOL	_varName="'isPref2Enabled'" _nullablePref="pref[prefKey2]" _default="false")
+
+		(var isEnabled:bool = "(displayMode != TP_DISPLAY_MODES.DISABLE) && (isPref1Enabled || isPref2Enabled)")
 
 		(var camera:gfx = "$datahub.getSingleComponent(CC.camera)")
 		(var altVision:bool = "camera ? camera.altVision : false" (event "camera.evAltVisionChanged"))
@@ -1360,7 +1374,7 @@
 	(bind visible "isVisible")
 
 	(controller $Instance
-		(bind renderer "settings.renderer")
+		(bind renderer "setting.renderer")
 		(bind enabled "isEnabled")
 		(args
 			_shipTTX	  = "_shipTTX"
@@ -1468,15 +1482,17 @@
 		(var isCorrectionNeeded:bool = "!(crewSkillEntity || isSelf || _isRealParams)")
 
 		(var modifiers:dict = "skillEntity ? skillEntity.attributes.modifiers : null")
-		(var rangeModifier:number = "isCorrectionNeeded && modifiers ? (1 + modifiers.GSMaxDist * 0.01) : 1.0") #value is negative and %
+		(var rangeModifier:number = "isCorrectionNeeded && modifiers ? (1 + modifiers.GSMaxDist * 0.01) : 1.0") # value is negative and %
 		# ---------------------
 
 		# Fix------------------
-		(var modifiedAtbaRange:number = "range * rangeModifier") #CAPTAIN SKILL FIX
+		(var modifiedAtbaRange:number = "range * rangeModifier") # CAPTAIN SKILL FIX
 		# ---------------------
+
+		(macro TT_GET_PREF_BOOL _varName="'isRangeVisible'" _pref="TP_PREFS.ATBA.RANGE")
 	)
 
-	(macro TP_SHIPCONFIG_TEXT_ITEM _value="modifiedAtbaRange"		_unit="'km'"	_isEnabled="modifiedAtbaRange")
+	(macro TP_SHIPCONFIG_TEXT_ITEM _value="modifiedAtbaRange"		_unit="'km'"	_isEnabled="modifiedAtbaRange && isRangeVisible")
 )
 
 (def element TP_ShipConfigAirDefenseItem(_shipTTX:gfx, _userPrefsNum:gfx=null)
