@@ -471,7 +471,7 @@
 		(event evMouseOut)
 
 		(var _markerEntity:gfx = "_items[$index]" watch=false)
-		(var _index:number = "indexOf(_markerEntity, _items)")
+		(var avatarIndex:number = "indexOf(_markerEntity, _items)")
 
 		# Health
 		(macro GET_MARKER_ENTITY_COMPONENT 'health')
@@ -514,6 +514,21 @@
 
 		(event evAddedToStage)
 		(var appearDelay:number = "1.5 + $index * 0.15")
+
+		(var deathAnimDuration:number = "isScenarioBot ? 1 : DEATH_ANIMATION_DURATION")
+
+		(var animatedTopPos:number = "avatarIndex == 0 ? 0 : (avatarIndex * (TP_PLAYER_ROW_SIZE.HEIGHT + 2)) + 2" watch=false)
+		(controller $Animation
+			(bindcall play
+				duration = 0.15
+				delay	 = "deathAnimDuration"
+				to       = "{animatedTopPos: avatarIndex == 0 ? 0 : (avatarIndex * (TP_PLAYER_ROW_SIZE.HEIGHT + 2)) + 2}"
+				action	 = "killAll"
+				init	 = false
+				watch	 = false
+				(bind trigger "avatarIndex")
+			)
+		)
 	)
 	# For tooltip
 	(dispatch evHideInfotip args="{}" (bind trigger "isMouseActive") (event "evMenuItemClicked"))
@@ -528,29 +543,38 @@
 		(position = "absolute")
 		(bind left "_isAlly ? 0 : auto")
 		(bind right "_isAlly ? auto : 0")
-		(bind top "_index == 0 ? 0 : (_index * (TP_PLAYER_ROW_SIZE.HEIGHT + 2)) + 2")
+		(bind top "animatedTopPos")
 
 		(alpha = 0)
 	)
+	(visible = "isVisible")
+	
 	(controller $Animation
 		(bindcall play
 			delay	 = "appearDelay"
 			duration = 0.3
-			from	 = "{ alpha: 0 }"
-			to		 = "{ alpha: 1 }"
+			from	 = "{ alpha: 0}"
+			to		 = "{ alpha: 1}"
 			watch	 = false
 			(event "evAddedToStage")
 		)
+		(bindcall play
+			duration = "deathAnimDuration"
+			from	 = "{ alpha: 0, visible: false}"
+			to		 = "{ alpha: 1, visible: true }"
+			watch	 = false
+			action	 = "killAll"
+			reverse	 = "!(isVisible)"
+			(bind trigger "isVisible")
+		)
 	)
-
-	(bind visible "isVisible")
 
 	(element TP_ContrastPanel _isBlur="isBlurMode" _intensity="blurAlpha"
 		(bind visible "isBlurVisible")
 	)
 
 	(element TP_HorizontalDividerTwoPx
-		(bind visible "_index == 0")
+		(bind visible "animatedTopPos == 0")
 	)
 	
 	(block
@@ -1103,10 +1127,12 @@
 		(var isAlive:bool = "healthComponent ? healthComponent.isAlive : false" (event "healthComponent.evIsAliveChanged"))
 		(var healthValue:number = "healthComponent ? healthComponent.value : 0" (event "healthComponent.evValueChanged"))
 		(var healthMax:number = "healthComponent ? healthComponent.max : 0" (event "healthComponent.evMaxChanged"))
-		(var healthRatio:number = "(healthValue == 0) || (healthMax == 0) 
-										? 1
-										: healthValue / healthMax"
-		)
+		(var healthRatio:number = "healthMax ? min(healthValue / healthMax, 1)
+											 : 1
+		")
+		# After respawn
+		# This could not work if heath is updated (changed to zero) after respawn
+		(bind healthRatio "isAlive ? 1 : healthRatio" watch=false init=false (event "healthComponent.evIsAliveChanged"))
 
 		# Regeneration
 		(macro GET_MARKER_ENTITY_COMPONENT 'dataComponent')
@@ -1149,7 +1175,6 @@
 
 		# Bar Color
 		(macro TT_GET_PREF_NUMBER _varName="'alphaScale'" _pref="TP_PREFS.HEALTHBAR_OPACITY")
-		(var regenBarColorTransform:dict = "{redMultiplier:0,greenMultiplier:0,blueMultiplier:0,alphaMultiplier:1.0,redOffset:230,greenOffset:230,blueOffset:230,alphaOffset:0 }")
 		(var markerColorTransform:dict = 
 			"	isBannedShip				? TP_BANNED_SHIP_COLOR_TRANSFORM :
 				isFlagShip					? TP_FLAGSHIP_COLOR_TRANSFORM[flagShipColorKey] :
@@ -1162,6 +1187,23 @@
 		(var bgAlpha:number = "alphaScale <= 0 ? 0 : 0.8")
 
 		(var barDirection:number = "_isAlly ? 1 : -1")
+
+		# FX
+		(event evStartHealthBarAnim)
+		(event onHealthBarAnimStarted)
+		(event onHealthBarAnimFinished)
+		(event onDamageFxAnimFinished)
+
+		(var hasUnifinishedAnim:bool = false) 
+		(bind hasUnifinishedAnim "true"		watch=false init=false (event "healthComponent.evValueChanged") (event "healthComponent.evMaxChanged"))
+		(bind hasUnifinishedAnim "false"	watch=false init=false (event "onHealthBarAnimStarted"))
+		
+		(var isPlayingFx:bool = false) 
+		(bind isPlayingFx "true"	watch=false init=false (event "onHealthBarAnimStarted"))
+		(bind isPlayingFx "false"	watch=false init=false (event "onDamageFxAnimFinished"))
+
+		(var targetBarScale:number = 0) 
+		(bind targetBarScale "healthRatio" watch=false (event "onHealthBarAnimStarted"))
 	)
 
 	(style
@@ -1169,6 +1211,8 @@
 		(align = "center|middle")
 		(hitTest = false)
 	)
+
+	(dispatch evStartHealthBarAnim args="{}" (bind enabled "hasUnifinishedAnim")(event "onDamageFxAnimFinished"))
 
 	(block
 		(class $FullsizeAbsolute)
@@ -1191,18 +1235,42 @@
 		(block
 			(class $FullsizeAbsolute)
 			(bind alpha "alphaScale")
-			(bind visible "isAlive")
+			# (bind visible "isAlive")
 			(blendMode = layer)
 			(tf)
+
 			# Regen
 			(block
 				(class $FullsizeAbsolute)
 				(style
-					(bind backgroundColor "0xFFFFFFFF")
+					(backgroundColor = 0xFFE6E6E6)
 					(backgroundSize = "fill")
 					(bind scaleX "regenRatio")
 				)
-				(bind colorTransform "regenBarColorTransform")
+			)
+
+			# Damage FX
+			(block
+				(class $FullsizeAbsolute)
+				
+				(alpha = 1.17)
+				(style
+					(backgroundColor = 0xFFFFFFFF)
+					(backgroundSize = "fill")
+					(scaleX = "healthRatio")
+				)
+
+				(controller $Animation
+					(bindcall play  duration	= "DAMAGE_BAR_TWEEN_DURATION"
+									delay		= "DAMAGE_BAR_TWEEN_DELAY"
+									action		= "killAll"
+									watch		= false
+									easing		= "Easing.quad_in"
+									to			= "{ scaleX: targetBarScale }"
+									(event "onHealthBarAnimFinished")
+					)
+					(dispatch onDamageFxAnimFinished args="{}" on=evAnimEnded)
+				)
 			)
 
 			# Health
@@ -1211,9 +1279,24 @@
 				(style
 					(bind backgroundColor "0xFFFFFFFF")
 					(backgroundSize = "fill")
-					(bind scaleX "healthRatio")
+					(scaleX = "healthRatio")
 				)
 				(bind colorTransform "markerColorTransform")
+
+				(controller $Animation
+					(bind enabled "!(isPlayingFx)")
+					(bindcall play	duration	= "HEALTH_BAR_TWEEN_DURATION"
+									action		= "killAll"
+									watch		= false
+									easing		= "Easing.quad_in"
+									to			= "{ scaleX: healthRatio }"
+									(event "healthComponent.evValueChanged")
+									(event "healthComponent.evMaxChanged")
+									(event "evStartHealthBarAnim")
+					)
+					(dispatch onHealthBarAnimStarted	args="{}" on=evAnimStarted)
+					(dispatch onHealthBarAnimFinished	args="{}" on=evAnimEnded)
+				)
 			)
 		)
 	)
