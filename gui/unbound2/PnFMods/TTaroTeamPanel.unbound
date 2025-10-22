@@ -742,7 +742,23 @@
 	(scope
 		(macro TT_GET_PREF_BOOL _varName="'isPlayerNameVisible'"	_pref="TP_PREFS.PLAYER_NAME")
 		(macro TT_GET_PREF_BOOL _varName="'isShipNameVisible'"		_pref="TP_PREFS.SHIP_NAME")
-		(var mTop:number = "isPlayerNameVisible && !isShipNameVisible ? 0px : -1px")
+
+		(var shipEntity:gfx = "_markerEntity ? _markerEntity.avatar.ship.ref.ship : null" (event "_markerEntity.avatar.evShipRefChanged"))
+		(var shipName:str = "shipEntity ? tr(shipEntity.nameIDS) : ''")
+		(var isShipNameAscii:bool = "isMatch(shipName, '^[ -~｡-ﾟ]+$')")
+
+		(var mTop:number = "
+			 isPlayerNameVisible && !isShipNameVisible						?  0px :
+			!isPlayerNameVisible &&  isShipNameVisible && !isShipNameAscii	?  0px
+																			: -1px
+		")
+		# Player | Ship | Margin
+		#    T   |  T   | -1px
+		#    T   |  F   |  0px
+		#    F   |  T   | ~~-1px~~ Ascii ? -1px : 0px
+		#    F   |  F   | -1px (whatever)
+		#
+		# idk how but the mutlibyte chars *visually* have more height than the latins...
 	)
 
 	(class $Fullsize)
