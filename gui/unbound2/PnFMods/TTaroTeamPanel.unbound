@@ -627,7 +627,7 @@
 			)
 
 			(controller $Instance renderer='TP_ShipConfigurationsItem'
-				(bind enabled "_isAlly || !isScenarioEnemy")
+				(bind enabled "!isScenarioEnemy")
 				(args
 					_markerEntity	= "_markerEntity"
 					_isAlly			= "_isAlly"
