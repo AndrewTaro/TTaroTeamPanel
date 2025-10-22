@@ -1167,7 +1167,7 @@
 
 		# Regeneration
 		(macro GET_MARKER_ENTITY_COMPONENT 'dataComponent')
-		(var regenMaxValue:number = "dataComponentComponent ? dataComponentComponent.data.maxValue : 0" (event "dataComponentComponent.evDataChanged"))
+		(var regenMaxValue:number = "dataComponentComponent && null != dataComponentComponent.data.maxValue ? dataComponentComponent.data.maxValue : 0" (event "dataComponentComponent.evDataChanged"))
 		(var regenRatio:number = "healthMax ? regenMaxValue / healthMax : 0")
 
 		# Relation
