@@ -1276,7 +1276,17 @@
 				(style
 					(backgroundColor = 0xFFE6E6E6)
 					(backgroundSize = "fill")
-					(bind scaleX "regenRatio")
+					(scaleX = "regenRatio")
+				)
+				(controller $Animation
+					(bindcall play
+						duration	= "HEALTH_BAR_TWEEN_DURATION"
+						action		= "killAll"
+						watch		= false
+						easing		= "Easing.quad_in"
+						to			= "{ scaleX: regenRatio }"
+						(bind trigger "regenRatio")
+					)
 				)
 			)
 
@@ -1292,13 +1302,14 @@
 				)
 
 				(controller $Animation
-					(bindcall play  duration	= "DAMAGE_BAR_TWEEN_DURATION"
-									delay		= "DAMAGE_BAR_TWEEN_DELAY"
-									action		= "killAll"
-									watch		= false
-									easing		= "Easing.quad_in"
-									to			= "{ scaleX: targetBarScale }"
-									(event "onHealthBarAnimFinished")
+					(bindcall play
+						duration	= "DAMAGE_BAR_TWEEN_DURATION"
+						delay		= "DAMAGE_BAR_TWEEN_DELAY"
+						action		= "killAll"
+						watch		= false
+						easing		= "Easing.quad_in"
+						to			= "{ scaleX: targetBarScale }"
+						(event "onHealthBarAnimFinished")
 					)
 					(dispatch onDamageFxAnimFinished args="{}" on=evAnimEnded)
 				)
@@ -1316,14 +1327,15 @@
 
 				(controller $Animation
 					(bind enabled "!(isPlayingFx)")
-					(bindcall play	duration	= "HEALTH_BAR_TWEEN_DURATION"
-									action		= "killAll"
-									watch		= false
-									easing		= "Easing.quad_in"
-									to			= "{ scaleX: healthRatio }"
-									(event "healthComponent.evValueChanged")
-									(event "healthComponent.evMaxChanged")
-									(event "evStartHealthBarAnim")
+					(bindcall play
+						duration	= "HEALTH_BAR_TWEEN_DURATION"
+						action		= "killAll"
+						watch		= false
+						easing		= "Easing.quad_in"
+						to			= "{ scaleX: healthRatio }"
+						(event "healthComponent.evValueChanged")
+						(event "healthComponent.evMaxChanged")
+						(event "evStartHealthBarAnim")
 					)
 					(dispatch onHealthBarAnimStarted	args="{}" on=evAnimStarted)
 					(dispatch onHealthBarAnimFinished	args="{}" on=evAnimEnded)
