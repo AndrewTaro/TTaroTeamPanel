@@ -234,7 +234,11 @@
 
 	(controller $Repeat renderer='TP_PlayerItem'
 		(count = "allyItems ? allyItems.length : 0")
-		(args "allyItems" _isAlly="true" _userPrefsNum="_userPrefsNum")
+		(args
+			_items	= "allyItems"
+			_isAlly	= "true"
+			_userPrefsNum = "_userPrefsNum"
+		)
 
 		(bindcall removeChildAt "$event[1]" (event "allyCollection.evRemoved"))
 		(bindcall addChildAt "$event[1]" (event "allyCollection.evAdded"))
@@ -263,7 +267,11 @@
 
 	(controller $Repeat renderer='TP_PlayerItem'
 		(count = "enemyItems ? enemyItems.length : 0")
-		(args "enemyItems" _isAlly="false" _userPrefsNum="_userPrefsNum")
+		(args 
+			_items	= "enemyItems"
+			_isAlly	= "false"
+			_userPrefsNum = "_userPrefsNum"
+		)
 
 		(bindcall removeChildAt "$event[1]" (event "enemyCollection.evRemoved"))
 		(bindcall addChildAt "$event[1]" (event "enemyCollection.evAdded"))
@@ -273,9 +281,6 @@
 # Header for ship configs
 (def element TP_HeaderItem (_isAlly:bool=false, _userPrefsNum:gfx=null)
 	(scope
-		# To suppress error
-		(var _markerEntity:gfx = "null")
-
 		(macro TT_GET_PREF_BOOL _varName="'isUnitVisible'" _pref="TP_PREFS.UNITS_VISIBLE")
 		(var shipConfigHeaderWidth:number = "isUnitVisible ? TP_SHIPCONFIG_ELEMENT_WIDTH.WITH_UNIT : TP_SHIPCONFIG_ELEMENT_WIDTH.NO_UNIT")
 
@@ -283,11 +288,27 @@
 		(var gameModeId:number = "battleDataEntity.battleInfo.gameModeId")
 		(var isScenarioMode:bool = "SC.Battle.GAME_MODE.PVE == gameModeId")
 		(var isScenarioEnemy:bool = "isScenarioMode && !_isAlly")
+
+		(event evAddedToStage)
 	)
+
+	(dispatch evAddedToStage args="{}" on=addedToStage)
+
 	(style
 		(bind flow "_isAlly ? Flow.HORIZONTAL : Flow.REVERSE_HORIZONTAL")
 		(align = "center|middle")
 		(marginTop = "-TP_PLAYER_ROW_SIZE.HEIGHT - 4px")
+		(alpha = 0)
+	)
+	(controller $Animation
+		(bindcall play
+			duration = 0.3
+			from     = "{alpha:0}"
+			to       = "{alpha:1}"
+			watch	 = false
+			init	 = false
+			(event "evAddedToStage")
+		)
 	)
 	
 	(controller $Repeat renderer='TP_PlayerInfoHeaderRendererItem' count="TP_PLAYERINFO_RENDERER_SETTINGS.length"
