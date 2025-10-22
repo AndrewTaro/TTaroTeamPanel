@@ -467,8 +467,9 @@
 # Player
 (def element TP_PlayerItem (_items:array, _isAlly:bool=false, _userPrefsNum:gfx=null)
 	(scope
-		(event evMouseOver)
-		(event evMouseOut)
+		(event evPlayerItemMouseOver)
+		(event evPlayerItemMouseOut)
+		(event evAddedToStage)
 
 		(var _markerEntity:gfx = "_items[$index]" watch=false)
 		(var avatarIndex:number = "indexOf(_markerEntity, _items)")
@@ -486,23 +487,8 @@
 		(var isContextMenuAvailable:bool = "!(isSelf || isBot)")
 		(var mouse:gfx = "$datahub.getSingleComponent(CC.mouse)")
 		(var isMouseActive:bool = "mouse.active" (event "mouse.evActiveChanged"))
-
-		(macro TT_GET_PREF_BOOL _varName="'isDeadPlayerVisible'" _pref="TP_PREFS.DEAD_PLAYER_VISIBLE")
-		(var battleDataEntity:gfx = "$datahub.getSingleEntity(CC.battleData)")
-		(var gameModeId:number = "battleDataEntity.battleInfo.gameModeId")
-		(var isScenarioMode:bool = "SC.Battle.GAME_MODE.PVE == gameModeId")
-		(var isScenarioEnemy:bool = "!_isAlly && isScenarioMode")
-		(var isVisible:bool = "(isDeadPlayerVisible && !(isScenarioEnemy)) ? true : isAlive")
-
-		(macro TT_GET_PREF_NUMBER _varName="'blurDisplayMode'" _pref="TP_PREFS.BACKGROUND.DISPLAY_MODE")
-		(macro TT_GET_PREF_NUMBER _varName="'blurAlpha'" _pref="TP_PREFS.BACKGROUND.ALPHA")
-		(macro TT_GET_PREF_BOOL _varName="'isBlurMode'" _pref="TP_PREFS.BACKGROUND.MODE")
-		(var camera:gfx = "$datahub.getSingleComponent(CC.camera)")
-		(var altVision:bool = "camera ? camera.altVision : false" (event "camera.evAltVisionChanged"))
-		(macro TP_GET_DISPLAY_MODE _varName="'isBlurVisible'" _prefValue="blurDisplayMode")
 		(var hoverBackground:str = "_isAlly ? 'ally_bg_panel' : 'enemy_bg_panel'")
 		(var hoverBackgroundUrl:str = "'url:../service_kit/panel_backgrounds/' + hoverBackground + '.png'")
-
 		(var elemWidth:number = "floor($globalLayoutBounds[2]) + 15" (event "$evLayoutBoundsChanged"))
 		# For some really weird reason, tooltip controller and (position="border") have an issue with tracking the border
 		# It tracks the border size only when making the elements larger
@@ -510,13 +496,28 @@
 		# Thus once the elements get expanded the border tooltip does not come back to the original position
 		# I have to manually do the calculation here :(
 
+		# Item Visibility
+		(macro TT_GET_PREF_BOOL _varName="'isDeadPlayerVisible'" _pref="TP_PREFS.DEAD_PLAYER_VISIBLE")
+		(var battleDataEntity:gfx = "$datahub.getSingleEntity(CC.battleData)")
+		(var gameModeId:number = "battleDataEntity.battleInfo.gameModeId")
+		(var isScenarioMode:bool = "SC.Battle.GAME_MODE.PVE == gameModeId")
+		(var isScenarioEnemy:bool = "!_isAlly && isScenarioMode")
+		(var isVisible:bool = "(isDeadPlayerVisible && !(isScenarioEnemy)) ? true : isAlive")
+
+		# Background
+		(macro TT_GET_PREF_NUMBER _varName="'blurDisplayMode'" _pref="TP_PREFS.BACKGROUND.DISPLAY_MODE")
+		(macro TT_GET_PREF_NUMBER _varName="'blurAlpha'" _pref="TP_PREFS.BACKGROUND.ALPHA")
+		(macro TT_GET_PREF_BOOL _varName="'isBlurMode'" _pref="TP_PREFS.BACKGROUND.MODE")
+		(var camera:gfx = "$datahub.getSingleComponent(CC.camera)")
+		(var altVision:bool = "camera ? camera.altVision : false" (event "camera.evAltVisionChanged"))
+		(macro TP_GET_DISPLAY_MODE _varName="'isBlurVisible'" _prefValue="blurDisplayMode")
+
+		# Damage Monitor for TR Spectators
 		(macro IS_SPECTATOR_MODE)
 
-		(event evAddedToStage)
+		# Animation
 		(var appearDelay:number = "1.5 + $index * 0.15")
-
 		(var deathAnimDuration:number = "isScenarioEnemy ? 1 : DEATH_ANIMATION_DURATION")
-
 		(var baseTopPos:number = "avatarIndex == 0 ? 0 : (avatarIndex * (TP_PLAYER_ROW_SIZE.HEIGHT + 2)) + 2")
 		(var animatedTopPos:number = "baseTopPos" watch=false)
 		(controller $Animation
@@ -584,10 +585,10 @@
 			(hitTest = true)
 		)
 
-		(dispatch evMouseOver args={} on='rollOver')
-		(dispatch evMouseOut  args={} on='rollOut')
+		(dispatch evPlayerItemMouseOver args={} on='rollOver')
+		(dispatch evPlayerItemMouseOut  args={} on='rollOut')
 
-		# Hover animation
+		# Hover BG
 		(block
 			(class $FullsizeAbsolute)
 			(style
@@ -598,14 +599,15 @@
 			(controller $Animation
 				(bindcall play  duration=0.15
 								to="{ alpha: 1 }"
-								(event "evMouseOver")
+								(event "evPlayerItemMouseOver")
 				)
 				(bindcall play  duration=0.15
 								to="{ alpha: 0 }"
-								(event "evMouseOut")
+								(event "evPlayerItemMouseOut")
 				)
 			)
 		)
+		
 
 		# Main Element
 		# Ally: hblock, Enemy: reverse hblock
@@ -652,16 +654,23 @@
 		# Tooltip for Detailed Ship Stats
 		(controller $Tooltip
 			(renderer = 'TP_TooltipShipConfigurationsItem')
-			(args "_markerEntity" _userPrefsNum="_userPrefsNum")
+			(args
+				_markerEntity = "_markerEntity"
+				_userPrefsNum = "_userPrefsNum"
+			)
 			(macro TP_TOOLTIP_BEHAVIOUR "_isAlly")
 		)
 
 		# Context Menu for Report/Compliment/Division
-		(controller $Tooltip (renderer = 'ContextMenuPlayer')
+		(controller $Tooltip
+			(renderer = 'ContextMenuPlayer')
 			(bind enabled "isContextMenuAvailable")
-			(args _playerEntity="_markerEntity" _selfPlayer="selfPlayer")
+			(args
+				_playerEntity	= "_markerEntity"
+				_selfPlayer		= "selfPlayer"
+			)
 			(macro DEFAULT_MENU_BEHAVIOUR "evHideInfotip" "1")
-			(cache=false)
+			(cache = false)
 		)
 	)
 
@@ -2740,23 +2749,24 @@
 )
 
 (def macro TP_TOOLTIP_BEHAVIOUR (_isAlly:expression = false)
-
-	(bindcall show animation =	{	duration:	"0.3",
-									delay:		"0.15",
-									easing:		"Easing.cubic_out",
-									from:		{ alpha: 0, top: 5 },
-									to:			{ alpha: 1, top: 0 }
-								}
-								on = 'rollOver'
+	(bindcall show animation = {
+			duration: 0.3,
+			delay	: 0.1,
+			easing	: "Easing.cubic_out",
+			from	: { alpha: 0, top: 5 },
+			to		: { alpha: 1, top: 0 }
+		}
+		(event "evPlayerItemMouseOver")
 	)
 
-	(bindcall hide animation = {	duration:	"0.05",
-									delay:		"0",
-									easing:		"Easing.cubic_out",
-									from:		{ alpha: 1, top: 0 },
-									to:			{ alpha: 0, top: -5}
-								}
-								on = 'rollOut'
+	(bindcall hide animation = {
+			duration: 0.05,
+			delay	: 0,
+			easing	: "Easing.cubic_out",
+			from	: { alpha: 1, top: 0 },
+			to		: { alpha: 0, top: -5}
+		}
+		(event "evPlayerItemMouseOut")
 	)
 
 	(offset = {	x: 35, y: 15})
@@ -2766,10 +2776,10 @@
 								right:	_isAlly ? 10 : elemWidth,
 								bottom:	10 }")
 	
-	(priority = "0")
+	(priority = 0)
 
 	(bind align "_isAlly ? right|middle : left|middle")
-	(position="absolute")
+	(position = "absolute")
 )
 
 (def macro TP_BIND_BLURINTENSITY(_blurIntensity:expression="0.3")
