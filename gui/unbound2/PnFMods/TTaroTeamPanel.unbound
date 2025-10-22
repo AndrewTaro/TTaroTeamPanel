@@ -1283,6 +1283,7 @@
 						duration	= "HEALTH_BAR_TWEEN_DURATION"
 						action		= "killAll"
 						watch		= false
+						init		= false
 						easing		= "Easing.quad_in"
 						to			= "{ scaleX: regenRatio }"
 						(bind trigger "regenRatio")
