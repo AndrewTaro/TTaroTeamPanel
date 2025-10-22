@@ -491,8 +491,8 @@
 		(var battleDataEntity:gfx = "$datahub.getSingleEntity(CC.battleData)")
 		(var gameModeId:number = "battleDataEntity.battleInfo.gameModeId")
 		(var isScenarioMode:bool = "SC.Battle.GAME_MODE.PVE == gameModeId")
-		(var isScenarioBot:bool = "isBot && isScenarioMode")
-		(var isVisible:bool = "(isDeadPlayerVisible && !(isScenarioBot)) ? true : isAlive")
+		(var isScenarioEnemy:bool = "!_isAlly && isScenarioMode")
+		(var isVisible:bool = "(isDeadPlayerVisible && !(isScenarioEnemy)) ? true : isAlive")
 
 		(macro TT_GET_PREF_NUMBER _varName="'blurDisplayMode'" _pref="TP_PREFS.BACKGROUND.DISPLAY_MODE")
 		(macro TT_GET_PREF_NUMBER _varName="'blurAlpha'" _pref="TP_PREFS.BACKGROUND.ALPHA")
@@ -515,18 +515,19 @@
 		(event evAddedToStage)
 		(var appearDelay:number = "1.5 + $index * 0.15")
 
-		(var deathAnimDuration:number = "isScenarioBot ? 1 : DEATH_ANIMATION_DURATION")
+		(var deathAnimDuration:number = "isScenarioEnemy ? 1 : DEATH_ANIMATION_DURATION")
 
-		(var animatedTopPos:number = "avatarIndex == 0 ? 0 : (avatarIndex * (TP_PLAYER_ROW_SIZE.HEIGHT + 2)) + 2" watch=false)
+		(var baseTopPos:number = "avatarIndex == 0 ? 0 : (avatarIndex * (TP_PLAYER_ROW_SIZE.HEIGHT + 2)) + 2")
+		(var animatedTopPos:number = "baseTopPos" watch=false)
 		(controller $Animation
 			(bindcall play
 				duration = 0.15
 				delay	 = "deathAnimDuration"
-				to       = "{animatedTopPos: avatarIndex == 0 ? 0 : (avatarIndex * (TP_PLAYER_ROW_SIZE.HEIGHT + 2)) + 2}"
+				to       = "{animatedTopPos: baseTopPos}"
 				action	 = "killAll"
 				init	 = false
 				watch	 = false
-				(bind trigger "avatarIndex")
+				(bind trigger "baseTopPos")
 			)
 		)
 	)
@@ -626,7 +627,7 @@
 			)
 
 			(controller $Instance renderer='TP_ShipConfigurationsItem'
-				(bind enabled "_isAlly || !isScenarioBot")
+				(bind enabled "_isAlly || !isScenarioEnemy")
 				(args
 					_markerEntity	= "_markerEntity"
 					_isAlly			= "_isAlly"
