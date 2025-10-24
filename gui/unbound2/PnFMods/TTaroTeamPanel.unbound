@@ -914,7 +914,7 @@
 
 		(controller $Animation
 			(bindcall play
-				duration = 5.3
+				duration = 0.3
 				from     = "{fxOffset: -100%, fxAlpha: 0, mainOffset:   0%, mainAlpha: 1}"
 				to       = "{fxOffset:    0%, fxAlpha: 1, mainOffset: 100%, mainAlpha: 0}"
 				easing   = "Easing.line"
