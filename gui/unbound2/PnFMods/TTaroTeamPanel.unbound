@@ -883,15 +883,83 @@
 
 (def element TP_PlayerKillCountItem (_markerEntity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
 	(scope
-		(var killCount:number = "_markerEntity ? _markerEntity.avatar.frags : 0" (event "_markerEntity.avatar.evFragsChanged"))
+		(event evRestartAnimation)
+		(event evStartAnimation)
+		(event onAnimationEnded)
+		(event onAnimationStarted)
+
+		(macro GET_MARKER_ENTITY_COMPONENT 'avatar')
+		(var newkillCount:str = "avatarComponent && avatarComponent.frags ? toString(avatarComponent.frags) : ''" (event "avatarComponent.evFragsChanged"))
+		(var currentKillCount:str = "newkillCount" watch=false (event "onAnimationStarted"))
+
+		(var hasUnifinishedAnim:bool = false watch=false)
+		(bind hasUnifinishedAnim  "true" watch=false init=false (event "avatarComponent.evFragsChanged"))
+		(bind hasUnifinishedAnim "false" watch=false init=false (event "onAnimationStarted"))
+
+		(var isPlayingFx:bool = false watch=false)
+		(bind isPlayingFx  "true" watch=false init=false (event "onAnimationStarted"))
+		(bind isPlayingFx "false" watch=false init=false (event "onAnimationEnded"))
+
+		# Default
+		(var fxOffset:number	= -100%	watch=false (event "onAnimationEnded"))
+		(var fxAlpha:number		=	  0 watch=false (event "onAnimationEnded"))
+		(var mainOffset:number	=	 0% watch=false (event "onAnimationEnded"))
+		(var mainAlpha:number	=	  1 watch=false (event "onAnimationEnded"))
+
+		# Reset
+		(bind fxOffset	 -100% init=false watch=false (event "onAnimationEnded"))
+		(bind fxAlpha		 0 init=false watch=false (event "onAnimationEnded"))
+		(bind mainOffset	0% init=false watch=false (event "onAnimationEnded"))
+		(bind mainAlpha		 1 init=false watch=false (event "onAnimationEnded"))
+
+		(controller $Animation
+			(bindcall play
+				duration = 0.3
+				from     = "{fxOffset: -100%, fxAlpha: 0, mainOffset:   0%, mainAlpha: 1}"
+				to       = "{fxOffset:    0%, fxAlpha: 1, mainOffset: 100%, mainAlpha: 0}"
+				easing   = "Easing.line"
+				init	 = false
+				watch	 = false
+				(event "evRestartAnimation")
+				(event "evStartAnimation")
+			)
+			(dispatch onAnimationStarted args="{}" init=false on=evAnimStarted)
+			(dispatch onAnimationEnded args="{}" init=false on=evAnimEnded)
+		)
 	)
+
+	(dispatch evStartAnimation	 args="{}" (bind enabled "!isPlayingFx")(event "avatarComponent.evFragsChanged"))
+	(dispatch evRestartAnimation args="{}" (bind enabled "hasUnifinishedAnim") (event "onAnimationEnded"))
+
 	(style
 		(align = "middle|center")
 	)
-	(tf
-		(class $TextDefaultBoldNM)
-		(class $FontEnableReadability)
-		(bind text "killCount ? killCount : ''")
+	# Fx
+	(block
+		(bind visible "isPlayingFx")
+		(class $MiddleVHAbsolutely)
+		(style
+			(bind visualOffsetY "fxOffset")
+			(bind alpha "fxAlpha")
+		)
+		(tf
+			(class $TextDefaultBoldNM)
+			(class $FontEnableReadability)
+			(bind text "newkillCount" watch=false (event "evRestartAnimation")(event "evStartAnimation"))
+		)
+	)
+	# Main
+	(block
+		(class $MiddleVHAbsolutely)
+		(style
+			(bind visualOffsetY "mainOffset")
+			(bind alpha "mainAlpha")
+		)
+		(tf
+			(class $TextDefaultBoldNM)
+			(class $FontEnableReadability)
+			(bind text "currentKillCount" watch=false (event "evStartAnimation")(event "onAnimationEnded"))
+		)
 	)
 )
 
