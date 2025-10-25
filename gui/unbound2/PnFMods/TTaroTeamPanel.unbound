@@ -119,6 +119,12 @@
 	ADAPTIVE: 2,
 })
 
+(def constant TP_CONSUMABLE_TYPES {
+	HYDRO		: 10,
+	RADAR		: 12,
+	SUB_RADAR	: 41,
+})
+
 (def constant TP_DETECTION_CIRCLE_SETTINGS {
 	DETECTED: {
 		COLORS	: "[SC.Ui_styles.SERVICE_COLORS.ORANGE, 0x0]",
@@ -1467,10 +1473,13 @@
 
 (def element TP_ShipConsumablesItem(_markerEntity:gfx=null, _isAlly:bool=false, _userPrefsNum:gfx=null)
 	(scope
-		(macro TT_GET_PREF_BOOL _varName="'isTeamConsumableVisible'" _pref="TP_PREFS.TEAM_CONSUMABLES")
+		(macro TT_GET_PREF_NUMBER	_varName="'displayMode'" _pref="TP_PREFS.CONSUMABLES_MONITOR.DISPLAY_MODE")
+
 		(macro GET_MARKER_ENTITY_COMPONENT 'data')
 		(var consData:gfx = "dataComponent ? dataComponent.data : null" (event "dataComponent.evChanged"))
 		(var consumables:array = "consData && null != consData.consMonitor ? consData.consMonitor : []")
+
+		(var rendererType:str = "displayMode == 1 ? 'TP_ActiveConsumableIconItem' : 'CM2_ConsumableItem'") # Simple | Full
 
 		(macro GET_MARKER_ENTITY_COMPONENT 'vehicle')
 		(var isShipVisible:bool = "vehicleComponent ? vehicleComponent : false")
@@ -1478,9 +1487,9 @@
 		(macro GET_MARKER_ENTITY_COMPONENT 'health')
 		(var isAlive:bool = "healthComponent ? healthComponent.isAlive : false" (event "healthComponent.evIsAliveChanged"))
 
-		(var iconAlpha:number = "!isAlive ? 0 : isShipVisible ? 1 : 0.3")
+		(var iconAlpha:number = "isShipVisible ? 1 : 0.3")
 
-		(var isEnabled:bool = "_isAlly && isTeamConsumableVisible")
+		(var isEnabled:bool = "isAlive && displayMode != 0 && consumables.length")
 	)
 	(style
 		(flow = "Flow.HORIZONTAL")
@@ -1488,23 +1497,135 @@
 	)
 	(bind visible "isEnabled")
 
-	(controller $Repeat renderer='TP_SpecialConsumableRendererItem'
-		(bind enabled "isEnabled && consumables.length > 0")
+	(controller $Repeat renderer='TP_ConsumableMonitorRendererItem'
+		(bind enabled "isEnabled")
 		(bind count "consumables.length")
 		(args
+			_renderer = "rendererType"
 			_consData = "consumables[$index]"
+			_userPrefsNum = "_userPrefsNum"
 		)
 	)
 )
 
-(def element TP_SpecialConsumableRendererItem(_consData:dict)
+(def element TP_ConsumableMonitorRendererItem(_renderer:str, _consData:dict, _userPrefsNum:gfx=null)
 	(scope
-		(var isSpecial:bool = "_consData && 'isSpecial' in _consData && _consData.isSpecial")
+		(var isSpecial:bool = "'isSpecial' in _consData && _consData.isSpecial")
+		(var consumableType:number = "'consumableType' in _consData ? _consData.consumableType : -1")
+		(var prefKey:str = "
+			isSpecial										? 'TEAM_CONSUMABLES' :
+			consumableType == TP_CONSUMABLE_TYPES.HYDRO 	? 'HYDRO' :
+			consumableType == TP_CONSUMABLE_TYPES.RADAR		? 'RADAR' :
+			consumableType == TP_CONSUMABLE_TYPES.SUB_RADAR ? 'SUB_RADAR'
+															: 'OTHERS'
+		")
+		(macro TT_GET_PREF_BOOL 	_varName="'isEnabled'"	_pref="TP_PREFS.CONSUMABLES_MONITOR[prefKey]")
 	)
-	(controller $Instance renderer='CM2_ConsumableItem'
-		(bind enabled "isSpecial")
+	(bind visible "isEnabled")
+
+	(controller $Instance
+		(bind renderer "_renderer")
+		(bind enabled "isEnabled")
 		(args _consData="_consData")
 	)
+)
+
+# Uses constants from CM2
+(def element TP_ActiveConsumableIconItem (_consData:dict) layout=true
+	(scope
+		(event evConsumableActivated)
+		(event evConsumableEnding)
+		(event evConsumableDeactivated)
+
+		(var iconPath:str = "'url:../consumables/consumable_' + _consData.icon + '.png'")
+		(var capacity:str = "_consData.capacity")
+		(var state:number = "_consData.state")
+		(var stateEndTime:number = "_consData.endTime")
+		(bind stateEndTime "_consData.endTime" watch=false init=false (bind trigger "state"))
+		#(trace "toString(_entity.avatar.name) + ': isActive: ' + toString(isActive) + ', isUnderThreshold: ' + (stateTime <= CM2_BLINK_SETTINGS.THRESHOLD) + ', ' + _consData.consumableType + ', ' + timer.currentTime" watch=false (bind trigger "isConsumableEnding"))
+		# The ub scope updates dict values one by one
+		# which triggers `isConsumableEnding` change event because it satisfies (isActive == true && previousStateTime <= animationThreshold)
+		# It will immediately becomes false as the previousStateTime gets updated to the current value.
+		# However the fired event still starts the animation, of course.
+		(var canUse:bool = "_consData.canUse")
+		(var lifeCycleType:number = "_consData.lifeCycleType")
+		(var isTimeBased:bool = "lifeCycleType == SC.Battle.CONSUMABLE_LIFECYCLE_TYPE.TIME_BASED")
+		
+		(var isReady:bool = "state == SC.Battle.CONSUMABLE_STATES.READY")
+		(var isActive:bool = "state == SC.Battle.CONSUMABLE_STATES.AT_WORK")
+		(var isReload:bool = "state == SC.Battle.CONSUMABLE_STATES.RELOAD")
+		(var isEmpty:bool = "state == SC.Battle.CONSUMABLE_STATES.NO_AMMO")
+		(var isPreparation:bool = "state == SC.Battle.CONSUMABLE_STATES.PREPARATION")
+		(var isRegenerating:bool = "state == SC.Battle.CONSUMABLE_STATES.REGENERATION")
+		(var isDisabled:bool = "!canUse && isReady")
+		(var isTimedState:bool = "state in SC.Battle.CONSUMABLE_STATES.WITH_TIME_STATES")
+		
+		(var timer:gfx = "$datahub.getSingleComponent(CC.timer)")
+		(var stateTime:number = "stateEndTime - timer.currentTime" (event "timer.evFrequent"))
+
+		(var isConsumableEnding:bool = "isActive && (stateTime <= CM2_BLINK_SETTINGS.THRESHOLD)")
+
+		(var animatedAlpha:number = "CM2_DEFAULT_SETTINGS.ALPHA" watch=false)
+		(var animatedOffset:number = "CM2_DEFAULT_SETTINGS.OFFSET_Y" watch=false)
+		(var isAnimationPlaying:bool = "false" watch=false)
+
+		(controller $Animation
+			(bindcall play
+				id			= 'consumableEndingBlink'
+				duration	= "CM2_BLINK_SETTINGS.DURATION"
+				repeatCount	= -1
+				easing		= "Easing.sine_in"
+				from		= "{ animatedAlpha: CM2_BLINK_SETTINGS.ALPHA_MAX }"
+				to			= "{ animatedAlpha: CM2_BLINK_SETTINGS.ALPHA_MIN }"
+				action		= "append"
+				(event "evConsumableEnding")
+			)
+			(bindcall stop id='consumableEndingBlink' init=false (event "evConsumableDeactivated"))
+
+			(bindcall play
+				id			= 'consumableActivating'
+				duration	= "CM2_APPEAR_SETTINGS.DURATION"
+				easing		= "Easing.cubic_out"
+				from		= "{ animatedAlpha: CM2_APPEAR_SETTINGS.ALPHA_MIN, animatedOffset: CM2_APPEAR_SETTINGS.OFFSET_Y_MAX }"
+				to			= "{ animatedAlpha: CM2_APPEAR_SETTINGS.ALPHA_MAX, animatedOffset: CM2_APPEAR_SETTINGS.OFFSET_Y_MIN }"
+				action		= "kill"
+				(event "evConsumableActivated")
+			)
+			(bindcall play
+				id			= 'consumableDeactivating'
+				duration	= "CM2_APPEAR_SETTINGS.DURATION"
+				to			= "{ animatedAlpha: CM2_APPEAR_SETTINGS.ALPHA_MIN,	 animatedOffset: CM2_APPEAR_SETTINGS.OFFSET_Y_MAX }"
+				easing		= "Easing.cubic_out"
+				action		= "killAll"
+				(event "evConsumableDeactivated")
+			)
+			(bind animatedAlpha		"CM2_DEFAULT_SETTINGS.ALPHA"	init=false on=evAnimEnded)
+			(bind animatedOffset	"CM2_DEFAULT_SETTINGS.OFFSET_Y" init=false on=evAnimEnded)
+
+			(bind isAnimationPlaying "true"				watch=false init=false on=evAnimStarted)
+			(bind isAnimationPlaying "false"			watch=false init=false on=evAnimEnded)
+		)
+
+		(var colorValue:number = "	isDisabled	? 0.8 :
+									isEmpty		? 0.5
+										  		: 1.0")
+		(var iconColorTransform:dict = "{ redMultiplier: colorValue, greenMultiplier: colorValue, blueMultiplier: colorValue, alphaMultiplier: animatedAlpha}")
+	)
+
+	(dispatch evConsumableActivated		watch=false init=false (bind enabled "isActive") (bind trigger "isActive"))
+	(dispatch evConsumableDeactivated	watch=false init=false (bind enabled "!isActive") (bind trigger "isActive"))
+	(dispatch evConsumableEnding		watch=false init=false (bind enabled "isConsumableEnding") (bind trigger "isConsumableEnding"))
+
+
+	(bind visible "isAnimationPlaying || isActive")
+	(style
+		(bind backgroundImage "iconPath")
+		(backgroundSize = "fill")
+		(width = 24px)
+		(height = 24px)
+		(bind visualOffsetY "animatedOffset")
+	)
+	(bind colorTransform "iconColorTransform")
 )
 
 (def element TP_HorizontalDividerTwoPx()
