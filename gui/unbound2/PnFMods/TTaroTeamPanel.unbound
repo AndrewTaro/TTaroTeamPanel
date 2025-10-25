@@ -1494,6 +1494,7 @@
 	(style
 		(flow = "Flow.HORIZONTAL")
 		(bind alpha "iconAlpha")
+		(align = "middle|center")
 	)
 	(bind visible "isEnabled")
 
@@ -1522,6 +1523,9 @@
 		(macro TT_GET_PREF_BOOL 	_varName="'isEnabled'"	_pref="TP_PREFS.CONSUMABLES_MONITOR[prefKey]")
 	)
 	(bind visible "isEnabled")
+	(style
+		(align = "middle|center")
+	)
 
 	(controller $Instance
 		(bind renderer "_renderer")
