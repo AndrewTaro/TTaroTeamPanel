@@ -664,8 +664,6 @@
 				)
 			)
 
-			(element TP_ShipConsumablesItem		_markerEntity="_markerEntity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
-
 			(block
 				(controller $Instance renderer='TP_ShipDamageItem'
 					(bind enabled "isSpectatorTrainingMode")
@@ -676,6 +674,8 @@
 					)
 				)
 			)
+
+			(element TP_ShipConsumablesItem		_markerEntity="_markerEntity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum")
 		)
 
 		# Tooltip for Detailed Ship Stats
