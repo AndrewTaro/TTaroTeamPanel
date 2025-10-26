@@ -1247,8 +1247,8 @@
 											 : 1
 		")
 		# After respawn
-		# This could not work if heath is updated (changed to zero) after respawn
-		(bind healthRatio "isAlive ? 1 : healthRatio" watch=false init=false (event "healthComponent.evIsAliveChanged"))
+		# This could not work if heath is updated (e.g. changed to zero) after respawn
+		(bind healthRatio "isAlive ? 1 : 0" watch=false init="!isAlive" (event "healthComponent.evIsAliveChanged"))
 
 		# Regeneration
 		(macro GET_MARKER_ENTITY_COMPONENT 'dataComponent')
@@ -1311,7 +1311,7 @@
 		(event onDamageFxAnimFinished)
 
 		(var hasUnifinishedAnim:bool = false) 
-		(bind hasUnifinishedAnim "true"		watch=false init=false (event "healthComponent.evValueChanged") (event "healthComponent.evMaxChanged"))
+		(bind hasUnifinishedAnim "true"		watch=false init=false (event "healthComponent.evValueChanged") (event "healthComponent.evMaxChanged") (event "healthComponent.evIsAliveChanged"))
 		(bind hasUnifinishedAnim "false"	watch=false init=false (event "onHealthBarAnimStarted"))
 		
 		(var isPlayingFx:bool = false) 
@@ -1421,6 +1421,7 @@
 						to			= "{ scaleX: healthRatio }"
 						(event "healthComponent.evValueChanged")
 						(event "healthComponent.evMaxChanged")
+						(event "healthComponent.evIsAliveChanged")
 						(event "evStartHealthBarAnim")
 					)
 					(dispatch onHealthBarAnimStarted	args="{}" on=evAnimStarted)
