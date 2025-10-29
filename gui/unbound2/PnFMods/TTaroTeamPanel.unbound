@@ -264,6 +264,8 @@
 	(style
 		(position = "absolute")
 		(right = 0)
+		(pivotX = 100%)
+		(align = "right")
 	)
 	(macro BIND_FAIR_SCALE "sizeScale")
 
