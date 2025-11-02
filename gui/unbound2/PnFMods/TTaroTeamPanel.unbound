@@ -860,8 +860,8 @@
 		(macro TT_GET_PREF_BOOL _varName="'isClanNameVisible'" _pref="TP_PREFS.CLAN_NAME")
 
 		(macro TP_GET_MARKER_DATA)
-		(var playerName:str = "avatarComponent.isBot || isClanNameVisible ? avatarComponent.name
-																		  : avatarComponent.pureName
+		(var playerName:str = "(avatarComponent && avatarComponent.isBot) || isClanNameVisible	? avatarComponent.name
+																								: avatarComponent.pureName
 		")
 
 		(var colorClass:str = "isGolden ? '$FontColorGolden' : '$FontColorWhite' ")
