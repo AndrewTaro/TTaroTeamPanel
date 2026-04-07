@@ -792,12 +792,11 @@
 	(scope
 		(macro GET_MARKER_ENTITY_COMPONENT 'divisionMember')
 
-		(var divisionSign:number = "divisionMemberComponent ? divisionMemberComponent.divisionSign : null" (event "divisionMemberComponent.evDivisionChanged"))
+		(var divisionSign:number = "divisionMemberComponent ? divisionMemberComponent.divisionSign : 0" (event "divisionMemberComponent.evDivisionChanged"))
 		(var isInSameDivision:bool = "divisionMemberComponent ? divisionMemberComponent.isInSameDivision : false" (event "divisionMemberComponent.evDivisionChanged"))
 		(var division:number = "divisionMemberComponent ? divisionMemberComponent.division : 0" (event "divisionMemberComponent.evDivisionChanged"))
 		(var isInDivision:bool = "division > 0")
 		(var isDivisionHidden:bool = "divisionMemberComponent ? divisionMemberComponent.divisionHidden : false" (event "divisionMemberComponent.evDivisionHiddenChanged"))
-		(var divisionIconIndex:number = "isInSameDivision ? (divisionSign + 1) : (divisionSign + 1 + 10)")
 
 		(macro GET_MARKER_ENTITY_COMPONENT 'contact')
 		(var isIgnored:bool = "contactComponent ? contactComponent.isIgnored : false" (event "contactComponent.evIsIgnoredChanged"))
@@ -820,6 +819,7 @@
 			(height = 18px)
 			(bind backgroundImage "'url:../service_kit/divisions/division_' + (isInSameDivision ? 'own_' : '') + max(divisionSign, 0) + '.png'")
 		)
+		(bind visible "division > 0 && !isDivisionHidden")
 	)
 	(block
 		(class $FullsizeAbsolute)
