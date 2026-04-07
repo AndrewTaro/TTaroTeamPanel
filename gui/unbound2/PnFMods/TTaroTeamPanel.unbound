@@ -814,9 +814,12 @@
 		(align = "middle|center")
 	)
 	
-	(mc division_item
-		(bind visible "isInDivision && !isDivisionHidden")
-		(bindcall gotoAndStop "divisionIconIndex" init=true)
+	(block
+		(style
+			(width = 13px)
+			(height = 18px)
+			(bind backgroundImage "'url:../service_kit/divisions/division_' + (isInSameDivision ? 'own_' : '') + max(divisionSign, 0) + '.png'")
+		)
 	)
 	(block
 		(class $FullsizeAbsolute)
