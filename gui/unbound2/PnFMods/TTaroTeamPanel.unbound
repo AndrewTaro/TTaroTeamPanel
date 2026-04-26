@@ -111,7 +111,7 @@
 (def constant TP_ATBA_CREW_ID "-1") # Works until WG introduces the EPIC ATBA SKILL (hope that never happens)
 
 (def constant TP_COMPONENT_KEY_BANNED_SHIPS "'modTTaroTeamPanelBannedShips'")
-(def constant TP_COMPONENT_KEY_CONSUMABLE_RANGES "'modTTaroTeamPanelConsumableRanges'")
+(def constant TP_COMPONENT_KEY_CONSUMABLE_DATA "'modTTaroTeamPanelConsumableData'")
 
 (def constant TP_DISPLAY_MODES {
 	DISABLE : 0,
@@ -160,6 +160,7 @@
 	{renderer: 'TP_ShipConfigTorpedoItem',				enablePrefKey: 'TORPEDO',				subPrefKeys: ['RANGE'],								headerImage: 'url:../ttaro_team_panel/torpedo.png',					headerTitle: 'IDS_SHIP_PARAM_TORPEDOES',	headerDescriptions: ['IDS_SHIP_PARAM_MAX_DIST']},
 	{renderer: 'TP_ShipConfigSurfaceConsumableItem',	enablePrefKey: 'SURFACE_CONSUMABLE',	subPrefKeys: ['HYDRO_RANGE', 'RADAR_RANGE'],		headerImage: 'url:../ttaro_team_panel/surface_consumables.png',		headerTitle: 'IDS_TITLE_CONSUMABLES',		headerDescriptions: ['IDS_DOCK_CONSUME_TITLE_PCY008_SONARSEARCH','IDS_DOCK_CONSUME_TITLE_PCY019_RLSSEARCH']},
 	{renderer: 'TP_ShipConfigSubmarineConsumableItem',	enablePrefKey: 'SUB_CONSUMABLE',		subPrefKeys: ['SUB_HYDRO_RANGE', 'SUB_RADAR_RANGE'],headerImage: 'url:../ttaro_team_panel/submarine_consumables.png',	headerTitle: 'IDS_TITLE_CONSUMABLES',		headerDescriptions: ['IDS_DOCK_CONSUME_TITLE_PCY045_HYDROPHONE','IDS_DOCK_CONSUME_TITLE_PCY048_SUBMARINELOCATOR']},
+	{renderer: 'TP_ShipConfigCrashCrewConsumableItem',	enablePrefKey: 'DCP',					subPrefKeys: ['WORK_TIME', 'RELOAD_TIME'],			headerImage: 'url:../ttaro_team_panel/crash_crew.png',				headerTitle: 'IDS_TITLE_CONSUMABLES',		headerDescriptions: ['IDS_SHIP_PARAM_WORK_TIME','IDS_SHIP_PARAM_DEPTH_CHARGE_RELOAD_TIME']},
 ])
 
 (def css $TP_ShipConfigText()
@@ -750,6 +751,12 @@
 	(scope
 		(macro TT_GET_PREF_BOOL _varName="'isPlayerNameVisible'"	_pref="TP_PREFS.PLAYER_NAME")
 		(macro TT_GET_PREF_BOOL _varName="'isShipNameVisible'"		_pref="TP_PREFS.SHIP_NAME")
+		(macro TT_GET_PREF_BOOL _varName="'isHorizontal'"		_pref="TP_PREFS.FLOW_DIRECTION")
+		(var itemsFlowDir:number = "isHorizontal ? _isAlly ? Flow.HORIZONTAL
+												 		   : Flow.REVERSE_HORIZONTAL
+												 : Flow.VERTICAL
+		")
+		(var childrenWidth:number = "isHorizontal && isPlayerNameVisible && isShipNameVisible ? 50% : 100%")
 
 		(var mTop:number = "
 			isPlayerNameVisible && !isShipNameVisible ?  0px
@@ -778,12 +785,19 @@
 			(vgap = 2px)
 			(align = "center|middle")
 			(bind marginTop "mTop") # To align texts to the baseline
+			(bind flow "itemsFlowDir")
 		)
 		(element TP_PlayerNameWithTagItem 	_markerEntity="_markerEntity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum"
 			(bind visible "isPlayerNameVisible")
+			(style
+				(bind width "childrenWidth")
+			)
 		)
 		(element TP_ShipNameItem 			_markerEntity="_markerEntity" _isAlly="_isAlly" _userPrefsNum="_userPrefsNum"
 			(bind visible "isShipNameVisible")
+			(style
+				(bind width "childrenWidth")
+			)
 		)
 	)
 )
@@ -881,9 +895,9 @@
 	(tf
 		(class $TextDefault13NM)
 		(class $FontEnableReadability)
-		(alpha = 0.95)
+		# (alpha = 0.95)
 		(style
-			(width = "100%")
+			(width = 100%)
 			(elideMode = true)
 			(bind textColor "fontColor")
 			(bind textAlign "_isAlly ? left : right")
@@ -1220,6 +1234,22 @@
 
 		(var settingKey:str = "isDetected ? 'DETECTED' : 'INVISIBLE'")
 		(var setting:dict = "TP_DETECTION_CIRCLE_SETTINGS[settingKey]")
+
+		(var colorOffset:number = "0" watch=false)
+		(controller $Animation
+			(bindcall play	duration=0.15
+							from={colorOffset: 0}
+							to={colorOffset: 160}
+							action="killAll"
+							(bind trigger "wasDetected")
+			)
+			(bindcall play	duration=0.45
+							delay=0.15
+							from={colorOffset: 160}
+							to={colorOffset: 0}
+							(bind trigger "wasDetected")
+			)
+		)
 	)
 	(style
 		(align = "center|middle")
@@ -1233,6 +1263,7 @@
 			(arc = 360)
 			(radius = 5)
 		)
+		(bind colorTransform "{redOffset: colorOffset, greenOffset: colorOffset, blueOffset: colorOffset}")
 	)
 )
 
@@ -1728,7 +1759,7 @@
 )
 
 # This will reduce unnecessary textfields
-(def macro TP_SHIPCONFIG_TEXT_ITEM(_value:expression, _unit:expression, _isEnabled:expression, _roundDigit:expression="1")
+(def macro TP_SHIPCONFIG_TEXT_ITEM(_value:expression, _unit:expression, _isEnabled:expression, _roundDigit:expression="1", _hasBraces:expression="false")
 	(block
 		(style
 			(width = 100%)
@@ -1740,9 +1771,17 @@
 				_unit			= "_unit"
 				_userPrefsNum	= "_userPrefsNum"
 				_roundDigit		= "_roundDigit"
+				_hasBraces		= "_hasBraces"
 			)
 		)
 	)
+)
+
+(def macro TP_GET_TORPEDO_DATA(_varNamePrefix:expression, _torpedoTTX:expression)
+	# Injects `_varNamePrefix + Range` and `_varNamePrefix + 'CanHit'`
+	# e.g. `torpedoRange` and `torpedoCanHit`
+	(var name="_varNamePrefix + 'Range'" type=number value="_torpedoTTX ? _torpedoTTX.maxDist.value : null")
+	(var name="_varNamePrefix + 'CanHit'" type=bool value="_torpedoTTX && _torpedoTTX.canHitClasses && _torpedoTTX.canHitClasses.length ? (ownShipType in _torpedoTTX.canHitClasses) : true")
 )
 
 (def element TP_ShipConfigArtilleryItem(_shipTTX:gfx, _userPrefsNum:gfx=null)
@@ -1760,38 +1799,41 @@
 
 (def element TP_ShipConfigTorpedoItem(_shipTTX:gfx, _userPrefsNum:gfx=null)
 	(scope
+		(var ownAvatar:gfx = "$datahub.getSingleEntity(CC.playerAvatar)")
+		(var avatarComponent:gfx = "ownAvatar ? ownAvatar.avatar : null")
+		(var ownShipType:str = "avatarComponent ? avatarComponent.shipType : null" (event "avatarComponent.evShipTypeChanged"))
 		# Surface Torps
 		(var torpedoesTTX:gfx = "_shipTTX ? _shipTTX.torpedoes : null")
 		# Normal torps
 		(var torpedoTTX:gfx = "torpedoesTTX ? torpedoesTTX.torpedo : null")
-		(var torpedoRange:number = "torpedoTTX ? torpedoTTX.maxDist.value : null")
+		(macro TP_GET_TORPEDO_DATA _varNamePrefix="'torpedo'" _torpedoTTX="torpedoTTX")
 		# Deepwater torps
 		(var torpedoDeepwaterTTX:gfx = "torpedoesTTX ? torpedoesTTX.torpedoDeepwater : null")
-		(var torpedoDeepwaterRange:number = "torpedoDeepwaterTTX ? torpedoDeepwaterTTX.maxDist.value : null")
+		(macro TP_GET_TORPEDO_DATA _varNamePrefix="'torpedoDeepwater'" _torpedoTTX="torpedoDeepwaterTTX")
 		# Alt torps
 		(var torpedoAltTTX:gfx = "torpedoesTTX ? torpedoesTTX.torpedoAlt : null")
-		(var torpedoAltRange:number = "torpedoAltTTX ? torpedoAltTTX.maxDist.value : null")
+		(macro TP_GET_TORPEDO_DATA _varNamePrefix="'torpedoAlt'" _torpedoTTX="torpedoAltTTX")
 
 		# Submarine torps
 		(var torpedoGroupsTTX:gfx = "_shipTTX ? _shipTTX.torpedoGroups : null")
 		# Normal torps
 		(var subTorpedoTTX:gfx = "torpedoGroupsTTX ? torpedoGroupsTTX.torpedo : null")
-		(var subTorpedoRange:number = "subTorpedoTTX ? subTorpedoTTX.maxDist.value : null")
+		(macro TP_GET_TORPEDO_DATA _varNamePrefix="'subTorpedo'" _torpedoTTX="subTorpedoTTX")
 		# Deepwater torps
 		(var subTorpedoDeepwaterTTX:gfx = "torpedoGroupsTTX ? torpedoGroupsTTX.torpedoDeepwater : null")
-		(var subTorpedoDeepwaterRange:number = "subTorpedoDeepwaterTTX ? subTorpedoDeepwaterTTX.maxDist.value : null")
+		(macro TP_GET_TORPEDO_DATA _varNamePrefix="'subTorpedoDeepwater'" _torpedoTTX="subTorpedoDeepwaterTTX")
 		# Alt torps
 		(var subTorpedoAltTTX:gfx = "torpedoGroupsTTX ? torpedoGroupsTTX.torpedoAlt : null")
-		(var subTorpedoAltRange:number = "subTorpedoAltTTX ? subTorpedoAltTTX.maxDist.value : null")
+		(macro TP_GET_TORPEDO_DATA _varNamePrefix="'subTorpedoAlt'" _torpedoTTX="subTorpedoAltTTX")
 	)
 
-	(macro TP_SHIPCONFIG_TEXT_ITEM _value="torpedoRange"			_unit="'km'"	_isEnabled="torpedoRange")
-	(macro TP_SHIPCONFIG_TEXT_ITEM _value="torpedoDeepwaterRange"	_unit="'km'"	_isEnabled="torpedoDeepwaterRange")
-	(macro TP_SHIPCONFIG_TEXT_ITEM _value="torpedoAltRange"			_unit="'km'"	_isEnabled="torpedoAltRange")
+	(macro TP_SHIPCONFIG_TEXT_ITEM _value="torpedoRange"			_unit="'km'"	_isEnabled="torpedoRange"			_hasBraces="!torpedoCanHit")
+	(macro TP_SHIPCONFIG_TEXT_ITEM _value="torpedoDeepwaterRange"	_unit="'km'"	_isEnabled="torpedoDeepwaterRange"	_hasBraces="!torpedoDeepwaterCanHit")
+	(macro TP_SHIPCONFIG_TEXT_ITEM _value="torpedoAltRange"			_unit="'km'"	_isEnabled="torpedoAltRange"		_hasBraces="!torpedoAltCanHit")
 
-	(macro TP_SHIPCONFIG_TEXT_ITEM _value="subTorpedoRange"			_unit="'km'"	_isEnabled="subTorpedoRange")
-	(macro TP_SHIPCONFIG_TEXT_ITEM _value="subTorpedoDeepwaterRange"_unit="'km'"	_isEnabled="subTorpedoDeepwaterRange")
-	(macro TP_SHIPCONFIG_TEXT_ITEM _value="subTorpedoAltRange"		_unit="'km'"	_isEnabled="subTorpedoAltRange")
+	(macro TP_SHIPCONFIG_TEXT_ITEM _value="subTorpedoRange"			_unit="'km'"	_isEnabled="subTorpedoRange"		_hasBraces="!subTorpedoCanHit")
+	(macro TP_SHIPCONFIG_TEXT_ITEM _value="subTorpedoDeepwaterRange"_unit="'km'"	_isEnabled="subTorpedoDeepwaterRange" _hasBraces="!subTorpedoDeepwaterCanHit")
+	(macro TP_SHIPCONFIG_TEXT_ITEM _value="subTorpedoAltRange"		_unit="'km'"	_isEnabled="subTorpedoAltRange"		_hasBraces="!subTorpedoAltCanHit")
 )
 
 (def element TP_ShipConfigAtbaItem(_shipTTX:gfx, _markerEntity:gfx, _isRealParams:bool, _userPrefsNum:gfx=null)
@@ -1932,14 +1974,13 @@
 
 (def element TP_ShipConfigSurfaceConsumableItem(_shipTTX:gfx, _markerEntity:gfx, _userPrefsNum:gfx=null)
 	(scope
-		(var avatarId:str = "_markerEntity ? toString(_markerEntity.avatar.id) : ''")
-		(var consumableEntityWatcher:gfx = "$datahub.getPrimWatcher(CC.mods_DataComponent, TP_COMPONENT_KEY_CONSUMABLE_RANGES)")
+		(var compKey:str = "_markerEntity ? TP_COMPONENT_KEY_CONSUMABLE_DATA + '_' + toString(_markerEntity.avatar.id) : ''")
+		(var consumableEntityWatcher:gfx = "$datahub.getPrimWatcher(CC.mods_DataComponent, compKey)")
 		(var consumableEntity:gfx = "consumableEntityWatcher.entity" (event "consumableEntityWatcher.event"))
 		(var consumableDataComponent:gfx = "consumableEntity ? consumableEntity.mods_DataComponent : null" (event "consumableEntity.evAdded"))
 		(var consumableData:dict = "consumableDataComponent ? consumableDataComponent.data : {}" (event "consumableDataComponent.evDataChanged"))
-		(var consumableRanges:dict = "avatarId in consumableData ? consumableData[avatarId] : {}")
-		(var radarRange:number = "'rls' in consumableRanges ? consumableRanges.rls : null")
-		(var hydroRange:number = "'sonar' in consumableRanges ? consumableRanges.sonar : null")
+		(var radarRange:number = "'rls' in consumableData ? consumableData.rls.range : null")
+		(var hydroRange:number = "'sonar' in consumableData ? consumableData.sonar.range : null")
 
 		(macro TT_GET_PREF_BOOL _varName="'isHydroRangeVisible'" _pref="TP_PREFS.SURFACE_CONSUMABLE.HYDRO_RANGE")
 		(macro TT_GET_PREF_BOOL _varName="'isRadarRangeVisible'" _pref="TP_PREFS.SURFACE_CONSUMABLE.RADAR_RANGE")
@@ -1951,14 +1992,13 @@
 
 (def element TP_ShipConfigSubmarineConsumableItem(_shipTTX:gfx, _markerEntity:gfx, _userPrefsNum:gfx=null)
 	(scope
-		(var avatarId:str = "_markerEntity ? toString(_markerEntity.avatar.id) : ''")
-		(var consumableEntityWatcher:gfx = "$datahub.getPrimWatcher(CC.mods_DataComponent, TP_COMPONENT_KEY_CONSUMABLE_RANGES)")
+		(var compKey:str = "_markerEntity ? TP_COMPONENT_KEY_CONSUMABLE_DATA + '_' + toString(_markerEntity.avatar.id) : ''")
+		(var consumableEntityWatcher:gfx = "$datahub.getPrimWatcher(CC.mods_DataComponent, compKey)")
 		(var consumableEntity:gfx = "consumableEntityWatcher.entity" (event "consumableEntityWatcher.event"))
 		(var consumableDataComponent:gfx = "consumableEntity ? consumableEntity.mods_DataComponent : null" (event "consumableEntity.evAdded"))
 		(var consumableData:dict = "consumableDataComponent ? consumableDataComponent.data : {}" (event "consumableDataComponent.evDataChanged"))
-		(var consumableRanges:dict = "avatarId in consumableData ? consumableData[avatarId] : {}")
-		(var radarRange:number = "'submarineLocator' in consumableRanges ? consumableRanges.submarineLocator : null")
-		(var hydroRange:number = "'hydrophone' in consumableRanges ? consumableRanges.hydrophone : null")
+		(var radarRange:number = "'submarineLocator' in consumableData ? consumableData.submarineLocator.range : null")
+		(var hydroRange:number = "'hydrophone' in consumableData ? consumableData.hydrophone.range : null")
 
 		(macro TT_GET_PREF_BOOL _varName="'isSubHydroRangeVisible'" _pref="TP_PREFS.SUB_CONSUMABLE.SUB_HYDRO_RANGE")
 		(macro TT_GET_PREF_BOOL _varName="'isSubRadarRangeVisible'" _pref="TP_PREFS.SUB_CONSUMABLE.SUB_RADAR_RANGE")
@@ -1968,8 +2008,27 @@
 	(macro TP_SHIPCONFIG_TEXT_ITEM _value="radarRange"	_unit="'km'"	_isEnabled="isSubRadarRangeVisible")
 )
 
+(def element TP_ShipConfigCrashCrewConsumableItem(_shipTTX:gfx, _markerEntity:gfx, _userPrefsNum:gfx=null)
+	(scope
+		(var compKey:str = "_markerEntity ? TP_COMPONENT_KEY_CONSUMABLE_DATA + '_' + toString(_markerEntity.avatar.id) : ''")
+		(var consumableEntityWatcher:gfx = "$datahub.getPrimWatcher(CC.mods_DataComponent, compKey)")
+		(var consumableEntity:gfx = "consumableEntityWatcher.entity" (event "consumableEntityWatcher.event"))
+		(var consumableDataComponent:gfx = "consumableEntity ? consumableEntity.mods_DataComponent : null" (event "consumableEntity.evAdded"))
+		(var consumableData:dict = "consumableDataComponent ? consumableDataComponent.data : {}" (event "consumableDataComponent.evDataChanged"))
+		(var dcpData:dict = "'crashCrew' in consumableData ? consumableData.crashCrew : null")
+		(var workTime:number = "'workTime' in dcpData ? dcpData.workTime : null")
+		(var reloadTime:number = "'reloadTime' in dcpData ? dcpData.reloadTime : null")
+
+		(macro TT_GET_PREF_BOOL _varName="'isWorkTimeVisible'"		_pref="TP_PREFS.DCP.WORK_TIME")
+		(macro TT_GET_PREF_BOOL _varName="'isReloadTimeVisible'"	_pref="TP_PREFS.DCP.RELOAD_TIME")
+	)
+
+	(macro TP_SHIPCONFIG_TEXT_ITEM _value="workTime"	_unit="'s'"	_isEnabled="isWorkTimeVisible"	 _roundDigit="0")
+	(macro TP_SHIPCONFIG_TEXT_ITEM _value="reloadTime"	_unit="'s'"	_isEnabled="isReloadTimeVisible" _roundDigit="0")
+)
+
 # Text Item
-(def element TP_ShipConfigTextItem (_value:number, _unit:str='', _roundDigit:number="1.0", _userPrefsNum:gfx=null)
+(def element TP_ShipConfigTextItem (_value:number, _unit:str='', _roundDigit:number="1.0", _hasBraces:bool="false" _userPrefsNum:gfx=null)
 	(scope
 		(var isValueVisible:bool = "_value")
 		(macro TT_GET_PREF_BOOL _varName="'isUnitVisible'" _pref="TP_PREFS.UNITS_VISIBLE")
@@ -1988,6 +2047,17 @@
 		(marginBottom = 2px)
 	)
 	(tf
+		(text = '(')
+		(bind visible "_hasBraces")
+		(class $TP_ShipConfigText)
+		(style
+			(marginRight = "XXS")
+			(position = "absolute")
+			(bind left "isUnitVisible ? 5px : 2px")
+			(top = -1px) # To compensate the weird brace position
+		)
+	)
+	(tf
 		(bind class "isBoldFont ? '$TP_ShipConfigTextBold' : '$TP_ShipConfigText'")
 		(style
 			(textAlign = "right")
@@ -1995,6 +2065,7 @@
 			# max width of the text (e.g. '99.9') is 26px.
 			# Without width and textAlign there is one fucking pixel misalignment on some texts
 			# This is cursed
+			(bind textColor "_hasBraces ? 0xdddddd : 0xffffff")
 		)
 		(bind text "valueText")
 	)
@@ -2007,6 +2078,16 @@
 			(width = "20px")
 			(marginLeft = "XS")
 			(marginRight = "-S") # Not center but this makes it *visually look* centered.
+		)
+	)
+	(tf
+		(text = ')')
+		(bind visible "_hasBraces")
+		(class $TP_ShipConfigText)
+		(style
+			(bind right "isUnitVisible ? -3px : 2px")
+			(position = "absolute")
+			(top = -1px) # To compensate the weird brace position
 		)
 	)
 )
