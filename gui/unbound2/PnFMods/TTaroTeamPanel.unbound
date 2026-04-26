@@ -2012,8 +2012,8 @@
 		(macro TT_GET_PREF_BOOL _varName="'isReloadTimeVisible'"	_pref="TP_PREFS.DCP.RELOAD_TIME")
 	)
 
-	(macro TP_SHIPCONFIG_TEXT_ITEM _value="workTime"	_unit="'s'"	_isEnabled="isWorkTimeVisible")
-	(macro TP_SHIPCONFIG_TEXT_ITEM _value="reloadTime"	_unit="'s'"	_isEnabled="isReloadTimeVisible")
+	(macro TP_SHIPCONFIG_TEXT_ITEM _value="workTime"	_unit="'s'"	_isEnabled="isWorkTimeVisible"	 _roundDigit="0")
+	(macro TP_SHIPCONFIG_TEXT_ITEM _value="reloadTime"	_unit="'s'"	_isEnabled="isReloadTimeVisible" _roundDigit="0")
 )
 
 # Text Item
