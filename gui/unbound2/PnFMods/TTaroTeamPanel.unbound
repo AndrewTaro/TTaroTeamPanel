@@ -2028,7 +2028,7 @@
 )
 
 # Text Item
-(def element TP_ShipConfigTextItem (_value:number, _unit:str='', _roundDigit:number="1.0", _hasBraces:bool="false" _userPrefsNum:gfx=null)
+(def element TP_ShipConfigTextItem (_value:number, _unit:str='', _roundDigit:number="1.0", _hasBraces:bool="false", _userPrefsNum:gfx=null)
 	(scope
 		(var isValueVisible:bool = "_value")
 		(macro TT_GET_PREF_BOOL _varName="'isUnitVisible'" _pref="TP_PREFS.UNITS_VISIBLE")
