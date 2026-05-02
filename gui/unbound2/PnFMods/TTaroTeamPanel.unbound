@@ -180,12 +180,11 @@
 		(macro STAGE_SIZE)
 		(macro TT_GET_USERPREF)
 		(macro TT_GET_PREF_NUMBER _varName="'posYModifier'" _pref="TP_PREFS.POS_OFFSET_MODIFIER")
-		(macro TT_GET_PREF_BOOL _varName="'isBlurMode'" _pref="TP_PREFS.BACKGROUND.MODE")
-
+		(macro TT_GET_PREF_BOOL _varName="'isBlurMode'"		_pref="TP_PREFS.BACKGROUND.MODE")
 		(macro TT_GET_PREF_BOOL _varName="'isVisibleOnlyOnAlt'" _pref="TP_PREFS.ALL_ALT_VISIBLE")
 		(var camera:gfx = "$datahub.getSingleComponent(CC.camera)")
 		(var altVision:bool = "camera ? camera.altVision : false" (event "camera.evAltVisionChanged"))
-		(var isiVisible:bool = "isVisibleOnlyOnAlt ? altVision : true")
+		(var isVisible:bool = "isVisibleOnlyOnAlt ? altVision : true")
 
 		(var posY:number = "TP_DEFAULT_HEIGHT + (posYModifier * 10)")
 	)
@@ -208,7 +207,7 @@
 	)
 
 	(block
-		(bind visible "isiVisible")
+		(bind visible "isVisible")
 		(style
 			(position = "absolute")
 			(bind top "posY")
@@ -227,11 +226,12 @@
 		(var allyItems:array = "allyCollection ? allyCollection.items : null" (event "allyCollection.evAdded") (event "allyCollection.evRemoved")  (event "allyCollection.evUpdated"))
 		(var isEnabled:bool = "allyItems && allyItems.length > 0")
 		(macro TT_GET_PREF_NUMBER _varName="'sizeScale'" _pref="TP_PREFS.SCALE_OFFSET")
+		(macro TT_GET_PREF_NUMBER_RAW _varName="'sideOffset'"	_pref="TP_PREFS.SIDE_OFFSET")
 	)
 
 	(style
 		(position = "absolute")
-		(left = 0)
+		(bind left "sideOffset")
 	)
 	(macro BIND_FAIR_SCALE "sizeScale")
 
@@ -260,11 +260,12 @@
 		(var enemyItems:array = "enemyCollection ? enemyCollection.items : null" (event "enemyCollection.evAdded") (event "enemyCollection.evRemoved") (event "enemyCollection.evUpdated"))
 		(var isEnabled:bool = "enemyItems && enemyItems.length > 0")
 		(macro TT_GET_PREF_NUMBER _varName="'sizeScale'" _pref="TP_PREFS.SCALE_OFFSET")
+		(macro TT_GET_PREF_NUMBER_RAW _varName="'sideOffset'"	_pref="TP_PREFS.SIDE_OFFSET")
 	)
 
 	(style
 		(position = "absolute")
-		(right = 0)
+		(bind right "sideOffset")
 		(pivotX = 100%)
 		(align = "right")
 	)
