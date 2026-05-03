@@ -41,7 +41,7 @@ try:
 except:
     pass
 
-from EntityController import EntityController
+from EntityController import EntityController, EntityControllersCollection
 
 
 CC = constants.UiComponents
@@ -253,68 +253,150 @@ class ShipRestrictionChecker(object):
 compChecker = ShipRestrictionChecker()
 
 
+CONSUMABLES_SEARCH_OPTIONS = [
+    {
+        'searchKeyWord': 'RLSSearch',
+        'dataKey': 'rls',
+        'params': [
+            {
+                'category': 'activeAttributes',
+                'type': 'neutral',
+                'name': 'distShip',
+                'dataKey': 'range',
+            }
+        ]
+    },
+    {
+        'searchKeyWord': 'SonarSearch',
+        'dataKey': 'sonar',
+        'params': [
+            {
+                'category': 'activeAttributes',
+                'type': 'neutral',
+                'name': 'distShip',
+                'dataKey': 'range'
+            }
+        ]
+    },
+    {
+        'searchKeyWord': 'SubmarineLocator',
+        'dataKey': 'submarineLocator',
+        'params': [
+            {
+                'category': 'activeAttributes',
+                'type': 'neutral',
+                'name': 'acousticWaveMaxDist_submarine_detection',
+                'dataKey': 'range'
+            }
+        ]
+    },
+    {
+        'searchKeyWord': 'Hydrophone',
+        'dataKey': 'hydrophone',
+        'params': [
+            {
+                'category': 'activeAttributes',
+                'type': 'neutral',
+                'name': 'hydrophoneWaveRadius',
+                'dataKey': 'range'
+            }
+        ]
+    },
+    {
+        'searchKeyWord': 'CrashCrew',
+        'dataKey': 'crashCrew',
+        'params': [
+            {
+                'category': 'usageAttributes',
+                'type': 'neutral',
+                'name': 'workTime',
+                'dataKey': 'workTime',
+            },
+            {
+                'category': 'usageAttributes',
+                'type': 'neutral',
+                'name': 'reloadTime',
+                'dataKey': 'reloadTime',
+            }
+        ]
+    },
+]
+
+
+def getParameterFromConsumable(consumable):
+    data = {}
+    for consOption in CONSUMABLES_SEARCH_OPTIONS:
+        if consOption['searchKeyWord'].upper() in consumable.title:
+            for option in consOption['params']:
+                try:
+                    consParams = getattr(consumable, option['category'])
+                    consParams = getattr(consParams, option['type'])
+                    for param in consParams:
+                        if param.paramName == option['name']:
+                            key = consOption['dataKey']
+                            if key not in data:
+                                data[key] = {}
+                            data[key][option['dataKey']] = param.measuredValue
+
+                except Exception, e:
+                    utils.logInfo('[TTaroTeamPanel] Failed to retrieve consumable data. {}'.format(e))
+                    continue
+
+    if len(data) > 0:
+        return data
+
+
+# ATTRIBUTE_CATEGORIES = ('activeAttributes', 'usageAttributes')
+# ATTRIBUTE_TYPES = ('neutral', 'positive', 'negative')
+
+# def flattenConsumableParams(consumable):
+#     data = {
+#         'title'     : consumable.title,
+#         'abilityId' : consumable.abilityId
+#     }
+#     for category in ATTRIBUTE_CATEGORIES:
+#         cat = getattr(consumable, category)
+#         for typ in ATTRIBUTE_TYPES:
+#             param = getattr(cat, typ)
+#             data[param.name] = param.measuredValue
+#     return data
+
+
 class ShipConsumableChecker(object):
     """
     Checks the ship consumables in a match
     """
-    COMPONENT_KEY = 'modTTaroTeamPanelConsumableRanges'
-    TITLE_TO_INFO = {
-        'RLSSearch'         : {'type': 'rls',               'attr': 'distShip'},
-        'SonarSearch'       : {'type': 'sonar',             'attr': 'distShip'},
-        'SubmarineLocator'  : {'type': 'submarineLocator',  'attr': 'acousticWaveMaxDist_submarine_detection'},
-        'Hydrophone'        : {'type': 'hydrophone',        'attr': 'hydrophoneWaveRadius'},
-    }
+    COMPONENT_KEY = 'modTTaroTeamPanelConsumableData'
 
     def __init__(self):
-        self.entityController = EntityController(ShipConsumableChecker.COMPONENT_KEY)
+        self.controllers = EntityControllersCollection(ShipConsumableChecker.COMPONENT_KEY)
         events.onBattleShown(self.__onBattleStart)
         events.onBattleQuit(self.__onBattleEnd)
 
     def __onBattleStart(self, *args):
-        self.entityController.createEntity()
-        data = self._getAllConsumablesData()
-        self.entityController.updateEntity(data)
-
-        utils.logInfo('[TTaroTeamPanel] Ship consumables have been updated.')
-
-    def __onBattleEnd(self, *args):
-        self.entityController.removeEntity()
-
-    def _getAllConsumablesData(self):
-        consumablesData = {}
+        self.controllers.removeAll()
         for entity in dataHub.getEntityCollections('shipBattleInfo'):
             ship = entity[CC.shipBattleInfo]
             data = self._getConsumablesDataByShip(ship)
             if data is not None:
-                consumablesData[ship.playerId] = data
+                self.controllers.addController(ship.playerId, data)
 
-        return consumablesData
+        utils.logInfo('[TTaroTeamPanel] Ship consumables have been updated.')
+
+    def __onBattleEnd(self, *args):
+        self.controllers.removeAll()
     
     def _getConsumablesDataByShip(self, ship):
         data = {}
         allConsumables = ship.mainConsumables + [cons for consList in ship.altConsumables for cons in consList]
         for cons in allConsumables:
-            consInfo = self.__getConsumableInfo(cons)
-            if consInfo is None:
-                continue
-            consType = consInfo['type']
-            data[consType] = self.__getConsumableRange(cons, consInfo)
+            param = getParameterFromConsumable(cons)
+            if param:
+                data.update(param)
 
         if len(data) > 0:
             return data
         return None
 
-    def __getConsumableInfo(self, consumable):
-        consName = consumable.title
-        for ident, consInfo in ShipConsumableChecker.TITLE_TO_INFO.iteritems():
-            if ident.upper() in consName:
-                return consInfo
-        return None
-
-    def __getConsumableRange(self, consumable, consInfo):
-        paramName = consInfo['attr']
-        for attr in consumable.activeAttributes.neutral:
-            if attr.paramName == paramName:
-                return attr.measuredValue
             
 consChecker = ShipConsumableChecker()
