@@ -2652,9 +2652,9 @@
 		(var planesDC:number = "bomberDC ? bomberDC.chargesNum.value : 0")
 		(var numSquadrons:number = "max(planesHE, planesAP, planesDC)")
 
-		(var bombHE:gfx = "bomberHE ? bomberHE.bombHE : null")
-		(var bombAP:gfx = "bomberAP ? bomberAP.bombAP : null")
-		(var bombDC:gfx = "bomberDC ? bomberDC.bombDC : null")
+		(var bombHE:gfx = "bomberHE ? bomberHE.payload : null")
+		(var bombAP:gfx = "bomberAP ? bomberAP.payload : null")
+		(var bombDC:gfx = "bomberDC ? bomberDC.payload : null")
 
 		(var damageHE:number = "bombHE ? bombHE.damage.value : null")
 		(var damageAP:number = "bombAP ? bombAP.damage.value : null")
