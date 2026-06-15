@@ -1814,27 +1814,11 @@
 		# Alt torps
 		(var torpedoAltTTX:gfx = "torpedoesTTX ? torpedoesTTX.torpedoAlt : null")
 		(macro TP_GET_TORPEDO_DATA _varNamePrefix="'torpedoAlt'" _torpedoTTX="torpedoAltTTX")
-
-		# Submarine torps
-		(var torpedoGroupsTTX:gfx = "_shipTTX ? _shipTTX.torpedoGroups : null")
-		# Normal torps
-		(var subTorpedoTTX:gfx = "torpedoGroupsTTX ? torpedoGroupsTTX.torpedo : null")
-		(macro TP_GET_TORPEDO_DATA _varNamePrefix="'subTorpedo'" _torpedoTTX="subTorpedoTTX")
-		# Deepwater torps
-		(var subTorpedoDeepwaterTTX:gfx = "torpedoGroupsTTX ? torpedoGroupsTTX.torpedoDeepwater : null")
-		(macro TP_GET_TORPEDO_DATA _varNamePrefix="'subTorpedoDeepwater'" _torpedoTTX="subTorpedoDeepwaterTTX")
-		# Alt torps
-		(var subTorpedoAltTTX:gfx = "torpedoGroupsTTX ? torpedoGroupsTTX.torpedoAlt : null")
-		(macro TP_GET_TORPEDO_DATA _varNamePrefix="'subTorpedoAlt'" _torpedoTTX="subTorpedoAltTTX")
 	)
 
 	(macro TP_SHIPCONFIG_TEXT_ITEM _value="torpedoRange"			_unit="'km'"	_isEnabled="torpedoRange"			_hasBraces="!torpedoCanHit")
 	(macro TP_SHIPCONFIG_TEXT_ITEM _value="torpedoDeepwaterRange"	_unit="'km'"	_isEnabled="torpedoDeepwaterRange"	_hasBraces="!torpedoDeepwaterCanHit")
 	(macro TP_SHIPCONFIG_TEXT_ITEM _value="torpedoAltRange"			_unit="'km'"	_isEnabled="torpedoAltRange"		_hasBraces="!torpedoAltCanHit")
-
-	(macro TP_SHIPCONFIG_TEXT_ITEM _value="subTorpedoRange"			_unit="'km'"	_isEnabled="subTorpedoRange"		_hasBraces="!subTorpedoCanHit")
-	(macro TP_SHIPCONFIG_TEXT_ITEM _value="subTorpedoDeepwaterRange"_unit="'km'"	_isEnabled="subTorpedoDeepwaterRange" _hasBraces="!subTorpedoDeepwaterCanHit")
-	(macro TP_SHIPCONFIG_TEXT_ITEM _value="subTorpedoAltRange"		_unit="'km'"	_isEnabled="subTorpedoAltRange"		_hasBraces="!subTorpedoAltCanHit")
 )
 
 (def element TP_ShipConfigAtbaItem(_shipTTX:gfx, _markerEntity:gfx, _isRealParams:bool, _userPrefsNum:gfx=null)
@@ -2102,7 +2086,6 @@
 	{renderer: 'TP_TooltipMainGunItem',				ttxName: 'artillery',			title: 'IDS_SHIP_PARAM_ARTILLERY', 		ttxSubAttr: 'mainGun'},
 	{renderer: 'TP_TooltipAtbaItem',				ttxName: 'artillery',			title: 'IDS_SHIP_PARAM_ARTILLERY_ATBA',	ttxSubAttr: 'atba'},
 	{renderer: 'TP_TooltipTorpedoesItem',			ttxName: 'torpedoes',			title: 'IDS_SHIP_PARAM_TORPEDOES'},
-	{renderer: 'TP_TooltipTorpedoesGroupItem',		ttxName: 'torpedoGroups',		title: 'IDS_SHIP_PARAM_TORPEDOES'},
 	{renderer: 'TP_TooltipAirDefenseItem',			ttxName: 'airDefense',			title: 'IDS_SHIP_PARAM_AIR_DEFENSE'},
 	{renderer: 'TP_TooltipAirSupportItem',			ttxName: 'airSupport',			title: 'IDS_SHIP_PARAM_AIR_SUPPORT'},
 	{renderer: 'TP_TooltipDepthChargeItem',			ttxName: 'depthCharges',		title: 'IDS_SHIP_PARAM_DEPTH_CHARGE'},
@@ -2538,8 +2521,14 @@
 		# Reload
 		(var reload:number = "torpedoesTTX ? torpedoesTTX.reloadTime.value : null")
 
-		(var launchers:array = "torpedoesTTX ? torpedoesTTX.launchers : []")
-		(var numOfLaunchers:number = "launchers.length")
+		(var bowGroup:gfx = "torpedoesTTX ? torpedoesTTX.bowGroup : null")
+		(var sternGroup:gfx = "torpedoesTTX ? torpedoesTTX.sternGroup : null")
+		(var bowTorps:number = "bowGroup ? bowGroup.numGuns.value * bowGroup.numBarrels.value : 0")
+		(var sternTorps:number = "sternGroup ? sternGroup.numGuns.value * sternGroup.numBarrels.value : 0")
+
+		(var ungroupedLaunchers:array = "torpedoesTTX ? torpedoesTTX.ungroupedLaunchers : []")
+		(var launchers:array = "ungroupedLaunchers ? ungroupedLaunchers.launchers : []")
+		(var numOfLaunchers:number = "launchers ? launchers.length : 0")
 
 		(var launcher1:gfx = "numOfLaunchers > 0 ? launchers[0] : null")
 		(var num1:str = "launcher1 ? subst('%dx%d', [launcher1.numGuns.value, launcher1.numBarrels.value]) : ''")
@@ -2589,7 +2578,6 @@
 
 (def element TP_TooltipTorpedoAmmoItem(_title:str, _torpedoAmmoTTX:gfx, _userPrefsNum:gfx=null)
 	(scope
-		(var torpedoTTX:gfx = "_torpedoAmmoTTX ? _torpedoAmmoTTX.torpedo : null")
 		(var range:number = "_torpedoAmmoTTX ? _torpedoAmmoTTX.maxDist.value : 0")
 		(var damage:number = "_torpedoAmmoTTX ? _torpedoAmmoTTX.damage.value : 0")
 		(var visibility:number = "_torpedoAmmoTTX ? _torpedoAmmoTTX.visibility.value : 0")
@@ -2611,60 +2599,6 @@
 		(controller $Instance renderer='TP_TooltipShipConfigClassIconsItem'
 			(bind enabled "canHitClasses && canHitClasses.length > 0")
 			(args _title="'IDS_SHIP_PARAM_TORPEDOES_AFFECTED_SHIPS'" _canHitClasses="canHitClasses" _indent="TP_TOOLTIP_INDENTS.SUB_TEXT" _userPrefsNum="_userPrefsNum")
-		)
-	)
-)
-
-(def element TP_TooltipTorpedoesGroupItem(_shipTTX:gfx, _userPrefsNum:gfx=null)
-	(scope
-		# Submarine Torps
-		(var torpedoGroupsTTX:gfx = "_shipTTX.torpedoGroups")
-		# Normal Torps
-		(var subTorpedoTTX:gfx = "torpedoGroupsTTX ? torpedoGroupsTTX.torpedo : null")
-		# Deepwater Torps
-		(var subTorpedoDeepwaterTTX:gfx = "torpedoGroupsTTX ? torpedoGroupsTTX.torpedoDeepwater : null")
-		# Alt Torps
-		(var subTorpedoAltTTX:gfx = "torpedoGroupsTTX ? torpedoGroupsTTX.torpedoAlt : null")
-		# Forward Reload
-		(var torpdoBowReload:number = "(torpedoGroupsTTX && torpedoGroupsTTX.bowGroup) ? torpedoGroupsTTX.bowGroup.reloadTime.value : null")
-		(var torpdoBowLoaders:number = "(torpedoGroupsTTX && torpedoGroupsTTX.bowGroup) ? torpedoGroupsTTX.bowGroup.numLoaders.value : null")
-		# Stern Reload
-		(var torpdoSternReload:number = "(torpedoGroupsTTX && torpedoGroupsTTX.sternGroup) ? torpedoGroupsTTX.sternGroup.reloadTime.value : null")
-		(var torpdoSternLoaders:number = "(torpedoGroupsTTX && torpedoGroupsTTX.sternGroup) ? torpedoGroupsTTX.sternGroup.numLoaders.value : null")
-	)
-
-	(class $TP_FullWidth)
-
-	(block
-		(class $TP_FullWidth)
-		(class $TP_TooltipSectionMargin)
-		(element TP_TooltipShipConfigTextItem _title="'IDS_SHIP_PARAM_SHOT_DELAY'" _value="torpdoBowReload" _unit="'s'" _userPrefsNum="_userPrefsNum")
-	)
-
-	(controller $Instance renderer='TP_TooltipTorpedoAmmoItem'
-		(bind enabled "subTorpedoTTX")
-		(args
-			_title			= 'IDS_SHIP_PARAM_TORPEDO_AMMO'
-			_torpedoAmmoTTX = "subTorpedoTTX"
-			_userPrefsNum	= "_userPrefsNum"
-		)
-	)
-
-	(controller $Instance renderer='TP_TooltipTorpedoAmmoItem'
-		(bind enabled "subTorpedoDeepwaterTTX")
-		(args
-			_title			= 'IDS_SHIP_PARAM_TORPEDO_DEEPWATER_AMMO'
-			_torpedoAmmoTTX = "subTorpedoDeepwaterTTX"
-			_userPrefsNum	= "_userPrefsNum"
-		)
-	)
-
-	(controller $Instance renderer='TP_TooltipTorpedoAmmoItem'
-		(bind enabled "subTorpedoAltTTX")
-		(args
-			_title			= 'IDS_SHIP_PARAM_TORPEDO_ALTERNATIVE_AMMO'
-			_torpedoAmmoTTX = "subTorpedoAltTTX"
-			_userPrefsNum	= "_userPrefsNum"
 		)
 	)
 )
