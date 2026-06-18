@@ -2526,7 +2526,7 @@
 		(var bowTorps:number = "bowGroup ? bowGroup.numGuns.value * bowGroup.numBarrels.value : 0")
 		(var sternTorps:number = "sternGroup ? sternGroup.numGuns.value * sternGroup.numBarrels.value : 0")
 
-		(var ungroupedLaunchers:array = "torpedoesTTX ? torpedoesTTX.ungroupedLaunchers : []")
+		(var ungroupedLaunchers:gfx = "torpedoesTTX ? torpedoesTTX.ungroupedLaunchers : null")
 		(var launchers:array = "ungroupedLaunchers ? ungroupedLaunchers.launchers : []")
 		(var numOfLaunchers:number = "launchers ? launchers.length : 0")
 
