@@ -1757,7 +1757,8 @@
 		# TT_GET_PREF's _key is an expression, so no per-section macro is needed.
 		(var prefBase:str = "setting.enableKey")
 
-		(macro TT_GET_PREF_NUMBER 			_varName="'displayMode'"	_pref="pref.DISPLAY_MODE")
+		(macro TT_GET_PREF _varName="'displayModePref'" _key="prefBase + '.displayMode'")
+		(var displayMode:number = "null != displayModePref && null != displayModePref.value ? displayModePref.value : 0")
 		(var prefKey1:str = "setting.subKeys			? setting.subKeys[0] : ''")
 		(var prefKey2:str = "setting.subKeys.length > 1 ? setting.subKeys[1] : ''")
 		(macro TT_GET_PREF _varName="'pref1'" _key="prefBase + '.' + prefKey1")
