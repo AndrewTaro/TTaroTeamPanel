@@ -140,21 +140,16 @@
 	}
 })
 
-# `enableDefault` is the pre-publish fallback and MUST equal that key's schema default -- the
-# defaults are MIXED (clanIcon/shipNation are off), so one shared literal cannot serve all rows.
-# It is declared on every row, including the keyless one, so the readers can take it straight off
-# the dict with no `in` test.  Getting it wrong is not cosmetic: `baseWidth` feeds the flow layout,
-# so a column that shows and then vanishes shifts every column to its right.
 (def constant TP_PLAYERINFO_RENDERER_SETTINGS [
 	# Width is defined here so that the header items can be aligned too.
-	{renderer: 'TP_ShipHealthBarAndInfoItem',			enableKey: '',				enableDefault: true,	baseWidth: "TP_PLAYER_ROW_SIZE.WIDTH",	widthKey: 'ttTeamPanel.healthbarWidth'},
-	{renderer: 'TP_PlayerClanIconItem', widthKey: '',					enableKey: 'ttTeamPanel.clanIcon',		enableDefault: false,	baseWidth: "MS"},
-	{renderer: 'TP_ShipNationItem', widthKey: '',						enableKey: 'ttTeamPanel.shipNation',	enableDefault: false,	baseWidth: "TP_PLAYER_ROW_SIZE.HEIGHT"},
-	{renderer: 'TP_ShipTierItem', widthKey: '',						enableKey: 'ttTeamPanel.shipTier',		enableDefault: true,	baseWidth: "MS"},
-	{renderer: 'TP_ShipIconItem', widthKey: '',						enableKey: 'ttTeamPanel.shipIcon',		enableDefault: true,	baseWidth: 20px}, # Actual width of the icon is 20px. Without this, there would be unnecessary visual margins on both sides.
+	{renderer: 'TP_ShipHealthBarAndInfoItem',			enableKey: '',				baseWidth: "TP_PLAYER_ROW_SIZE.WIDTH",	widthKey: 'ttTeamPanel.healthbarWidth'},
+	{renderer: 'TP_PlayerClanIconItem', widthKey: '',					enableKey: 'ttTeamPanel.clanIcon',		baseWidth: "MS"},
+	{renderer: 'TP_ShipNationItem', widthKey: '',						enableKey: 'ttTeamPanel.shipNation',	baseWidth: "TP_PLAYER_ROW_SIZE.HEIGHT"},
+	{renderer: 'TP_ShipTierItem', widthKey: '',						enableKey: 'ttTeamPanel.shipTier',		baseWidth: "MS"},
+	{renderer: 'TP_ShipIconItem', widthKey: '',						enableKey: 'ttTeamPanel.shipIcon',		baseWidth: 20px}, # Actual width of the icon is 20px. Without this, there would be unnecessary visual margins on both sides.
 	# {renderer: 'TP_ShipWeightItem',						enableKey: '',				baseWidth: "MS"}, # TODO: Do something about this. The visibility of this element is controlled inside of it, not its renderer parent.
-	{renderer: 'TP_ShipDetectionItem', widthKey: '',					enableKey: 'ttTeamPanel.shipDetection',enableDefault: true,	headerTitle: 'IDS_HELP_DETECTION_INDICATORS',			headerDescriptions: ['IDS_HELP_ENEMY_DETECT'],				baseWidth: "M",	headerImage: 'url:../ttaro_team_panel/detection.png'},
-	{renderer: 'TP_PlayerKillCountItem', widthKey: '',				enableKey: 'ttTeamPanel.killCount',	enableDefault: true,	headerTitle: 'IDS_DESTROYED_ENEMY_SHIPS_RESULT_SCREEN',	headerDescriptions: ['IDS_DESTROYED_ENEMY_SHIPS_TOOLTIP'],	baseWidth: "M", headerImage: 'bitmap:icon_stat_frag_tiny'},
+	{renderer: 'TP_ShipDetectionItem', widthKey: '',					enableKey: 'ttTeamPanel.shipDetection',headerTitle: 'IDS_HELP_DETECTION_INDICATORS',			headerDescriptions: ['IDS_HELP_ENEMY_DETECT'],				baseWidth: "M",	headerImage: 'url:../ttaro_team_panel/detection.png'},
+	{renderer: 'TP_PlayerKillCountItem', widthKey: '',				enableKey: 'ttTeamPanel.killCount',	headerTitle: 'IDS_DESTROYED_ENEMY_SHIPS_RESULT_SCREEN',	headerDescriptions: ['IDS_DESTROYED_ENEMY_SHIPS_TOOLTIP'],	baseWidth: "M", headerImage: 'bitmap:icon_stat_frag_tiny'},
 ])
 
 (def constant TP_SHIPCONFIG_RENDERER_SETTINGS [
@@ -362,10 +357,17 @@
 		# Every row declares both key fields (empty where it has none), so these read straight off the
 		# dict -- no `in` test, whose string literal would otherwise read as a pref key to the linter.
 		(var enableKey:str = "setting.enableKey")
-		(var enableDefault:bool = "setting.enableDefault")
 		(macro TT_GET_PREF _varName="'enablePref'" _key="enableKey")
-		# Per-row default, NOT a shared literal: clanIcon and shipNation default OFF and the rest ON.
-		(var isEnabled:bool = "null != enablePref && null != enablePref.value ? enablePref.value : enableDefault")
+		# Two DIFFERENT cases, and collapsing them onto one literal is what broke this before.
+		# A row with NO key has no component ever, so its fallback is permanent -> always on.
+		# A row WITH a key falls back only in the gap before Python publishes, and Python publishes the
+		# EFFECTIVE value (stored or schema default), so the correct value always arrives.  false is the
+		# conservative choice there -- the schema defaults are MIXED (clanIcon/shipNation are off), and
+		# `baseWidth` feeds the flow layout, so a column that shows and then vanishes shifts every column
+		# to its right.  Better a column that appears late than one that shows and then flips.
+		# Do NOT reintroduce per-row default literals here: the schema owns defaults, and a copy in the
+		# view is a second source of truth that drifts silently when the CMS changes one.
+		(var isEnabled:bool = "enableKey == '' ? true : (null != enablePref && null != enablePref.value ? enablePref.value : false)")
 
 		(var isFirstElement:bool = "$index == 0")
 		(var mLeft:number = "isFirstElement && _isAlly ? 0px : XXS")
@@ -741,10 +743,17 @@
 		# Every row declares both key fields (empty where it has none), so these read straight off the
 		# dict -- no `in` test, whose string literal would otherwise read as a pref key to the linter.
 		(var enableKey:str = "setting.enableKey")
-		(var enableDefault:bool = "setting.enableDefault")
 		(macro TT_GET_PREF _varName="'enablePref'" _key="enableKey")
-		# Per-row default, NOT a shared literal: clanIcon and shipNation default OFF and the rest ON.
-		(var isEnabled:bool = "null != enablePref && null != enablePref.value ? enablePref.value : enableDefault")
+		# Two DIFFERENT cases, and collapsing them onto one literal is what broke this before.
+		# A row with NO key has no component ever, so its fallback is permanent -> always on.
+		# A row WITH a key falls back only in the gap before Python publishes, and Python publishes the
+		# EFFECTIVE value (stored or schema default), so the correct value always arrives.  false is the
+		# conservative choice there -- the schema defaults are MIXED (clanIcon/shipNation are off), and
+		# `baseWidth` feeds the flow layout, so a column that shows and then vanishes shifts every column
+		# to its right.  Better a column that appears late than one that shows and then flips.
+		# Do NOT reintroduce per-row default literals here: the schema owns defaults, and a copy in the
+		# view is a second source of truth that drifts silently when the CMS changes one.
+		(var isEnabled:bool = "enableKey == '' ? true : (null != enablePref && null != enablePref.value ? enablePref.value : false)")
 
 		(var isFirstElement:bool = "$index == 0")
 		(var mLeft:number = "isFirstElement && _isAlly ? 0px : XXS")
