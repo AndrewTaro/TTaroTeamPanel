@@ -102,6 +102,13 @@
 })
 (def constant TP_ATBA_CREW_ID "-1") # Works until WG introduces the EPIC ATBA SKILL (hope that never happens)
 
+# Two OTHER mods' component keys.  Both are optional installs, so an unresolved watcher must
+# read as "no data" rather than as an error -- which is what getPrimWatcher gives us.
+# Must match COMPONENT_KEY_LIST_PREFIX in ConsumablesMonitor2's Main.py and
+# COMPONENT_KEY_PREFIX in RegenMonitor's.
+(def constant TP_CM2_COMPONENT_KEY_LIST_PREFIX 'modConsumablesMonitor2List_')
+(def constant TP_REGENMONITOR_KEY_PREFIX 'modRegenMonitor_')
+
 (def constant TP_COMPONENT_KEY_BANNED_SHIPS "'modTTaroTeamPanelBannedShips'")
 (def constant TP_COMPONENT_KEY_CONSUMABLE_DATA "'modTTaroTeamPanelConsumableData'")
 
@@ -1327,9 +1334,16 @@
 		# This could not work if heath is updated (e.g. changed to zero) after respawn
 		(bind healthRatio "isAlive ? 1 : 0" watch=false init="!isAlive" (event "healthComponent.evIsAliveChanged"))
 
-		# Regeneration
-		(macro GET_MARKER_ENTITY_COMPONENT 'dataComponent')
-		(var regenMaxValue:number = "dataComponentComponent && null != dataComponentComponent.data.maxValue ? dataComponentComponent.data.maxValue : 0" (event "dataComponentComponent.evDataChanged"))
+		# Regeneration.  RegenMonitor stopped bolting a CC.dataComponent onto the ship's own
+		# entity; it publishes one entity per ship through the keyed mods_DataComponent.  The
+		# old read could not error -- it just found nothing and left regenRatio at 0 forever.
+		#
+		# Keyed by AVATAR id, never vehicle id: a vehicle id depends on spotted status, so an
+		# unspotted enemy has none.
+		(var regenWatcher:gfx = "$datahub.getPrimWatcher(CC.mods_DataComponent, TP_REGENMONITOR_KEY_PREFIX + toString(_markerEntity && _markerEntity.avatar ? _markerEntity.avatar.id : 0))")
+		(var regenEntity:gfx = "regenWatcher.entity" (event "regenWatcher.event"))
+		(var regenComponent:gfx = "regenEntity ? regenEntity.mods_DataComponent : null")
+		(var regenMaxValue:number = "regenComponent && null != regenComponent.data.maxValue ? regenComponent.data.maxValue : 0" (event "regenComponent.evDataChanged"))
 		(var regenRatio:number = "healthMax ? regenMaxValue / healthMax : 0")
 
 		# Relation
@@ -1568,9 +1582,14 @@
 		(macro TT_GET_PREF _varName="'displayModePref'" _key="'ttTeamPanel.mods.consumablesMonitor.displayMode'")
 		(var displayMode:number = "null != displayModePref && null != displayModePref.value ? displayModePref.value : 2")
 
-		(macro GET_MARKER_ENTITY_COMPONENT 'data')
-		(var consData:gfx = "dataComponent ? dataComponent.data : null" (event "dataComponent.evChanged"))
-		(var consumables:array = "consData && null != consData.consMonitor ? consData.consMonitor : []")
+		# ConsumablesMonitor2 publishes an entity per CONSUMABLE plus a per-ship list of their
+		# ids, keyed by this marker entity's id.  It used to be one CC.data blob on the ship,
+		# which re-marshalled in full whenever any one consumable ticked.  The list carries
+		# entity ids now, not dicts, so both renderers below take an id.
+		(var consListWatcher:gfx = "$datahub.getPrimWatcher(CC.mods_DataComponent, TP_CM2_COMPONENT_KEY_LIST_PREFIX + toString(_markerEntity ? _markerEntity.id : 0))")
+		(var consListEntity:gfx = "consListWatcher.entity" (event "consListWatcher.event"))
+		(var consListComponent:gfx = "consListEntity ? consListEntity.mods_DataComponent : null")
+		(var consumables:array = "consListComponent ? consListComponent.data.ids : []" (event "consListComponent.evDataChanged"))
 
 		(var rendererType:str = "displayMode == 1 ? 'TP_ActiveConsumableIconItem' : 'CM2_ConsumableItem'") # Simple | Full
 
@@ -1596,15 +1615,20 @@
 		(bind count "consumables.length")
 		(args
 			_renderer = "rendererType"
-			_consData = "consumables[$index]"
+			_entityId = "consumables[$index]"
 		)
 	)
 )
 
-(def element TP_ConsumableMonitorRendererItem(_renderer:str, _consData:dict)
+(def element TP_ConsumableMonitorRendererItem(_renderer:str, _entityId:number)
 	(scope
-		(var isSpecial:bool = "'isSpecial' in _consData && _consData.isSpecial")
-		(var consumableType:number = "'consumableType' in _consData ? _consData.consumableType : -1")
+		# Both fields are STATIC, so they ride on the consumable entity's CC.data rather than
+		# on the keyed mods_DataComponent that carries the values which actually move.
+		(var consEntity:gfx = "$datahub.getEntity(_entityId)")
+		(var consStaticComponent:gfx = "consEntity && consEntity.hasComponent(CC.data) ? consEntity.data : null" (event "consEntity.evAdded") (event "consEntity.evRemoved"))
+		(var consStatic:gfx = "consStaticComponent ? consStaticComponent.data : null")
+		(var isSpecial:bool = "consStatic && consStatic.isSpecial ? true : false")
+		(var consumableType:number = "consStatic && null != consStatic.consumableType ? consStatic.consumableType : -1")
 		(var consumableKey:str = "
 			isSpecial										? 'teamConsumables' :
 			consumableType == TP_CONSUMABLE_TYPES.HYDRO 	? 'hydro' :
@@ -1623,29 +1647,42 @@
 	(controller $Instance
 		(bind renderer "_renderer")
 		(bind enabled "isEnabled")
-		(args _consData="_consData")
+		(args _entityId="_entityId")
 	)
 )
 
 # Uses constants from CM2
-(def element TP_ActiveConsumableIconItem (_consData:dict) layout=true
+(def element TP_ActiveConsumableIconItem (_entityId:number) layout=true
 	(scope
 		(event evConsumableActivated)
 		(event evConsumableEnding)
 		(event evConsumableDeactivated)
 
-		(var iconPath:str = "'url:../consumables/consumable_' + _consData.icon + '.png'")
-		(var capacity:str = "_consData.capacity")
-		(var state:number = "_consData.state")
-		(var stateEndTime:number = "_consData.endTime")
-		(bind stateEndTime "_consData.endTime" watch=false init=false (bind trigger "state"))
-		#(trace "toString(_entity.avatar.name) + ': isActive: ' + toString(isActive) + ', isUnderThreshold: ' + (stateTime <= CM2_BLINK_SETTINGS.THRESHOLD) + ', ' + _consData.consumableType + ', ' + timer.currentTime" watch=false (bind trigger "isConsumableEnding"))
+		# The same three-component read as ConsumablesMonitor2's own CM2_ConsumableItem, which
+		# this element is a compact copy of.  CC.data is written once, CC.countDown carries
+		# endTime as a plain attribute, and only the mods_DataComponent's dict re-marshals.
+		(var consEntity:gfx = "$datahub.getEntity(_entityId)")
+		(var staticComponent:gfx = "consEntity && consEntity.hasComponent(CC.data) ? consEntity.data : null" (event "consEntity.evAdded") (event "consEntity.evRemoved"))
+		(var dynamicComponent:gfx = "consEntity && consEntity.hasComponent(CC.mods_DataComponent) ? consEntity.mods_DataComponent : null" (event "consEntity.evAdded") (event "consEntity.evRemoved"))
+		(var countDownComponent:gfx = "consEntity && consEntity.hasComponent(CC.countDown) ? consEntity.countDown : null" (event "consEntity.evAdded") (event "consEntity.evRemoved"))
+
+		(var staticData:gfx = "staticComponent ? staticComponent.data : null")
+		(var consData:gfx = "dynamicComponent ? dynamicComponent.data : null" (event "dynamicComponent.evDataChanged"))
+
+		(var iconPath:str = "'url:../consumables/consumable_' + (staticData ? staticData.icon : '') + '.png'")
+		(var capacity:str = "consData ? consData.capacity : ''")
+		(var state:number = "consData ? consData.state : -1")
+		(var stateEndTime:number = "countDownComponent ? countDownComponent.endTime : 0")
+		(bind stateEndTime "countDownComponent ? countDownComponent.endTime : 0" watch=false init=false (bind trigger "state"))
+		#(trace "toString(_entity.avatar.name) + ': isActive: ' + toString(isActive) + ', isUnderThreshold: ' + (stateTime <= CM2_BLINK_SETTINGS.THRESHOLD) + ', ' + toString(state) + ', ' + timer.currentTime" watch=false (bind trigger "isConsumableEnding"))
 		# The ub scope updates dict values one by one
 		# which triggers `isConsumableEnding` change event because it satisfies (isActive == true && previousStateTime <= animationThreshold)
 		# It will immediately becomes false as the previousStateTime gets updated to the current value.
 		# However the fired event still starts the animation, of course.
-		(var canUse:bool = "_consData.canUse")
-		(var lifeCycleType:number = "_consData.lifeCycleType")
+		# Gating on `state` also orders the two components against each other, which is why
+		# ConsumablesMonitor2 writes countDown.endTime before the state dict.
+		(var canUse:bool = "consData ? consData.canUse : false")
+		(var lifeCycleType:number = "staticData ? staticData.lifeCycleType : -1")
 		(var isTimeBased:bool = "lifeCycleType == SC.Battle.CONSUMABLE_LIFECYCLE_TYPE.TIME_BASED")
 		
 		(var isReady:bool = "state == SC.Battle.CONSUMABLE_STATES.READY")
