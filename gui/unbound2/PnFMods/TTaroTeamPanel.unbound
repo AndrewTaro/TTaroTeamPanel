@@ -140,7 +140,7 @@
 (def constant TP_PLAYERINFO_RENDERER_SETTINGS [
 	# Width is defined here so that the header items can be aligned too.
 	{renderer: 'TP_ShipHealthBarAndInfoItem',			enableKey: '',				baseWidth: "TP_PLAYER_ROW_SIZE.WIDTH",	widthKey: 'ttTeamPanel.healthBar.width'},
-	{renderer: 'TP_PlayerClanIconItem', widthKey: '',					enableKey: 'ttTeamPanel.basicInfo.clanIcon',		baseWidth: "MS"},
+	{renderer: 'TP_PlayerClanIconItem', widthKey: '',					enableKey: 'ttTeamPanel.playerInfo.clanIcon',		baseWidth: "MS"},
 	{renderer: 'TP_ShipNationItem', widthKey: '',						enableKey: 'ttTeamPanel.shipInfo.nation',	baseWidth: "TP_PLAYER_ROW_SIZE.HEIGHT"},
 	{renderer: 'TP_ShipTierItem', widthKey: '',						enableKey: 'ttTeamPanel.shipInfo.tier',		baseWidth: "MS"},
 	{renderer: 'TP_ShipIconItem', widthKey: '',						enableKey: 'ttTeamPanel.shipInfo.icon',		baseWidth: 20px}, # Actual width of the icon is 20px. Without this, there would be unnecessary visual margins on both sides.
@@ -152,8 +152,8 @@
 (def constant TP_SHIPCONFIG_RENDERER_SETTINGS [
 	{renderer: 'TP_ShipConfigVisibilityItem',			enableKey: 'ttTeamPanel.shipParams.visibility',			subKeys: ['surface', 'air'],					headerImage: 'url:../ttaro_team_panel/concealment.png',				headerTitle: 'IDS_SHIP_PARAM_DETECTION',	headerDescriptions: ['IDS_SHIP_PARAM_VISIBILITY_DIST_BY_SHIP','IDS_SHIP_PARAM_VISIBILITY_DIST_BY_PLANE']},
 	{renderer: 'TP_ShipConfigMobilityItem',				enableKey: 'ttTeamPanel.shipParams.speed',					subKeys: ['surface', 'underwater'],				headerImage: 'url:../ttaro_team_panel/speed.png',					headerTitle: 'IDS_SHIP_PARAM_MAXSPEED',		headerDescriptions: ['IDS_SHIP_PARAM_MOBILITY','IDS_SHIP_PARAM_UNDERWATER_MOBILITY']},
-	{renderer: 'TP_ShipConfigAirSupportItem',			enableKey: 'ttTeamPanel.shipParams.airsupport',			subKeys: ['range', 'reload'],					headerImage: 'url:../ttaro_team_panel/air_support.png',				headerTitle: 'IDS_SHIP_PARAM_AIR_SUPPORT',	headerDescriptions: ['IDS_SHIP_PARAM_MAX_DIST','IDS_SHIP_PARAM_SHOT_DELAY']},
-	{renderer: 'TP_ShipConfigAirDefenseItem',			enableKey: 'ttTeamPanel.shipParams.antiair',				subKeys: ['range', 'rate'],						headerImage: 'url:../ttaro_team_panel/anti_air.png',				headerTitle: 'IDS_SHIP_PARAM_AIR_DEFENSE',	headerDescriptions: ['IDS_SHIP_PARAM_MAX_DIST','IDS_SHIP_PARAM_AIR_DEFENSE']},
+	{renderer: 'TP_ShipConfigAirSupportItem',			enableKey: 'ttTeamPanel.shipParams.airSupport',			subKeys: ['range', 'reload'],					headerImage: 'url:../ttaro_team_panel/air_support.png',				headerTitle: 'IDS_SHIP_PARAM_AIR_SUPPORT',	headerDescriptions: ['IDS_SHIP_PARAM_MAX_DIST','IDS_SHIP_PARAM_SHOT_DELAY']},
+	{renderer: 'TP_ShipConfigAirDefenseItem',			enableKey: 'ttTeamPanel.shipParams.antiAir',				subKeys: ['range', 'rate'],						headerImage: 'url:../ttaro_team_panel/anti_air.png',				headerTitle: 'IDS_SHIP_PARAM_AIR_DEFENSE',	headerDescriptions: ['IDS_SHIP_PARAM_MAX_DIST','IDS_SHIP_PARAM_AIR_DEFENSE']},
 	{renderer: 'TP_ShipConfigAtbaItem',					enableKey: 'ttTeamPanel.shipParams.atba',					subKeys: ['range'],								headerImage: 'url:../ttaro_team_panel/secondary_gun.png',			headerTitle: 'IDS_SHIP_PARAM_ATBA',			headerDescriptions: ['IDS_SHIP_PARAM_MAX_DIST']},
 	{renderer: 'TP_ShipConfigArtilleryItem',			enableKey: 'ttTeamPanel.shipParams.artillery',				subKeys: ['range', 'reload'],					headerImage: 'url:../ttaro_team_panel/main_gun.png',				headerTitle: 'IDS_SHIP_PARAM_MAIN_GUN',		headerDescriptions: ['IDS_SHIP_PARAM_MAX_DIST','IDS_SHIP_PARAM_SHOT_DELAY']},
 	{renderer: 'TP_ShipConfigTorpedoItem',				enableKey: 'ttTeamPanel.shipParams.torpedo',				subKeys: ['range'],								headerImage: 'url:../ttaro_team_panel/torpedo.png',					headerTitle: 'IDS_SHIP_PARAM_TORPEDOES',	headerDescriptions: ['IDS_SHIP_PARAM_MAX_DIST']},
@@ -177,8 +177,8 @@
 (def element TTaroTeamPanels () layout=true
 	(scope
 		(macro STAGE_SIZE)
-		(macro TT_GET_PREF _varName="'posYPref'" _key="'ttTeamPanel.posY'")
-		(macro TT_GET_PREF _varName="'isBlurModePref'" _key="'ttTeamPanel.background.mode'")
+		(macro TT_GET_PREF _varName="'posYPref'" _key="'ttTeamPanel.offset.y'")
+		(macro TT_GET_PREF _varName="'isBlurModePref'" _key="'ttTeamPanel.background.useBlur'")
 		(var isBlurMode:bool = "null != isBlurModePref && null != isBlurModePref.value ? isBlurModePref.value : true")
 		# Three-state now, not a bool: the old `visibleOnAlt` switch became a DISPLAY_MODE dropdown, so
 		# ADAPTIVE is what "only while Alt is held" turned into (the v1 migration maps 0/1 -> 1/2).
@@ -227,9 +227,9 @@
 		(var allyCollection:gfx = "avatarCollection ? avatarCollection.getChildByPath('team.ally.sortedAlive') : null" (event "avatarCollection.evChildAdded") (event "avatarCollection.evChildRemoved"))
 		(var allyItems:array = "allyCollection ? allyCollection.items : null" (event "allyCollection.evAdded") (event "allyCollection.evRemoved")  (event "allyCollection.evUpdated"))
 		(var isEnabled:bool = "allyItems && allyItems.length > 0")
-		(macro TT_GET_PREF _varName="'sizeScalePref'" _key="'ttTeamPanel.scaleOffset'")
+		(macro TT_GET_PREF _varName="'sizeScalePref'" _key="'ttTeamPanel.scale'")
 		(var sizeScale:number = "null != sizeScalePref && null != sizeScalePref.value ? sizeScalePref.value : 1")
-		(macro TT_GET_PREF _varName="'sideOffsetPref'" _key="'ttTeamPanel.sideOffset'")
+		(macro TT_GET_PREF _varName="'sideOffsetPref'" _key="'ttTeamPanel.offset.x'")
 		(var sideOffset:number = "null != sideOffsetPref && null != sideOffsetPref.value ? sideOffsetPref.value : 0")
 	)
 
@@ -262,9 +262,9 @@
 		(var enemyCollection:gfx = "avatarCollection ? avatarCollection.getChildByPath('team.enemy.sortedAlive') : null" (event "avatarCollection.evChildAdded") (event "avatarCollection.evChildRemoved"))
 		(var enemyItems:array = "enemyCollection ? enemyCollection.items : null" (event "enemyCollection.evAdded") (event "enemyCollection.evRemoved") (event "enemyCollection.evUpdated"))
 		(var isEnabled:bool = "enemyItems && enemyItems.length > 0")
-		(macro TT_GET_PREF _varName="'sizeScalePref'" _key="'ttTeamPanel.scaleOffset'")
+		(macro TT_GET_PREF _varName="'sizeScalePref'" _key="'ttTeamPanel.scale'")
 		(var sizeScale:number = "null != sizeScalePref && null != sizeScalePref.value ? sizeScalePref.value : 1")
-		(macro TT_GET_PREF _varName="'sideOffsetPref'" _key="'ttTeamPanel.sideOffset'")
+		(macro TT_GET_PREF _varName="'sideOffsetPref'" _key="'ttTeamPanel.offset.x'")
 		(var sideOffset:number = "null != sideOffsetPref && null != sideOffsetPref.value ? sideOffsetPref.value : 0")
 	)
 
@@ -554,7 +554,7 @@
 		# I have to manually do the calculation here :(
 
 		# Item Visibility
-		(macro TT_GET_PREF _varName="'isDeadPlayerVisiblePref'" _key="'ttTeamPanel.deadPlayerVisible'")
+		(macro TT_GET_PREF _varName="'isDeadPlayerVisiblePref'" _key="'ttTeamPanel.showDead'")
 		(var isDeadPlayerVisible:bool = "null != isDeadPlayerVisiblePref && null != isDeadPlayerVisiblePref.value ? isDeadPlayerVisiblePref.value : true")
 		(var battleDataEntity:gfx = "$datahub.getSingleEntity(CC.battleData)")
 		(var gameModeId:number = "battleDataEntity.battleInfo.gameModeId")
@@ -567,7 +567,7 @@
 		(var blurDisplayMode:number = "null != blurDisplayModePref && null != blurDisplayModePref.value ? blurDisplayModePref.value : 0")
 		(macro TT_GET_PREF _varName="'blurAlphaPref'" _key="'ttTeamPanel.background.alpha'")
 		(var blurAlpha:number = "null != blurAlphaPref && null != blurAlphaPref.value ? blurAlphaPref.value : 0.4")
-		(macro TT_GET_PREF _varName="'isBlurModePref'" _key="'ttTeamPanel.background.mode'")
+		(macro TT_GET_PREF _varName="'isBlurModePref'" _key="'ttTeamPanel.background.useBlur'")
 		(var isBlurMode:bool = "null != isBlurModePref && null != isBlurModePref.value ? isBlurModePref.value : true")
 		(var camera:gfx = "$datahub.getSingleComponent(CC.camera)")
 		(var altVision:bool = "camera ? camera.altVision : false" (event "camera.evAltVisionChanged"))
@@ -789,11 +789,11 @@
 # Player Info
 (def element TP_PlayerInfoForHealthBarItem (_markerEntity:gfx=null, _isAlly:bool=false)
 	(scope
-		(macro TT_GET_PREF _varName="'isPlayerNameVisiblePref'" _key="'ttTeamPanel.basicInfo.playerName'")
+		(macro TT_GET_PREF _varName="'isPlayerNameVisiblePref'" _key="'ttTeamPanel.playerInfo.name'")
 		(var isPlayerNameVisible:bool = "null != isPlayerNameVisiblePref && null != isPlayerNameVisiblePref.value ? isPlayerNameVisiblePref.value : true")
-		(macro TT_GET_PREF _varName="'isShipNameVisiblePref'" _key="'ttTeamPanel.basicInfo.shipName'")
+		(macro TT_GET_PREF _varName="'isShipNameVisiblePref'" _key="'ttTeamPanel.playerInfo.shipName'")
 		(var isShipNameVisible:bool = "null != isShipNameVisiblePref && null != isShipNameVisiblePref.value ? isShipNameVisiblePref.value : true")
-		(macro TT_GET_PREF _varName="'isHorizontalPref'" _key="'ttTeamPanel.basicInfo.flowDirection'")
+		(macro TT_GET_PREF _varName="'isHorizontalPref'" _key="'ttTeamPanel.playerInfo.flowDirection'")
 		(var isHorizontal:bool = "null != isHorizontalPref && null != isHorizontalPref.value ? isHorizontalPref.value : 1")
 		(var itemsFlowDir:number = "isHorizontal ? _isAlly ? Flow.HORIZONTAL
 												 		   : Flow.REVERSE_HORIZONTAL
@@ -917,7 +917,7 @@
 
 (def element TP_PlayerNameWithTagItem (_markerEntity:gfx=null, _isAlly:bool=false)
 	(scope
-		(macro TT_GET_PREF _varName="'isClanNameVisiblePref'" _key="'ttTeamPanel.basicInfo.clanName'")
+		(macro TT_GET_PREF _varName="'isClanNameVisiblePref'" _key="'ttTeamPanel.playerInfo.clan'")
 		(var isClanNameVisible:bool = "null != isClanNameVisiblePref && null != isClanNameVisiblePref.value ? isClanNameVisiblePref.value : true")
 
 		(macro TP_GET_MARKER_DATA)
@@ -1054,7 +1054,7 @@
 		(var colorPreset:dict = "(TP_SHIP_ICON_COLOR_PRESET.length > shipIconColorIndex) ? TP_SHIP_ICON_COLOR_PRESET[shipIconColorIndex] : null")
 		(var colorDict:dict = "(isColorAvailable && colorPreset) ? colorPreset[subType] : {}")
 
-		(macro TT_GET_PREF _varName="'isPremiumHighlightedPref'" _key="'ttTeamPanel.shipInfo.highlighPremium'")
+		(macro TT_GET_PREF _varName="'isPremiumHighlightedPref'" _key="'ttTeamPanel.shipInfo.highlightPremium'")
 		(var isPremiumHighlighted:bool = "null != isPremiumHighlightedPref && null != isPremiumHighlightedPref.value ? isPremiumHighlightedPref.value : false")
 
 		(var shipEntity:gfx = "_markerEntity ? _markerEntity.avatar.ship.ref.ship : null" (event "_markerEntity.avatar.evShipRefChanged"))
@@ -1226,7 +1226,7 @@
 	(scope
 		(var shipEntity:gfx = "_markerEntity ? _markerEntity.avatar.ship.ref.ship : null" (event "_markerEntity.avatar.evShipRefChanged"))
 		(var levelRome:str = "shipEntity ? shipEntity.levelRome : ''") # IDS_PASB518
-		(macro TT_GET_PREF _varName="'isPremiumHighlightedPref'" _key="'ttTeamPanel.shipInfo.highlighPremium'")
+		(macro TT_GET_PREF _varName="'isPremiumHighlightedPref'" _key="'ttTeamPanel.shipInfo.highlightPremium'")
 		(var isPremiumHighlighted:bool = "null != isPremiumHighlightedPref && null != isPremiumHighlightedPref.value ? isPremiumHighlightedPref.value : false")
 
 		(var isPremium:bool = "shipEntity ? shipEntity.isPremium : false")
@@ -1962,9 +1962,9 @@
 		(var airDefenseTTX:gfx = "_shipTTX ? _shipTTX.airDefense : null")
 		(var range:number = "airDefenseTTX ? airDefenseTTX.averageAura.maxDist.value : null")
 		(var integralValue:number = "airDefenseTTX ? airDefenseTTX.integralValue.value : 0")
-		(macro TT_GET_PREF _varName="'isAntiAirRangeVisiblePref'" _key="'ttTeamPanel.shipParams.antiair.range'")
+		(macro TT_GET_PREF _varName="'isAntiAirRangeVisiblePref'" _key="'ttTeamPanel.shipParams.antiAir.range'")
 		(var isAntiAirRangeVisible:bool = "null != isAntiAirRangeVisiblePref && null != isAntiAirRangeVisiblePref.value ? isAntiAirRangeVisiblePref.value : true")
-		(macro TT_GET_PREF _varName="'isAntiAirRatingVisiblePref'" _key="'ttTeamPanel.shipParams.antiair.rate'")
+		(macro TT_GET_PREF _varName="'isAntiAirRatingVisiblePref'" _key="'ttTeamPanel.shipParams.antiAir.rate'")
 		(var isAntiAirRatingVisible:bool = "null != isAntiAirRatingVisiblePref && null != isAntiAirRatingVisiblePref.value ? isAntiAirRatingVisiblePref.value : true")
 	)
 
@@ -1977,9 +1977,9 @@
 		(var airSupportTTX:gfx = "_shipTTX ? _shipTTX.airSupport : null")
 		(var range:number = "airSupportTTX ? airSupportTTX.maxDist.value : null")
 		(var reload:number = "airSupportTTX ? airSupportTTX.reloadTime.value : null")
-		(macro TT_GET_PREF _varName="'isAirSupportRangeVisiblePref'" _key="'ttTeamPanel.shipParams.airsupport.range'")
+		(macro TT_GET_PREF _varName="'isAirSupportRangeVisiblePref'" _key="'ttTeamPanel.shipParams.airSupport.range'")
 		(var isAirSupportRangeVisible:bool = "null != isAirSupportRangeVisiblePref && null != isAirSupportRangeVisiblePref.value ? isAirSupportRangeVisiblePref.value : true")
-		(macro TT_GET_PREF _varName="'isAirSupportReloadVisiblePref'" _key="'ttTeamPanel.shipParams.airsupport.reload'")
+		(macro TT_GET_PREF _varName="'isAirSupportReloadVisiblePref'" _key="'ttTeamPanel.shipParams.airSupport.reload'")
 		(var isAirSupportReloadVisible:bool = "null != isAirSupportReloadVisiblePref && null != isAirSupportReloadVisiblePref.value ? isAirSupportReloadVisiblePref.value : true")
 	)
 
@@ -2130,7 +2130,7 @@
 		(var isValueVisible:bool = "_value")
 		(macro TT_GET_PREF _varName="'isUnitVisiblePref'" _key="'ttTeamPanel.shipParams.units'")
 		(var isUnitVisible:bool = "null != isUnitVisiblePref && null != isUnitVisiblePref.value ? isUnitVisiblePref.value : false")
-		(macro TT_GET_PREF _varName="'isBoldFontPref'" _key="'ttTeamPanel.shipParams.fontWeight'")
+		(macro TT_GET_PREF _varName="'isBoldFontPref'" _key="'ttTeamPanel.shipParams.font.bold'")
 		(var isBoldFont:bool = "null != isBoldFontPref && null != isBoldFontPref.value ? isBoldFontPref.value : true")
 
 		(var roundDigit:number = "_value >= 100 ? 0 : _roundDigit")
@@ -2250,12 +2250,12 @@
 		(var isRealParams:bool = "shipBattleInfo ? shipBattleInfo.isRealParams : false" (event "shipBattleInfoEntity.shipBattleInfo.evChanged"))
 		(var shipTTX:gfx = "isRealParams ? newTTX : classicTTX")
 
-		(macro TT_GET_PREF _varName="'isOwnBuildOnlyPref'" _key="'ttTeamPanel.mods.buildViewer.hideBuild'")
+		(macro TT_GET_PREF _varName="'isOwnBuildOnlyPref'" _key="'ttTeamPanel.mods.buildViewer.hideOthers'")
 		(var isOwnBuildOnly:bool = "null != isOwnBuildOnlyPref && null != isOwnBuildOnlyPref.value ? isOwnBuildOnlyPref.value : false")
 		(macro TT_IS_MOD_INSTALLED _varName="'hasBuildViewer'" _slug="'build-viewer'")
 		(var isBuildVisible:bool = "hasBuildViewer && (isSpectatorTrainingMode || (!isOwnBuildOnly || isSelf))")
 
-		(macro TT_GET_PREF _varName="'isOwnDamageOnlyPref'" _key="'ttTeamPanel.mods.damageMonitor.hideDamage'")
+		(macro TT_GET_PREF _varName="'isOwnDamageOnlyPref'" _key="'ttTeamPanel.mods.damageMonitor.hideOthers'")
 		(var isOwnDamageOnly:bool = "null != isOwnDamageOnlyPref && null != isOwnDamageOnlyPref.value ? isOwnDamageOnlyPref.value : false")
 		(macro TT_IS_MOD_INSTALLED _varName="'hasDamageMonitor'" _slug="'damage-monitor'")
 		(var isDamageVisible:bool = "hasDamageMonitor && (isSpectatorTrainingMode || (!isOwnDamageOnly || isSelf))")
