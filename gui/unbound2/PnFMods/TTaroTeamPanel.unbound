@@ -2499,7 +2499,6 @@
 		(var caliber:number = "hasMainGun ? mainGunTTX[0].caliber.value : 0")
 		(var overmatch:number = "hasMainGun ? floor(caliber / 14.3) : 0")
 
-		(macro TT_GET_LANGUAGE_INDEX)
 		(macro TT_GET_TRANSLATION _varName="'overmatchTranslation'" _key="'IDS_TT_OVERMATCH'")
 	)
 
