@@ -1,0 +1,1417 @@
+{
+  "schemaVersion": 4,
+  "id": "cmtkswuwl0005v01412wj9emy",
+  "author": "ttaro",
+  "modName": "Team Panel",
+  "slug": "team-panel",
+  "order": 5,
+  "tree": [
+    {
+      "kind": "group",
+      "key": "cmtktamim00hmv0d4sos9qjpp",
+      "label": "IDS_TT_TITLE_GENERAL",
+      "collapse": "expanded",
+      "children": [
+        {
+          "kind": "setting",
+          "control": "toggle",
+          "key": "ttTeamPanel.showDead",
+          "label": "IDS_TT_SHOW_DEAD",
+          "default": true
+        },
+        {
+          "kind": "group",
+          "key": "cmt4yym240002v0to7holoi4f",
+          "aggregate": "inline",
+          "children": [
+            {
+              "kind": "setting",
+              "control": "slider",
+              "key": "ttTeamPanel.offset.y",
+              "label": "IDS_TT_DISPLAY_HEIGHT_OFFSET",
+              "default": 160,
+              "min": 0,
+              "max": 1000,
+              "step": 1,
+              "decimals": 0
+            },
+            {
+              "kind": "setting",
+              "control": "number",
+              "key": "ttTeamPanel.offset.x",
+              "label": "IDS_TT_SIDE_OFFSET",
+              "hint": {
+                "text": "IDS_TT_HINT_NUMBER_INPUT"
+              },
+              "default": 0,
+              "min": 0,
+              "max": 30000,
+              "step": 10
+            }
+          ]
+        },
+        {
+          "kind": "setting",
+          "control": "slider",
+          "key": "ttTeamPanel.scale",
+          "label": "IDS_TT_UI_SCALE",
+          "default": 1,
+          "min": 0.5,
+          "max": 1.5,
+          "step": 0.1
+        },
+        {
+          "kind": "setting",
+          "control": "dropdown",
+          "key": "ttTeamPanel.displayMode",
+          "label": "IDS_TT_DISPLAY_MODE",
+          "hint": {
+            "text": "IDS_TT_HINT_DISPLAY_MODE"
+          },
+          "default": 1,
+          "options": [
+            {
+              "value": 0,
+              "phrase": "IDS_TURN_OFF"
+            },
+            {
+              "value": 1,
+              "phrase": "IDS_TURN_ON"
+            },
+            {
+              "value": 2,
+              "phrase": "IDS_ALT_VISION_MODE_1",
+              "icon": "CMD_ICONS"
+            }
+          ],
+          "optionStyle": "KEY"
+        }
+      ]
+    },
+    {
+      "kind": "group",
+      "key": "cmtktam83008yv0d4wp6mx9bs",
+      "label": "IDS_TT_TITLE_BACKGROUND",
+      "collapse": "expanded",
+      "children": [
+        {
+          "kind": "setting",
+          "control": "dropdown",
+          "key": "ttTeamPanel.background.displayMode",
+          "label": "IDS_TT_DISPLAY_MODE",
+          "hint": {
+            "text": "IDS_TT_HINT_DISPLAY_MODE"
+          },
+          "default": 0,
+          "options": [
+            {
+              "value": 0,
+              "phrase": "IDS_TURN_OFF"
+            },
+            {
+              "value": 1,
+              "phrase": "IDS_TURN_ON"
+            },
+            {
+              "value": 2,
+              "phrase": "IDS_ALT_VISION_MODE_1",
+              "icon": "CMD_ICONS"
+            }
+          ],
+          "optionStyle": "KEY"
+        },
+        {
+          "kind": "setting",
+          "control": "toggle",
+          "key": "ttTeamPanel.background.useBlur",
+          "label": "IDS_TT_USE_BLUR",
+          "hint": {
+            "text": "IDS_TT_HINT_BLUR_PERFORMANCE_WARNING"
+          },
+          "default": true,
+          "enabledWhen": {
+            "kind": "group",
+            "join": "all",
+            "conditions": [
+              {
+                "kind": "compare",
+                "key": "ttTeamPanel.background.displayMode",
+                "op": "in",
+                "values": [
+                  1,
+                  2
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "kind": "setting",
+          "control": "slider",
+          "key": "ttTeamPanel.background.alpha",
+          "label": "IDS_TT_OPACITY",
+          "default": 0.4,
+          "min": 0.1,
+          "max": 1,
+          "step": 0.1,
+          "enabledWhen": {
+            "kind": "group",
+            "join": "all",
+            "conditions": [
+              {
+                "kind": "compare",
+                "key": "ttTeamPanel.background.displayMode",
+                "op": "in",
+                "values": [
+                  1,
+                  2
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "kind": "group",
+      "key": "cmtktam9h00a2v0d4foe6cjie",
+      "label": "IDS_TT_TITLE_HEALTH_BAR",
+      "collapse": "expanded",
+      "children": [
+        {
+          "kind": "setting",
+          "control": "slider",
+          "key": "ttTeamPanel.healthBar.width",
+          "label": "IDS_TT_BAR_WIDTH",
+          "default": 200,
+          "min": 100,
+          "max": 300,
+          "step": 20,
+          "decimals": 0
+        },
+        {
+          "kind": "group",
+          "key": "cmsyrc93w0002v0r0qmdwfkge",
+          "label": "IDS_TT_TITLE_COLORS",
+          "collapse": "expanded",
+          "children": [
+            {
+              "kind": "setting",
+              "control": "color",
+              "key": "ttTeamPanel.healthBar.color.ally",
+              "label": "IDS_TT_TITLE_HEALTHBAR_COLOR_ALLY",
+              "default": 1715987365,
+              "min": 0,
+              "max": 4294967295
+            },
+            {
+              "kind": "setting",
+              "control": "color",
+              "key": "ttTeamPanel.healthBar.color.enemy",
+              "label": "IDS_TT_TITLE_HEALTHBAR_COLOR_ENEMY",
+              "default": 1727941930,
+              "min": 0,
+              "max": 4294967295
+            },
+            {
+              "kind": "setting",
+              "control": "color",
+              "key": "ttTeamPanel.healthBar.color.self",
+              "label": "IDS_TT_TITLE_HEALTHBAR_COLOR_SELF",
+              "default": 1714070861,
+              "min": 0,
+              "max": 4294967295
+            },
+            {
+              "kind": "setting",
+              "control": "color",
+              "key": "ttTeamPanel.healthBar.color.flagshipAlly",
+              "label": "IDS_TT_TITLE_HEALTHBAR_COLOR_FLAGSHIP_ALLY",
+              "default": 1711309055,
+              "min": 0,
+              "max": 4294967295
+            },
+            {
+              "kind": "setting",
+              "control": "color",
+              "key": "ttTeamPanel.healthBar.color.flagshipEnemy",
+              "label": "IDS_TT_TITLE_HEALTHBAR_COLOR_FLAGSHIP_ENEMY",
+              "default": 1724697600,
+              "min": 0,
+              "max": 4294967295
+            },
+            {
+              "kind": "setting",
+              "control": "color",
+              "key": "ttTeamPanel.healthBar.color.banned",
+              "label": "IDS_TT_TITLE_HEALTHBAR_COLOR_BANNED",
+              "default": 1711276032,
+              "min": 0,
+              "max": 4294967295
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "group",
+      "key": "cmtktam20003zv0d4s1zgjdz2",
+      "label": "IDS_TT_TITLE_BASIC_INFO",
+      "collapse": "expanded",
+      "children": [
+        {
+          "kind": "setting",
+          "control": "toggle",
+          "key": "ttTeamPanel.playerInfo.name",
+          "label": "IDS_TT_PLAYER_NAME",
+          "default": true
+        },
+        {
+          "kind": "setting",
+          "control": "toggle",
+          "key": "ttTeamPanel.playerInfo.shipName",
+          "label": "IDS_TT_SHIP_NAME",
+          "default": true
+        },
+        {
+          "kind": "setting",
+          "control": "toggle",
+          "key": "ttTeamPanel.playerInfo.clan",
+          "label": "IDS_TT_CLAN_NAME",
+          "default": true,
+          "enabledWhen": {
+            "kind": "group",
+            "join": "all",
+            "conditions": [
+              {
+                "kind": "compare",
+                "key": "ttTeamPanel.playerInfo.name",
+                "op": "in",
+                "values": [
+                  1
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "kind": "setting",
+          "control": "toggle",
+          "key": "ttTeamPanel.playerInfo.clanIcon",
+          "label": "IDS_TT_CLAN_ICON",
+          "default": false
+        },
+        {
+          "kind": "setting",
+          "control": "dropdown",
+          "key": "ttTeamPanel.playerInfo.flowDirection",
+          "label": "IDS_TT_LAYOUT_DIRECTION",
+          "default": 1,
+          "options": [
+            {
+              "value": 0,
+              "phrase": "IDS_TT_VERTICAL"
+            },
+            {
+              "value": 1,
+              "phrase": "IDS_TT_HORIZONTAL"
+            }
+          ],
+          "optionStyle": "CUSTOM_TEXT"
+        }
+      ]
+    },
+    {
+      "kind": "group",
+      "key": "cmtktamjw00iov0d4qd1cyyhv",
+      "label": "IDS_TT_TITLE_SHIP_INFO",
+      "collapse": "expanded",
+      "children": [
+        {
+          "kind": "setting",
+          "control": "toggle",
+          "key": "ttTeamPanel.shipInfo.nation",
+          "label": "IDS_TT_NATIONAL_FLAG",
+          "default": false
+        },
+        {
+          "kind": "setting",
+          "control": "toggle",
+          "key": "ttTeamPanel.shipInfo.tier",
+          "label": "IDS_TT_TIER",
+          "default": true
+        },
+        {
+          "kind": "setting",
+          "control": "toggle",
+          "key": "ttTeamPanel.shipInfo.highlightPremium",
+          "label": "IDS_TT_HIGHLIGHT_PREMIUM_TIER",
+          "default": false
+        },
+        {
+          "kind": "setting",
+          "control": "toggle",
+          "key": "ttTeamPanel.shipInfo.icon",
+          "label": "IDS_TT_CLASS_ICON",
+          "default": true
+        },
+        {
+          "kind": "setting",
+          "control": "dropdown",
+          "key": "ttTeamPanel.shipInfo.color",
+          "label": "IDS_TT_CLASS_ICON_COLOR",
+          "default": 0,
+          "options": [
+            {
+              "value": 0,
+              "phrase": "None"
+            },
+            {
+              "value": 1,
+              "phrase": "Aslain v1"
+            },
+            {
+              "value": 2,
+              "phrase": "Aslain v2"
+            },
+            {
+              "value": 3,
+              "phrase": "AutoSpy"
+            },
+            {
+              "value": 4,
+              "phrase": "Roslich"
+            },
+            {
+              "value": 5,
+              "phrase": "DeCease"
+            },
+            {
+              "value": 6,
+              "phrase": "Hakabase"
+            }
+          ]
+        },
+        {
+          "kind": "setting",
+          "control": "toggle",
+          "key": "ttTeamPanel.shipInfo.iconStatusOverwrite",
+          "label": "IDS_TT_CLASS_ICON_STATUS",
+          "hint": {
+            "text": "IDS_TT_HINT_CLASS_ICON_STATUS"
+          },
+          "default": true
+        },
+        {
+          "kind": "setting",
+          "control": "toggle",
+          "key": "ttTeamPanel.shipInfo.kills",
+          "label": "IDS_TT_KILL_COUNT",
+          "default": true
+        },
+        {
+          "kind": "setting",
+          "control": "toggle",
+          "key": "ttTeamPanel.shipInfo.detection",
+          "label": "IDS_TT_DETECTION",
+          "default": true
+        }
+      ]
+    },
+    {
+      "kind": "group",
+      "key": "cmtktamhc00gjv0d4f07ncjd9",
+      "label": "IDS_TT_MODS_INTEGRATION",
+      "children": [
+        {
+          "kind": "group",
+          "key": "cmtktam38004wv0d42cqf1u20",
+          "label": "IDS_TT_MOD_CONSUMABLES_MONITOR",
+          "collapse": "expanded",
+          "enabledWhen": {
+            "kind": "group",
+            "join": "all",
+            "conditions": [
+              {
+                "kind": "installed",
+                "mod": "ttaro.consumables-monitor",
+                "hint": "IDS_TT_HINT_MOD_REQUIRED",
+                "requirementNote": "Consumables Monitor"
+              }
+            ]
+          },
+          "children": [
+            {
+              "kind": "setting",
+              "control": "dropdown",
+              "key": "ttTeamPanel.mods.consumablesMonitor.displayMode",
+              "label": "IDS_TT_DISPLAY_MODE",
+              "hint": {
+                "text": "IDS_TT_HINT_TEAM_CONSUMABLE_WARNING"
+              },
+              "default": 2,
+              "options": [
+                {
+                  "value": 0,
+                  "phrase": "IDS_TURN_OFF"
+                },
+                {
+                  "value": 1,
+                  "phrase": "IDS_ALT_VISION_MODE_0"
+                },
+                {
+                  "value": 2,
+                  "phrase": "IDS_ALT_VISION_MODE_2"
+                }
+              ]
+            },
+            {
+              "kind": "setting",
+              "control": "toggle",
+              "key": "ttTeamPanel.mods.consumablesMonitor.hydro",
+              "label": "IDS_DOCK_CONSUME_TITLE_PCY016_SONARSEARCHPREMIUM",
+              "hint": {
+                "text": "IDS_TT_HINT_TEAM_CONSUMABLE_WARNING"
+              },
+              "default": false,
+              "enabledWhen": {
+                "kind": "group",
+                "join": "all",
+                "conditions": [
+                  {
+                    "kind": "compare",
+                    "key": "ttTeamPanel.mods.consumablesMonitor.displayMode",
+                    "op": "in",
+                    "values": [
+                      1,
+                      2
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "setting",
+              "control": "toggle",
+              "key": "ttTeamPanel.mods.consumablesMonitor.radar",
+              "label": "IDS_DOCK_CONSUME_TITLE_PCY020_RLSSEARCHPREMIUM",
+              "hint": {
+                "text": "IDS_TT_HINT_TEAM_CONSUMABLE_WARNING"
+              },
+              "default": false,
+              "enabledWhen": {
+                "kind": "group",
+                "join": "all",
+                "conditions": [
+                  {
+                    "kind": "compare",
+                    "key": "ttTeamPanel.mods.consumablesMonitor.displayMode",
+                    "op": "in",
+                    "values": [
+                      1,
+                      2
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "setting",
+              "control": "toggle",
+              "key": "ttTeamPanel.mods.consumablesMonitor.subRadar",
+              "label": "IDS_DOCK_CONSUME_TITLE_PCY048_SUBMARINELOCATOR",
+              "hint": {
+                "text": "IDS_TT_HINT_TEAM_CONSUMABLE_WARNING"
+              },
+              "default": false,
+              "enabledWhen": {
+                "kind": "group",
+                "join": "all",
+                "conditions": [
+                  {
+                    "kind": "compare",
+                    "key": "ttTeamPanel.mods.consumablesMonitor.displayMode",
+                    "op": "in",
+                    "values": [
+                      1,
+                      2
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "setting",
+              "control": "toggle",
+              "key": "ttTeamPanel.mods.consumablesMonitor.others",
+              "label": "IDS_TT_OTHER_CONSUMABLES",
+              "hint": {
+                "text": "IDS_TT_HINT_TEAM_CONSUMABLE_WARNING"
+              },
+              "default": false,
+              "enabledWhen": {
+                "kind": "group",
+                "join": "all",
+                "conditions": [
+                  {
+                    "kind": "compare",
+                    "key": "ttTeamPanel.mods.consumablesMonitor.displayMode",
+                    "op": "in",
+                    "values": [
+                      1,
+                      2
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "setting",
+              "control": "toggle",
+              "key": "ttTeamPanel.mods.consumablesMonitor.teamConsumables",
+              "label": "IDS_TT_TEAM_CONSUMABLE",
+              "hint": {
+                "text": "IDS_TT_HINT_TEAM_CONSUMABLE_WARNING"
+              },
+              "default": true,
+              "enabledWhen": {
+                "kind": "group",
+                "join": "all",
+                "conditions": [
+                  {
+                    "kind": "compare",
+                    "key": "ttTeamPanel.mods.consumablesMonitor.displayMode",
+                    "op": "in",
+                    "values": [
+                      1,
+                      2
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "kind": "group",
+          "key": "cmtktamdb00d8v0d48rv8cm00",
+          "label": "IDS_TT_MOD_DAMAGE_MONITOR",
+          "collapse": "expanded",
+          "enabledWhen": {
+            "kind": "group",
+            "join": "all",
+            "conditions": [
+              {
+                "kind": "installed",
+                "mod": "ttaro.damage-monitor",
+                "hint": "IDS_TT_HINT_MOD_REQUIRED",
+                "requirementNote": "Damage Monitor"
+              }
+            ]
+          },
+          "children": [
+            {
+              "kind": "setting",
+              "control": "toggle",
+              "key": "ttTeamPanel.mods.damageMonitor.hideOthers",
+              "label": "IDS_TT_DISABLE_NONPLAYER_DAMAGES",
+              "default": false
+            }
+          ]
+        },
+        {
+          "kind": "group",
+          "key": "cmtktam270044v0d4teq2pu8k",
+          "label": "IDS_TT_MOD_BUILD_VIEWER",
+          "collapse": "expanded",
+          "enabledWhen": {
+            "kind": "group",
+            "join": "all",
+            "conditions": [
+              {
+                "kind": "installed",
+                "mod": "ttaro.build-viewer",
+                "hint": "IDS_TT_HINT_MOD_REQUIRED",
+                "requirementNote": "Build Viewer"
+              }
+            ]
+          },
+          "children": [
+            {
+              "kind": "setting",
+              "control": "toggle",
+              "key": "ttTeamPanel.mods.buildViewer.hideOthers",
+              "label": "IDS_TT_DISABLE_ALLY_BUILDS",
+              "default": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "group",
+      "key": "cmtktamdf00dbv0d4t545bm1z",
+      "label": "IDS_TT_TITLE_SHIP_STATS",
+      "collapse": "expanded",
+      "children": [
+        {
+          "kind": "setting",
+          "control": "toggle",
+          "key": "ttTeamPanel.shipParams.units",
+          "label": "IDS_TT_SHOW_UNIT",
+          "default": false
+        },
+        {
+          "kind": "group",
+          "key": "cmt4us0gw0014v0rwfa5yiex1",
+          "aggregate": "inline",
+          "children": [
+            {
+              "kind": "setting",
+              "control": "toggle",
+              "key": "ttTeamPanel.shipParams.font.bold",
+              "label": "IDS_TT_BOLD_FONT",
+              "default": true
+            }
+          ]
+        },
+        {
+          "kind": "group",
+          "key": "cmtktambd00bjv0d4kp2m2hi9",
+          "label": "IDS_TT_TITLE_VISIBILITY",
+          "collapse": "expanded",
+          "children": [
+            {
+              "kind": "setting",
+              "control": "dropdown",
+              "key": "ttTeamPanel.shipParams.visibility.displayMode",
+              "label": "IDS_TT_DISPLAY_MODE",
+              "hint": {
+                "text": "IDS_TT_HINT_DISPLAY_MODE"
+              },
+              "default": 1,
+              "options": [
+                {
+                  "value": 0,
+                  "phrase": "IDS_TURN_OFF"
+                },
+                {
+                  "value": 1,
+                  "phrase": "IDS_TURN_ON"
+                },
+                {
+                  "value": 2,
+                  "phrase": "IDS_ALT_VISION_MODE_1",
+                  "icon": "CMD_ICONS"
+                }
+              ],
+              "optionStyle": "KEY"
+            },
+            {
+              "kind": "setting",
+              "control": "toggle",
+              "key": "ttTeamPanel.shipParams.visibility.surface",
+              "label": "IDS_TT_SURFACE",
+              "default": true,
+              "enabledWhen": {
+                "kind": "group",
+                "join": "all",
+                "conditions": [
+                  {
+                    "kind": "compare",
+                    "key": "ttTeamPanel.shipParams.visibility.displayMode",
+                    "op": "in",
+                    "values": [
+                      1,
+                      2
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "setting",
+              "control": "toggle",
+              "key": "ttTeamPanel.shipParams.visibility.air",
+              "label": "IDS_TT_AIR",
+              "default": false,
+              "enabledWhen": {
+                "kind": "group",
+                "join": "all",
+                "conditions": [
+                  {
+                    "kind": "compare",
+                    "key": "ttTeamPanel.shipParams.visibility.displayMode",
+                    "op": "in",
+                    "values": [
+                      1,
+                      2
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "kind": "group",
+          "key": "cmtktamem00eav0d4tzikof9n",
+          "label": "IDS_TT_TITLE_SPEED",
+          "collapse": "expanded",
+          "children": [
+            {
+              "kind": "setting",
+              "control": "dropdown",
+              "key": "ttTeamPanel.shipParams.speed.displayMode",
+              "label": "IDS_TT_DISPLAY_MODE",
+              "hint": {
+                "text": "IDS_TT_HINT_DISPLAY_MODE"
+              },
+              "default": 1,
+              "options": [
+                {
+                  "value": 0,
+                  "phrase": "IDS_TURN_OFF"
+                },
+                {
+                  "value": 1,
+                  "phrase": "IDS_TURN_ON"
+                },
+                {
+                  "value": 2,
+                  "phrase": "IDS_ALT_VISION_MODE_1",
+                  "icon": "CMD_ICONS"
+                }
+              ],
+              "optionStyle": "KEY"
+            },
+            {
+              "kind": "setting",
+              "control": "toggle",
+              "key": "ttTeamPanel.shipParams.speed.surface",
+              "label": "IDS_TT_SURFACE",
+              "default": true,
+              "enabledWhen": {
+                "kind": "group",
+                "join": "all",
+                "conditions": [
+                  {
+                    "kind": "compare",
+                    "key": "ttTeamPanel.shipParams.speed.displayMode",
+                    "op": "in",
+                    "values": [
+                      1,
+                      2
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "setting",
+              "control": "toggle",
+              "key": "ttTeamPanel.shipParams.speed.underwater",
+              "label": "IDS_TT_UNDERWATER",
+              "default": true,
+              "enabledWhen": {
+                "kind": "group",
+                "join": "all",
+                "conditions": [
+                  {
+                    "kind": "compare",
+                    "key": "ttTeamPanel.shipParams.speed.displayMode",
+                    "op": "in",
+                    "values": [
+                      1,
+                      2
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "kind": "group",
+          "key": "cmtktaml800jov0d4hu7ae7z0",
+          "label": "IDS_TT_TITLE_AIR_STRIKE",
+          "collapse": "collapsed",
+          "children": [
+            {
+              "kind": "setting",
+              "control": "dropdown",
+              "key": "ttTeamPanel.shipParams.airSupport.displayMode",
+              "label": "IDS_TT_DISPLAY_MODE",
+              "hint": {
+                "text": "IDS_TT_HINT_DISPLAY_MODE"
+              },
+              "default": 0,
+              "options": [
+                {
+                  "value": 0,
+                  "phrase": "IDS_TURN_OFF"
+                },
+                {
+                  "value": 1,
+                  "phrase": "IDS_TURN_ON"
+                },
+                {
+                  "value": 2,
+                  "phrase": "IDS_ALT_VISION_MODE_1",
+                  "icon": "CMD_ICONS"
+                }
+              ],
+              "optionStyle": "KEY"
+            },
+            {
+              "kind": "setting",
+              "control": "toggle",
+              "key": "ttTeamPanel.shipParams.airSupport.range",
+              "label": "IDS_TT_RANGE",
+              "default": true,
+              "enabledWhen": {
+                "kind": "group",
+                "join": "all",
+                "conditions": [
+                  {
+                    "kind": "compare",
+                    "key": "ttTeamPanel.shipParams.airSupport.displayMode",
+                    "op": "in",
+                    "values": [
+                      1,
+                      2
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "setting",
+              "control": "toggle",
+              "key": "ttTeamPanel.shipParams.airSupport.reload",
+              "label": "IDS_TT_RELOAD",
+              "default": true,
+              "enabledWhen": {
+                "kind": "group",
+                "join": "all",
+                "conditions": [
+                  {
+                    "kind": "compare",
+                    "key": "ttTeamPanel.shipParams.airSupport.displayMode",
+                    "op": "in",
+                    "values": [
+                      1,
+                      2
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "kind": "group",
+          "key": "cmtktaml400jlv0d4xeflm4oq",
+          "label": "IDS_TT_TITLE_AIR_DEFENSE",
+          "collapse": "expanded",
+          "children": [
+            {
+              "kind": "setting",
+              "control": "dropdown",
+              "key": "ttTeamPanel.shipParams.antiAir.displayMode",
+              "label": "IDS_TT_DISPLAY_MODE",
+              "hint": {
+                "text": "IDS_TT_HINT_DISPLAY_MODE"
+              },
+              "default": 0,
+              "options": [
+                {
+                  "value": 0,
+                  "phrase": "IDS_TURN_OFF"
+                },
+                {
+                  "value": 1,
+                  "phrase": "IDS_TURN_ON"
+                },
+                {
+                  "value": 2,
+                  "phrase": "IDS_ALT_VISION_MODE_1",
+                  "icon": "CMD_ICONS"
+                }
+              ],
+              "optionStyle": "KEY"
+            },
+            {
+              "kind": "setting",
+              "control": "toggle",
+              "key": "ttTeamPanel.shipParams.antiAir.range",
+              "label": "IDS_TT_RANGE",
+              "default": true,
+              "enabledWhen": {
+                "kind": "group",
+                "join": "all",
+                "conditions": [
+                  {
+                    "kind": "compare",
+                    "key": "ttTeamPanel.shipParams.antiAir.displayMode",
+                    "op": "in",
+                    "values": [
+                      1,
+                      2
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "setting",
+              "control": "toggle",
+              "key": "ttTeamPanel.shipParams.antiAir.rate",
+              "label": "IDS_TT_RATING",
+              "default": true,
+              "enabledWhen": {
+                "kind": "group",
+                "join": "all",
+                "conditions": [
+                  {
+                    "kind": "compare",
+                    "key": "ttTeamPanel.shipParams.antiAir.displayMode",
+                    "op": "in",
+                    "values": [
+                      1,
+                      2
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "kind": "group",
+          "key": "cmtktamnf00kqv0d4342l33rm",
+          "label": "IDS_TT_TITLE_ATBA",
+          "collapse": "collapsed",
+          "children": [
+            {
+              "kind": "setting",
+              "control": "dropdown",
+              "key": "ttTeamPanel.shipParams.atba.displayMode",
+              "label": "IDS_TT_DISPLAY_MODE",
+              "hint": {
+                "text": "IDS_TT_HINT_DISPLAY_MODE"
+              },
+              "default": 0,
+              "options": [
+                {
+                  "value": 0,
+                  "phrase": "IDS_TURN_OFF"
+                },
+                {
+                  "value": 1,
+                  "phrase": "IDS_TURN_ON"
+                },
+                {
+                  "value": 2,
+                  "phrase": "IDS_ALT_VISION_MODE_1",
+                  "icon": "CMD_ICONS"
+                }
+              ],
+              "optionStyle": "KEY"
+            },
+            {
+              "kind": "setting",
+              "control": "toggle",
+              "key": "ttTeamPanel.shipParams.atba.range",
+              "label": "IDS_TT_RANGE",
+              "default": true,
+              "enabledWhen": {
+                "kind": "group",
+                "join": "all",
+                "conditions": [
+                  {
+                    "kind": "compare",
+                    "key": "ttTeamPanel.shipParams.atba.displayMode",
+                    "op": "in",
+                    "values": [
+                      1,
+                      2
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "kind": "group",
+          "key": "cmtktamc600c8v0d49l6d9it9",
+          "label": "IDS_TT_TITLE_ARTILLERY",
+          "collapse": "expanded",
+          "children": [
+            {
+              "kind": "setting",
+              "control": "dropdown",
+              "key": "ttTeamPanel.shipParams.artillery.displayMode",
+              "label": "IDS_TT_DISPLAY_MODE",
+              "hint": {
+                "text": "IDS_TT_HINT_DISPLAY_MODE"
+              },
+              "default": 0,
+              "options": [
+                {
+                  "value": 0,
+                  "phrase": "IDS_TURN_OFF"
+                },
+                {
+                  "value": 1,
+                  "phrase": "IDS_TURN_ON"
+                },
+                {
+                  "value": 2,
+                  "phrase": "IDS_ALT_VISION_MODE_1",
+                  "icon": "CMD_ICONS"
+                }
+              ],
+              "optionStyle": "KEY"
+            },
+            {
+              "kind": "setting",
+              "control": "toggle",
+              "key": "ttTeamPanel.shipParams.artillery.range",
+              "label": "IDS_TT_RANGE",
+              "default": true,
+              "enabledWhen": {
+                "kind": "group",
+                "join": "all",
+                "conditions": [
+                  {
+                    "kind": "compare",
+                    "key": "ttTeamPanel.shipParams.artillery.displayMode",
+                    "op": "in",
+                    "values": [
+                      1,
+                      2
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "setting",
+              "control": "toggle",
+              "key": "ttTeamPanel.shipParams.artillery.reload",
+              "label": "IDS_TT_RELOAD",
+              "default": true,
+              "enabledWhen": {
+                "kind": "group",
+                "join": "all",
+                "conditions": [
+                  {
+                    "kind": "compare",
+                    "key": "ttTeamPanel.shipParams.artillery.displayMode",
+                    "op": "in",
+                    "values": [
+                      1,
+                      2
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "kind": "group",
+          "key": "cmtktam82008xv0d4edfjab1o",
+          "label": "IDS_TT_TITLE_TORPEDO",
+          "collapse": "expanded",
+          "children": [
+            {
+              "kind": "setting",
+              "control": "dropdown",
+              "key": "ttTeamPanel.shipParams.torpedo.displayMode",
+              "label": "IDS_TT_DISPLAY_MODE",
+              "hint": {
+                "text": "IDS_TT_HINT_DISPLAY_MODE"
+              },
+              "default": 1,
+              "options": [
+                {
+                  "value": 0,
+                  "phrase": "IDS_TURN_OFF"
+                },
+                {
+                  "value": 1,
+                  "phrase": "IDS_TURN_ON"
+                },
+                {
+                  "value": 2,
+                  "phrase": "IDS_ALT_VISION_MODE_1",
+                  "icon": "CMD_ICONS"
+                }
+              ],
+              "optionStyle": "KEY"
+            },
+            {
+              "kind": "setting",
+              "control": "toggle",
+              "key": "ttTeamPanel.shipParams.torpedo.range",
+              "label": "IDS_TT_RANGE",
+              "default": true,
+              "enabledWhen": {
+                "kind": "group",
+                "join": "all",
+                "conditions": [
+                  {
+                    "kind": "compare",
+                    "key": "ttTeamPanel.shipParams.torpedo.displayMode",
+                    "op": "in",
+                    "values": [
+                      1,
+                      2
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "kind": "group",
+          "key": "cmtktamk400ivv0d4doiwzlms",
+          "label": "IDS_TT_TITLE_SURFACE_CONSUMABLE_RANGE",
+          "collapse": "expanded",
+          "children": [
+            {
+              "kind": "setting",
+              "control": "dropdown",
+              "key": "ttTeamPanel.shipParams.surfaceConsumable.displayMode",
+              "label": "IDS_TT_DISPLAY_MODE",
+              "hint": {
+                "text": "IDS_TT_HINT_DISPLAY_MODE"
+              },
+              "default": 1,
+              "options": [
+                {
+                  "value": 0,
+                  "phrase": "IDS_TURN_OFF"
+                },
+                {
+                  "value": 1,
+                  "phrase": "IDS_TURN_ON"
+                },
+                {
+                  "value": 2,
+                  "phrase": "IDS_ALT_VISION_MODE_1",
+                  "icon": "CMD_ICONS"
+                }
+              ],
+              "optionStyle": "KEY"
+            },
+            {
+              "kind": "setting",
+              "control": "toggle",
+              "key": "ttTeamPanel.shipParams.surfaceConsumable.hydroRange",
+              "label": "IDS_TT_HYDRO",
+              "default": true,
+              "enabledWhen": {
+                "kind": "group",
+                "join": "all",
+                "conditions": [
+                  {
+                    "kind": "compare",
+                    "key": "ttTeamPanel.shipParams.surfaceConsumable.displayMode",
+                    "op": "in",
+                    "values": [
+                      1,
+                      2
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "setting",
+              "control": "toggle",
+              "key": "ttTeamPanel.shipParams.surfaceConsumable.radarRange",
+              "label": "IDS_TT_RADAR",
+              "default": true,
+              "enabledWhen": {
+                "kind": "group",
+                "join": "all",
+                "conditions": [
+                  {
+                    "kind": "compare",
+                    "key": "ttTeamPanel.shipParams.surfaceConsumable.displayMode",
+                    "op": "in",
+                    "values": [
+                      1,
+                      2
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "kind": "group",
+          "key": "cmtktamkf00j4v0d4uflvp4hu",
+          "label": "IDS_TT_TITLE_SUBMARINE_CONSUMABLE_RANGE",
+          "collapse": "expanded",
+          "children": [
+            {
+              "kind": "setting",
+              "control": "dropdown",
+              "key": "ttTeamPanel.shipParams.subConsumable.displayMode",
+              "label": "IDS_TT_DISPLAY_MODE",
+              "hint": {
+                "text": "IDS_TT_HINT_DISPLAY_MODE"
+              },
+              "default": 0,
+              "options": [
+                {
+                  "value": 0,
+                  "phrase": "IDS_TURN_OFF"
+                },
+                {
+                  "value": 1,
+                  "phrase": "IDS_TURN_ON"
+                },
+                {
+                  "value": 2,
+                  "phrase": "IDS_ALT_VISION_MODE_1",
+                  "icon": "CMD_ICONS"
+                }
+              ],
+              "optionStyle": "KEY"
+            },
+            {
+              "kind": "setting",
+              "control": "toggle",
+              "key": "ttTeamPanel.shipParams.subConsumable.subHydroRange",
+              "label": "IDS_TT_SUB_HYDRO",
+              "default": true,
+              "enabledWhen": {
+                "kind": "group",
+                "join": "all",
+                "conditions": [
+                  {
+                    "kind": "compare",
+                    "key": "ttTeamPanel.shipParams.subConsumable.displayMode",
+                    "op": "in",
+                    "values": [
+                      1,
+                      2
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "setting",
+              "control": "toggle",
+              "key": "ttTeamPanel.shipParams.subConsumable.subRadarRange",
+              "label": "IDS_TT_SUB_RADAR",
+              "default": true,
+              "enabledWhen": {
+                "kind": "group",
+                "join": "all",
+                "conditions": [
+                  {
+                    "kind": "compare",
+                    "key": "ttTeamPanel.shipParams.subConsumable.displayMode",
+                    "op": "in",
+                    "values": [
+                      1,
+                      2
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "kind": "group",
+          "key": "cmtktam30004pv0d4dzym30dg",
+          "label": "IDS_TT_TITLE_DCP_CONSUMABLE",
+          "collapse": "collapsed",
+          "children": [
+            {
+              "kind": "setting",
+              "control": "dropdown",
+              "key": "ttTeamPanel.shipParams.dcp.displayMode",
+              "label": "IDS_TT_DISPLAY_MODE",
+              "hint": {
+                "text": "IDS_TT_HINT_DISPLAY_MODE"
+              },
+              "default": 0,
+              "options": [
+                {
+                  "value": 0,
+                  "phrase": "IDS_TURN_OFF"
+                },
+                {
+                  "value": 1,
+                  "phrase": "IDS_TURN_ON"
+                },
+                {
+                  "value": 2,
+                  "phrase": "IDS_ALT_VISION_MODE_1",
+                  "icon": "CMD_ICONS"
+                }
+              ],
+              "optionStyle": "KEY"
+            },
+            {
+              "kind": "setting",
+              "control": "toggle",
+              "key": "ttTeamPanel.shipParams.dcp.workTime",
+              "label": "IDS_SHIP_PARAM_WORK_TIME",
+              "default": true,
+              "enabledWhen": {
+                "kind": "group",
+                "join": "all",
+                "conditions": [
+                  {
+                    "kind": "compare",
+                    "key": "ttTeamPanel.shipParams.dcp.displayMode",
+                    "op": "in",
+                    "values": [
+                      1,
+                      2
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "setting",
+              "control": "toggle",
+              "key": "ttTeamPanel.shipParams.dcp.reloadTime",
+              "label": "IDS_SHIP_PARAM_DEPTH_CHARGE_RELOAD_TIME",
+              "default": true,
+              "enabledWhen": {
+                "kind": "group",
+                "join": "all",
+                "conditions": [
+                  {
+                    "kind": "compare",
+                    "key": "ttTeamPanel.shipParams.dcp.displayMode",
+                    "op": "in",
+                    "values": [
+                      1,
+                      2
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
