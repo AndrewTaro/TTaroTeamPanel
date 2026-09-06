@@ -21,7 +21,7 @@ You can personalize it to be the simplest team panel, or the most info-flooded o
 4. Done!
 
 # Requirements
-[TTaro Mod Config](../../../TTaroModConfig): You must install this config in order to activate the mod.
+[TTaro Mod Config](../../../TTaroModUtils): You must install this config in order to activate the mod.
 
 # Ship Restriction Highlight
 This feature highlights the invalid ships or composition in the teams, making it easier to identify the forfeit in tournaments.
