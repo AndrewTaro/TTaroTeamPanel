@@ -992,8 +992,8 @@
 				(event "evRestartAnimation")
 				(event "evStartAnimation")
 			)
-			(dispatch onAnimationStarted args="{}" init=false on=evAnimStarted)
-			(dispatch onAnimationEnded args="{}" init=false on=evAnimEnded)
+			(dispatch onAnimationStarted args="{}" on=evAnimStarted)
+			(dispatch onAnimationEnded args="{}" on=evAnimEnded)
 		)
 	)
 
@@ -1266,13 +1266,13 @@
 		(var hasMapPosition:bool = "_markerEntity ? _markerEntity.hasComponent(CC.mapPosition) : false" watch=false)
 		(bind hasMapPosition "!hasMapPosition && $event.classID == CC.mapPosition ? true : false" watch=false init=false (event "_markerEntity.evAdded"))
 		(event evMapPositionAdded)
-		(dispatch evMapPositionAdded watch=false init=false (bind enabled "!hasMapPosition && isMapVisibleEnabled") (bind trigger "hasMapPosition"))
+		(dispatch evMapPositionAdded (bind enabled "!hasMapPosition && isMapVisibleEnabled") (bind trigger "hasMapPosition"))
 
 		(var isDetected:bool = "visibilityFlag || (isMapVisibleEnabled && mapVisible)")
 		(var wasDetected:bool = "false" watch=false)
 
 		(event evVisibilityChanged)
-		(dispatch evVisibilityChanged args="{}" watch=false init=false (bind enabled "!(wasDetected) && isDetected") (bind trigger "isDetected"))
+		(dispatch evVisibilityChanged args="{}" (bind enabled "!(wasDetected) && isDetected") (bind trigger "isDetected"))
 		(bind wasDetected "true" watch=false init=false (event "evMapPositionAdded")(event "evVisibilityChanged"))
 
 		(macro GET_MARKER_ENTITY_COMPONENT 'health')
@@ -1746,9 +1746,9 @@
 		(var iconColorTransform:dict = "{ redMultiplier: colorValue, greenMultiplier: colorValue, blueMultiplier: colorValue, alphaMultiplier: animatedAlpha}")
 	)
 
-	(dispatch evConsumableActivated		watch=false init=false (bind enabled "isActive") (bind trigger "isActive"))
-	(dispatch evConsumableDeactivated	watch=false init=false (bind enabled "!isActive") (bind trigger "isActive"))
-	(dispatch evConsumableEnding		watch=false init=false (bind enabled "isConsumableEnding") (bind trigger "isConsumableEnding"))
+	(dispatch evConsumableActivated (bind enabled "isActive") (bind trigger "isActive"))
+	(dispatch evConsumableDeactivated (bind enabled "!isActive") (bind trigger "isActive"))
+	(dispatch evConsumableEnding (bind enabled "isConsumableEnding") (bind trigger "isConsumableEnding"))
 
 
 	(bind visible "isAnimationPlaying || isActive")
