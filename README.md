@@ -16,7 +16,7 @@ You can personalize it to be the simplest team panel, or the most info-flooded o
 
 # Install
 1. Download a zip.
-2. Unzip the archive and you should get `gui`, `PnFMods`, `ModSchemas` folders, and `PnFModsLoader.py`.
+2. Unzip the archive and you should get `gui`, `PnFMods`, `ModSchemas`, `ForgeBlueprints` folders, and `PnFModsLoader.py`.
 3. Move them to `(wows)/bin/(latest_number)/res_mods/`. So the path will look like `res_mods/gui/unbound2/mods/ttaro_teampanel.unbound`
 4. Done!
 
