@@ -1,6 +1,5 @@
-# Install gating comes from modPrefs.installedMods (Python-scanned), so this mod no longer advertises
-# itself with a TT_TEAMPANEL_INSTALLED constant -- and it reads other mods' presence with
-# TT_IS_MOD_INSTALLED rather than depending on their constants existing.
+# Install gating comes from modPrefs.installedMods (Python-scanned): read other mods' presence with
+# TT_IS_MOD_INSTALLED, never by depending on their constants existing.
 
 (def constant TP_PLAYER_ROW_SIZE {
 	WIDTH: 200px,
@@ -374,8 +373,7 @@
 		(var baseWidth:number = "'baseWidth' in setting ? setting.baseWidth : 0px")
 		(var widthKey:str = "setting.widthKey")
 		(macro TT_GET_PREF _varName="'widthPref'" _key="widthKey")
-		# The pref IS the px width now, so a column with no widthKey falls back to its own baseWidth
-		# instead of multiplying it by a 1 that meant "unscaled".
+		# The pref IS the px width, so a column with no widthKey falls back to its own baseWidth.
 		(var width:number = "null != widthPref && null != widthPref.value ? widthPref.value : baseWidth")
 
 		(var tooltipTitle:str = "'headerTitle' in setting ? setting.headerTitle : ''")
@@ -761,8 +759,7 @@
 		(var baseWidth:number = "'baseWidth' in setting ? setting.baseWidth : 0px")
 		(var widthKey:str = "setting.widthKey")
 		(macro TT_GET_PREF _varName="'widthPref'" _key="widthKey")
-		# The pref IS the px width now, so a column with no widthKey falls back to its own baseWidth
-		# instead of multiplying it by a 1 that meant "unscaled".
+		# The pref IS the px width, so a column with no widthKey falls back to its own baseWidth.
 		(var width:number = "null != widthPref && null != widthPref.value ? widthPref.value : baseWidth")
 	)
 	(style
@@ -1583,9 +1580,8 @@
 		(var displayMode:number = "null != displayModePref && null != displayModePref.value ? displayModePref.value : 2")
 
 		# ConsumablesMonitor2 publishes an entity per CONSUMABLE plus a per-ship list of their
-		# ids, keyed by this marker entity's id.  It used to be one CC.data blob on the ship,
-		# which re-marshalled in full whenever any one consumable ticked.  The list carries
-		# entity ids now, not dicts, so both renderers below take an id.
+		# ids, keyed by this marker entity's id.  The list carries entity ids, not dicts, so both
+		# renderers below take an id.
 		(var consListWatcher:gfx = "$datahub.getPrimWatcher(CC.mods_DataComponent, TP_CM2_COMPONENT_KEY_LIST_PREFIX + toString(_markerEntity ? _markerEntity.id : 0))")
 		(var consListEntity:gfx = "consListWatcher.entity" (event "consListWatcher.event"))
 		(var consListComponent:gfx = "consListEntity ? consListEntity.mods_DataComponent : null")
