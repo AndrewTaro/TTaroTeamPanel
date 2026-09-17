@@ -1,11 +1,11 @@
 {
   "schemaVersion": 4,
-  "opVocabularyVersion": 1,
+  "opVocabularyVersion": 3,
   "slug": "team-panel",
   "migrations": [
     {
       "version": 1,
-      "description": "flat keys → dotted ancestry keys; slider step index → value; per-channel sliders → packed ARGB",
+      "description": "flat keys → dotted ancestry keys; legacy values decoded and folded onto the derived keys",
       "ops": [
         {
           "op": "rename",
@@ -74,11 +74,6 @@
         },
         {
           "op": "rename",
-          "from": "ttTeamPanelBlurOpacity",
-          "to": "ttTeamPanel.background.alpha"
-        },
-        {
-          "op": "rename",
           "from": "ttTeamPanelClanIconVisible",
           "to": "ttTeamPanel.playerInfo.clanIcon"
         },
@@ -111,11 +106,6 @@
           "op": "rename",
           "from": "ttTeamPanelDeadPlayerVisible",
           "to": "ttTeamPanel.showDead"
-        },
-        {
-          "op": "rename",
-          "from": "ttTeamPanelHealthBarWidth",
-          "to": "ttTeamPanel.healthBar.width"
         },
         {
           "op": "rename",
@@ -164,11 +154,6 @@
         },
         {
           "op": "rename",
-          "from": "ttTeamPanelPosOffset",
-          "to": "ttTeamPanel.offset.y"
-        },
-        {
-          "op": "rename",
           "from": "ttTeamPanelRadarConsumableVisible",
           "to": "ttTeamPanel.mods.consumablesMonitor.radar"
         },
@@ -176,11 +161,6 @@
           "op": "rename",
           "from": "ttTeamPanelRadarRangeVisible",
           "to": "ttTeamPanel.shipParams.surfaceConsumable.radarRange"
-        },
-        {
-          "op": "rename",
-          "from": "ttTeamPanelScaleOffset",
-          "to": "ttTeamPanel.scale"
         },
         {
           "op": "rename",
@@ -303,130 +283,398 @@
           "to": "ttTeamPanel.shipParams.visibility.surface"
         },
         {
-          "op": "rename",
-          "from": "ttTeamPanelVisibleOnAlt",
-          "to": "ttTeamPanel.displayMode"
-        },
-        {
           "op": "transform",
-          "from": "ttTeamPanel.background.alpha",
+          "transform": "compose",
           "to": "ttTeamPanel.background.alpha",
-          "transform": "stepIndex",
-          "args": {
-            "min": 0.1,
-            "step": 0.1
+          "sources": [
+            {
+              "key": "ttTeamPanelBlurOpacity"
+            }
+          ],
+          "value": {
+            "add": [
+              0.1,
+              {
+                "mul": [
+                  {
+                    "round": {
+                      "src": 0
+                    }
+                  },
+                  0.1
+                ]
+              }
+            ]
           }
         },
         {
           "op": "transform",
-          "from": "ttTeamPanel.displayMode",
+          "transform": "compose",
           "to": "ttTeamPanel.displayMode",
-          "transform": "stepIndex",
-          "args": {
-            "min": 1,
-            "step": 1
+          "sources": [
+            {
+              "key": "ttTeamPanelVisibleOnAlt"
+            }
+          ],
+          "value": {
+            "add": [
+              1,
+              {
+                "mul": [
+                  {
+                    "round": {
+                      "src": 0
+                    }
+                  },
+                  1
+                ]
+              }
+            ]
           }
         },
         {
           "op": "transform",
-          "from": "ttTeamPanel.healthBar.width",
-          "to": "ttTeamPanel.healthBar.width",
-          "transform": "stepIndex",
-          "args": {
-            "min": 100,
-            "step": 20
-          }
-        },
-        {
-          "op": "transform",
-          "from": "ttTeamPanel.offset.y",
-          "to": "ttTeamPanel.offset.y",
-          "transform": "stepIndex",
-          "args": {
-            "min": 110,
-            "step": 10
-          }
-        },
-        {
-          "op": "transform",
-          "from": "ttTeamPanel.scale",
-          "to": "ttTeamPanel.scale",
-          "transform": "stepIndex",
-          "args": {
-            "min": 0.5,
-            "step": 0.1
-          }
-        },
-        {
-          "op": "transform",
-          "from": "ttTeamPanel.healthBar.color.ally",
+          "transform": "compose",
           "to": "ttTeamPanel.healthBar.color.ally",
-          "transform": "packChannels",
-          "args": {
-            "default": 1715987365,
-            "alphaFrom": "ttTeamPanelHealthBarOpacity",
-            "alphaMin": 0,
-            "alphaStep": 0.1
+          "sources": [
+            {
+              "key": "ttTeamPanelHealthBarOpacity",
+              "default": 4
+            }
+          ],
+          "when": {
+            "or": [
+              {
+                "present": 0
+              }
+            ]
+          },
+          "value": {
+            "argb": {
+              "a": {
+                "mul": [
+                  {
+                    "add": [
+                      0,
+                      {
+                        "mul": [
+                          {
+                            "round": {
+                              "src": 0
+                            }
+                          },
+                          0.1
+                        ]
+                      }
+                    ]
+                  },
+                  255
+                ]
+              },
+              "r": 71,
+              "g": 227,
+              "b": 165
+            }
           }
         },
         {
           "op": "transform",
-          "from": "ttTeamPanel.healthBar.color.banned",
+          "transform": "compose",
           "to": "ttTeamPanel.healthBar.color.banned",
-          "transform": "packChannels",
-          "args": {
-            "default": 1711276032,
-            "alphaFrom": "ttTeamPanelHealthBarOpacity",
-            "alphaMin": 0,
-            "alphaStep": 0.1
+          "sources": [
+            {
+              "key": "ttTeamPanelHealthBarOpacity",
+              "default": 4
+            }
+          ],
+          "when": {
+            "or": [
+              {
+                "present": 0
+              }
+            ]
+          },
+          "value": {
+            "argb": {
+              "a": {
+                "mul": [
+                  {
+                    "add": [
+                      0,
+                      {
+                        "mul": [
+                          {
+                            "round": {
+                              "src": 0
+                            }
+                          },
+                          0.1
+                        ]
+                      }
+                    ]
+                  },
+                  255
+                ]
+              },
+              "r": 0,
+              "g": 0,
+              "b": 0
+            }
           }
         },
         {
           "op": "transform",
-          "from": "ttTeamPanel.healthBar.color.enemy",
+          "transform": "compose",
           "to": "ttTeamPanel.healthBar.color.enemy",
-          "transform": "packChannels",
-          "args": {
-            "default": 1727941930,
-            "alphaFrom": "ttTeamPanelHealthBarOpacity",
-            "alphaMin": 0,
-            "alphaStep": 0.1
+          "sources": [
+            {
+              "key": "ttTeamPanelHealthBarOpacity",
+              "default": 4
+            }
+          ],
+          "when": {
+            "or": [
+              {
+                "present": 0
+              }
+            ]
+          },
+          "value": {
+            "argb": {
+              "a": {
+                "mul": [
+                  {
+                    "add": [
+                      0,
+                      {
+                        "mul": [
+                          {
+                            "round": {
+                              "src": 0
+                            }
+                          },
+                          0.1
+                        ]
+                      }
+                    ]
+                  },
+                  255
+                ]
+              },
+              "r": 254,
+              "g": 77,
+              "b": 42
+            }
           }
         },
         {
           "op": "transform",
-          "from": "ttTeamPanel.healthBar.color.flagshipAlly",
+          "transform": "compose",
           "to": "ttTeamPanel.healthBar.color.flagshipAlly",
-          "transform": "packChannels",
-          "args": {
-            "default": 1711309055,
-            "alphaFrom": "ttTeamPanelHealthBarOpacity",
-            "alphaMin": 0,
-            "alphaStep": 0.1
+          "sources": [
+            {
+              "key": "ttTeamPanelHealthBarOpacity",
+              "default": 4
+            }
+          ],
+          "when": {
+            "or": [
+              {
+                "present": 0
+              }
+            ]
+          },
+          "value": {
+            "argb": {
+              "a": {
+                "mul": [
+                  {
+                    "add": [
+                      0,
+                      {
+                        "mul": [
+                          {
+                            "round": {
+                              "src": 0
+                            }
+                          },
+                          0.1
+                        ]
+                      }
+                    ]
+                  },
+                  255
+                ]
+              },
+              "r": 0,
+              "g": 128,
+              "b": 255
+            }
           }
         },
         {
           "op": "transform",
-          "from": "ttTeamPanel.healthBar.color.flagshipEnemy",
+          "transform": "compose",
           "to": "ttTeamPanel.healthBar.color.flagshipEnemy",
-          "transform": "packChannels",
-          "args": {
-            "default": 1724697600,
-            "alphaFrom": "ttTeamPanelHealthBarOpacity",
-            "alphaMin": 0,
-            "alphaStep": 0.1
+          "sources": [
+            {
+              "key": "ttTeamPanelHealthBarOpacity",
+              "default": 4
+            }
+          ],
+          "when": {
+            "or": [
+              {
+                "present": 0
+              }
+            ]
+          },
+          "value": {
+            "argb": {
+              "a": {
+                "mul": [
+                  {
+                    "add": [
+                      0,
+                      {
+                        "mul": [
+                          {
+                            "round": {
+                              "src": 0
+                            }
+                          },
+                          0.1
+                        ]
+                      }
+                    ]
+                  },
+                  255
+                ]
+              },
+              "r": 204,
+              "g": 204,
+              "b": 0
+            }
           }
         },
         {
           "op": "transform",
-          "from": "ttTeamPanel.healthBar.color.self",
+          "transform": "compose",
           "to": "ttTeamPanel.healthBar.color.self",
-          "transform": "packChannels",
-          "args": {
-            "default": 1714070861,
-            "alphaFrom": "ttTeamPanelHealthBarOpacity",
-            "alphaMin": 0,
-            "alphaStep": 0.1
+          "sources": [
+            {
+              "key": "ttTeamPanelHealthBarOpacity",
+              "default": 4
+            }
+          ],
+          "when": {
+            "or": [
+              {
+                "present": 0
+              }
+            ]
+          },
+          "value": {
+            "argb": {
+              "a": {
+                "mul": [
+                  {
+                    "add": [
+                      0,
+                      {
+                        "mul": [
+                          {
+                            "round": {
+                              "src": 0
+                            }
+                          },
+                          0.1
+                        ]
+                      }
+                    ]
+                  },
+                  255
+                ]
+              },
+              "r": 42,
+              "g": 165,
+              "b": 77
+            }
+          }
+        },
+        {
+          "op": "transform",
+          "transform": "compose",
+          "to": "ttTeamPanel.healthBar.width",
+          "sources": [
+            {
+              "key": "ttTeamPanelHealthBarWidth"
+            }
+          ],
+          "value": {
+            "add": [
+              100,
+              {
+                "mul": [
+                  {
+                    "round": {
+                      "src": 0
+                    }
+                  },
+                  20
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "op": "transform",
+          "transform": "compose",
+          "to": "ttTeamPanel.offset.y",
+          "sources": [
+            {
+              "key": "ttTeamPanelPosOffset"
+            }
+          ],
+          "value": {
+            "add": [
+              110,
+              {
+                "mul": [
+                  {
+                    "round": {
+                      "src": 0
+                    }
+                  },
+                  10
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "op": "transform",
+          "transform": "compose",
+          "to": "ttTeamPanel.scale",
+          "sources": [
+            {
+              "key": "ttTeamPanelScaleOffset"
+            }
+          ],
+          "value": {
+            "add": [
+              0.5,
+              {
+                "mul": [
+                  {
+                    "round": {
+                      "src": 0
+                    }
+                  },
+                  0.1
+                ]
+              }
+            ]
           }
         }
       ]
