@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 4,
+  "schemaVersion": 5,
   "id": "cmtkswuwl0005v01412wj9emy",
   "author": "ttaro",
   "modName": "Team Panel",
@@ -9,6 +9,7 @@
     {
       "kind": "group",
       "key": "cmtktamim00hmv0d4sos9qjpp",
+      "display": "section",
       "label": "IDS_TT_TITLE_GENERAL",
       "collapse": "expanded",
       "children": [
@@ -22,7 +23,7 @@
         {
           "kind": "group",
           "key": "cmt4yym240002v0to7holoi4f",
-          "aggregate": "inline",
+          "display": "transparent",
           "children": [
             {
               "kind": "setting",
@@ -91,6 +92,7 @@
     {
       "kind": "group",
       "key": "cmtktam83008yv0d4wp6mx9bs",
+      "display": "section",
       "label": "IDS_TT_TITLE_BACKGROUND",
       "collapse": "expanded",
       "children": [
@@ -175,6 +177,7 @@
     {
       "kind": "group",
       "key": "cmtktam9h00a2v0d4foe6cjie",
+      "display": "section",
       "label": "IDS_TT_TITLE_HEALTH_BAR",
       "collapse": "expanded",
       "children": [
@@ -192,6 +195,7 @@
         {
           "kind": "group",
           "key": "cmsyrc93w0002v0r0qmdwfkge",
+          "display": "section",
           "label": "IDS_TT_TITLE_COLORS",
           "collapse": "expanded",
           "children": [
@@ -256,6 +260,7 @@
     {
       "kind": "group",
       "key": "cmtktam20003zv0d4s1zgjdz2",
+      "display": "section",
       "label": "IDS_TT_TITLE_BASIC_INFO",
       "collapse": "expanded",
       "children": [
@@ -324,6 +329,7 @@
     {
       "kind": "group",
       "key": "cmtktamjw00iov0d4qd1cyyhv",
+      "display": "section",
       "label": "IDS_TT_TITLE_SHIP_INFO",
       "collapse": "expanded",
       "children": [
@@ -421,11 +427,13 @@
     {
       "kind": "group",
       "key": "cmtktamhc00gjv0d4f07ncjd9",
+      "display": "section",
       "label": "IDS_TT_MODS_INTEGRATION",
       "children": [
         {
           "kind": "group",
           "key": "cmtktam38004wv0d42cqf1u20",
+          "display": "section",
           "label": "IDS_TT_MOD_CONSUMABLES_MONITOR",
           "collapse": "expanded",
           "enabledWhen": {
@@ -595,6 +603,7 @@
         {
           "kind": "group",
           "key": "cmtktamdb00d8v0d48rv8cm00",
+          "display": "section",
           "label": "IDS_TT_MOD_DAMAGE_MONITOR",
           "collapse": "expanded",
           "enabledWhen": {
@@ -622,6 +631,7 @@
         {
           "kind": "group",
           "key": "cmtktam270044v0d4teq2pu8k",
+          "display": "section",
           "label": "IDS_TT_MOD_BUILD_VIEWER",
           "collapse": "expanded",
           "enabledWhen": {
@@ -651,6 +661,7 @@
     {
       "kind": "group",
       "key": "cmtktamdf00dbv0d4t545bm1z",
+      "display": "section",
       "label": "IDS_TT_TITLE_SHIP_STATS",
       "collapse": "expanded",
       "children": [
@@ -664,7 +675,7 @@
         {
           "kind": "group",
           "key": "cmt4us0gw0014v0rwfa5yiex1",
-          "aggregate": "inline",
+          "display": "transparent",
           "children": [
             {
               "kind": "setting",
@@ -678,6 +689,7 @@
         {
           "kind": "group",
           "key": "cmtktambd00bjv0d4kp2m2hi9",
+          "display": "section",
           "label": "IDS_TT_TITLE_VISIBILITY",
           "collapse": "expanded",
           "children": [
@@ -756,6 +768,7 @@
         {
           "kind": "group",
           "key": "cmtktamem00eav0d4tzikof9n",
+          "display": "section",
           "label": "IDS_TT_TITLE_SPEED",
           "collapse": "expanded",
           "children": [
@@ -834,6 +847,7 @@
         {
           "kind": "group",
           "key": "cmtktaml800jov0d4hu7ae7z0",
+          "display": "section",
           "label": "IDS_TT_TITLE_AIR_STRIKE",
           "collapse": "collapsed",
           "children": [
@@ -912,6 +926,7 @@
         {
           "kind": "group",
           "key": "cmtktaml400jlv0d4xeflm4oq",
+          "display": "section",
           "label": "IDS_TT_TITLE_AIR_DEFENSE",
           "collapse": "expanded",
           "children": [
@@ -990,6 +1005,7 @@
         {
           "kind": "group",
           "key": "cmtktamnf00kqv0d4342l33rm",
+          "display": "section",
           "label": "IDS_TT_TITLE_ATBA",
           "collapse": "collapsed",
           "children": [
@@ -1046,6 +1062,7 @@
         {
           "kind": "group",
           "key": "cmtktamc600c8v0d49l6d9it9",
+          "display": "section",
           "label": "IDS_TT_TITLE_ARTILLERY",
           "collapse": "expanded",
           "children": [
@@ -1124,6 +1141,7 @@
         {
           "kind": "group",
           "key": "cmtktam82008xv0d4edfjab1o",
+          "display": "section",
           "label": "IDS_TT_TITLE_TORPEDO",
           "collapse": "expanded",
           "children": [
@@ -1180,6 +1198,7 @@
         {
           "kind": "group",
           "key": "cmtktamk400ivv0d4doiwzlms",
+          "display": "section",
           "label": "IDS_TT_TITLE_SURFACE_CONSUMABLE_RANGE",
           "collapse": "expanded",
           "children": [
@@ -1258,6 +1277,7 @@
         {
           "kind": "group",
           "key": "cmtktamkf00j4v0d4uflvp4hu",
+          "display": "section",
           "label": "IDS_TT_TITLE_SUBMARINE_CONSUMABLE_RANGE",
           "collapse": "expanded",
           "children": [
@@ -1336,6 +1356,7 @@
         {
           "kind": "group",
           "key": "cmtktam30004pv0d4dzym30dg",
+          "display": "section",
           "label": "IDS_TT_TITLE_DCP_CONSUMABLE",
           "collapse": "collapsed",
           "children": [
