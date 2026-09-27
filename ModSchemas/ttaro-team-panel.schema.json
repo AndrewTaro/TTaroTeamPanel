@@ -5,7 +5,7 @@
   "modName": "Team Panel",
   "slug": "team-panel",
   "order": 5,
-  "migrationVersion": 1,
+  "migrationVersion": 2,
   "tree": [
     {
       "kind": "group",
@@ -17,7 +17,7 @@
         {
           "kind": "setting",
           "control": "toggle",
-          "key": "ttTeamPanel.showDead",
+          "key": "teamPanel.showDead",
           "label": "IDS_TT_SHOW_DEAD",
           "default": true
         },
@@ -29,7 +29,7 @@
             {
               "kind": "setting",
               "control": "slider",
-              "key": "ttTeamPanel.offset.y",
+              "key": "teamPanel.offset.y",
               "label": "IDS_TT_DISPLAY_HEIGHT_OFFSET",
               "default": 160,
               "min": 0,
@@ -40,7 +40,7 @@
             {
               "kind": "setting",
               "control": "number",
-              "key": "ttTeamPanel.offset.x",
+              "key": "teamPanel.offset.x",
               "label": "IDS_TT_SIDE_OFFSET",
               "hint": {
                 "text": "IDS_TT_HINT_NUMBER_INPUT"
@@ -55,7 +55,7 @@
         {
           "kind": "setting",
           "control": "slider",
-          "key": "ttTeamPanel.scale",
+          "key": "teamPanel.scale",
           "label": "IDS_TT_UI_SCALE",
           "default": 1,
           "min": 0.5,
@@ -66,7 +66,7 @@
         {
           "kind": "setting",
           "control": "dropdown",
-          "key": "ttTeamPanel.displayMode",
+          "key": "teamPanel.displayMode",
           "label": "IDS_TT_DISPLAY_MODE",
           "hint": {
             "text": "IDS_TT_HINT_DISPLAY_MODE"
@@ -88,92 +88,6 @@
             }
           ],
           "optionStyle": "KEY"
-        }
-      ]
-    },
-    {
-      "kind": "group",
-      "key": "cmtktam83008yv0d4wp6mx9bs",
-      "display": "section",
-      "label": "IDS_TT_TITLE_BACKGROUND",
-      "collapse": "expanded",
-      "children": [
-        {
-          "kind": "setting",
-          "control": "dropdown",
-          "key": "ttTeamPanel.background.displayMode",
-          "label": "IDS_TT_DISPLAY_MODE",
-          "hint": {
-            "text": "IDS_TT_HINT_DISPLAY_MODE"
-          },
-          "default": 0,
-          "options": [
-            {
-              "value": 0,
-              "phrase": "IDS_TURN_OFF"
-            },
-            {
-              "value": 1,
-              "phrase": "IDS_TURN_ON"
-            },
-            {
-              "value": 2,
-              "phrase": "IDS_ALT_VISION_MODE_1",
-              "icon": "CMD_ICONS"
-            }
-          ],
-          "optionStyle": "KEY"
-        },
-        {
-          "kind": "setting",
-          "control": "toggle",
-          "key": "ttTeamPanel.background.useBlur",
-          "label": "IDS_TT_USE_BLUR",
-          "hint": {
-            "text": "IDS_TT_HINT_BLUR_PERFORMANCE_WARNING"
-          },
-          "default": true,
-          "enabledWhen": {
-            "kind": "group",
-            "join": "all",
-            "conditions": [
-              {
-                "kind": "compare",
-                "key": "ttTeamPanel.background.displayMode",
-                "op": "in",
-                "values": [
-                  1,
-                  2
-                ]
-              }
-            ]
-          }
-        },
-        {
-          "kind": "setting",
-          "control": "slider",
-          "key": "ttTeamPanel.background.alpha",
-          "label": "IDS_TT_OPACITY",
-          "default": 0.4,
-          "min": 0.1,
-          "max": 1,
-          "step": 0.01,
-          "decimals": 2,
-          "enabledWhen": {
-            "kind": "group",
-            "join": "all",
-            "conditions": [
-              {
-                "kind": "compare",
-                "key": "ttTeamPanel.background.displayMode",
-                "op": "in",
-                "values": [
-                  1,
-                  2
-                ]
-              }
-            ]
-          }
         }
       ]
     },
@@ -187,7 +101,7 @@
         {
           "kind": "setting",
           "control": "slider",
-          "key": "ttTeamPanel.healthBar.width",
+          "key": "teamPanel.healthBar.width",
           "label": "IDS_TT_BAR_WIDTH",
           "default": 200,
           "min": 100,
@@ -205,7 +119,7 @@
             {
               "kind": "setting",
               "control": "color",
-              "key": "ttTeamPanel.healthBar.color.ally",
+              "key": "teamPanel.healthBar.color.ally",
               "label": "IDS_TT_TITLE_HEALTHBAR_COLOR_ALLY",
               "default": 1715987365,
               "min": 0,
@@ -214,7 +128,7 @@
             {
               "kind": "setting",
               "control": "color",
-              "key": "ttTeamPanel.healthBar.color.enemy",
+              "key": "teamPanel.healthBar.color.enemy",
               "label": "IDS_TT_TITLE_HEALTHBAR_COLOR_ENEMY",
               "default": 1727941930,
               "min": 0,
@@ -223,7 +137,7 @@
             {
               "kind": "setting",
               "control": "color",
-              "key": "ttTeamPanel.healthBar.color.self",
+              "key": "teamPanel.healthBar.color.self",
               "label": "IDS_TT_TITLE_HEALTHBAR_COLOR_SELF",
               "default": 1714070861,
               "min": 0,
@@ -232,7 +146,7 @@
             {
               "kind": "setting",
               "control": "color",
-              "key": "ttTeamPanel.healthBar.color.flagshipAlly",
+              "key": "teamPanel.healthBar.color.flagshipAlly",
               "label": "IDS_TT_TITLE_HEALTHBAR_COLOR_FLAGSHIP_ALLY",
               "default": 1711309055,
               "min": 0,
@@ -241,7 +155,7 @@
             {
               "kind": "setting",
               "control": "color",
-              "key": "ttTeamPanel.healthBar.color.flagshipEnemy",
+              "key": "teamPanel.healthBar.color.flagshipEnemy",
               "label": "IDS_TT_TITLE_HEALTHBAR_COLOR_FLAGSHIP_ENEMY",
               "default": 1724697600,
               "min": 0,
@@ -250,7 +164,7 @@
             {
               "kind": "setting",
               "control": "color",
-              "key": "ttTeamPanel.healthBar.color.banned",
+              "key": "teamPanel.healthBar.color.banned",
               "label": "IDS_TT_TITLE_HEALTHBAR_COLOR_BANNED",
               "default": 1711276032,
               "min": 0,
@@ -270,21 +184,21 @@
         {
           "kind": "setting",
           "control": "toggle",
-          "key": "ttTeamPanel.playerInfo.name",
+          "key": "teamPanel.playerInfo.name",
           "label": "IDS_TT_PLAYER_NAME",
           "default": true
         },
         {
           "kind": "setting",
           "control": "toggle",
-          "key": "ttTeamPanel.playerInfo.shipName",
+          "key": "teamPanel.playerInfo.shipName",
           "label": "IDS_TT_SHIP_NAME",
           "default": true
         },
         {
           "kind": "setting",
           "control": "toggle",
-          "key": "ttTeamPanel.playerInfo.clan",
+          "key": "teamPanel.playerInfo.clan",
           "label": "IDS_TT_CLAN_NAME",
           "default": true,
           "enabledWhen": {
@@ -293,7 +207,7 @@
             "conditions": [
               {
                 "kind": "compare",
-                "key": "ttTeamPanel.playerInfo.name",
+                "key": "teamPanel.playerInfo.name",
                 "op": "in",
                 "values": [
                   1
@@ -305,14 +219,14 @@
         {
           "kind": "setting",
           "control": "toggle",
-          "key": "ttTeamPanel.playerInfo.clanIcon",
+          "key": "teamPanel.playerInfo.clanIcon",
           "label": "IDS_TT_CLAN_ICON",
           "default": false
         },
         {
           "kind": "setting",
           "control": "dropdown",
-          "key": "ttTeamPanel.playerInfo.flowDirection",
+          "key": "teamPanel.playerInfo.flowDirection",
           "label": "IDS_TT_LAYOUT_DIRECTION",
           "default": 1,
           "options": [
@@ -339,35 +253,35 @@
         {
           "kind": "setting",
           "control": "toggle",
-          "key": "ttTeamPanel.shipInfo.nation",
+          "key": "teamPanel.shipInfo.nation",
           "label": "IDS_TT_NATIONAL_FLAG",
           "default": false
         },
         {
           "kind": "setting",
           "control": "toggle",
-          "key": "ttTeamPanel.shipInfo.tier",
+          "key": "teamPanel.shipInfo.tier",
           "label": "IDS_TT_TIER",
           "default": true
         },
         {
           "kind": "setting",
           "control": "toggle",
-          "key": "ttTeamPanel.shipInfo.highlightPremium",
+          "key": "teamPanel.shipInfo.highlightPremium",
           "label": "IDS_TT_HIGHLIGHT_PREMIUM_TIER",
           "default": false
         },
         {
           "kind": "setting",
           "control": "toggle",
-          "key": "ttTeamPanel.shipInfo.icon",
+          "key": "teamPanel.shipInfo.icon",
           "label": "IDS_TT_CLASS_ICON",
           "default": true
         },
         {
           "kind": "setting",
           "control": "dropdown",
-          "key": "ttTeamPanel.shipInfo.color",
+          "key": "teamPanel.shipInfo.color",
           "label": "IDS_TT_CLASS_ICON_COLOR",
           "default": 0,
           "options": [
@@ -404,7 +318,7 @@
         {
           "kind": "setting",
           "control": "toggle",
-          "key": "ttTeamPanel.shipInfo.iconStatusOverwrite",
+          "key": "teamPanel.shipInfo.iconStatusOverwrite",
           "label": "IDS_TT_CLASS_ICON_STATUS",
           "hint": {
             "text": "IDS_TT_HINT_CLASS_ICON_STATUS"
@@ -414,14 +328,14 @@
         {
           "kind": "setting",
           "control": "toggle",
-          "key": "ttTeamPanel.shipInfo.kills",
+          "key": "teamPanel.shipInfo.kills",
           "label": "IDS_TT_KILL_COUNT",
           "default": true
         },
         {
           "kind": "setting",
           "control": "toggle",
-          "key": "ttTeamPanel.shipInfo.detection",
+          "key": "teamPanel.shipInfo.detection",
           "label": "IDS_TT_DETECTION",
           "default": true
         }
@@ -455,7 +369,7 @@
             {
               "kind": "setting",
               "control": "dropdown",
-              "key": "ttTeamPanel.mods.consumablesMonitor.displayMode",
+              "key": "teamPanel.mods.consumablesMonitor.displayMode",
               "label": "IDS_TT_DISPLAY_MODE",
               "hint": {
                 "text": "IDS_TT_HINT_TEAM_CONSUMABLE_WARNING"
@@ -479,7 +393,7 @@
             {
               "kind": "setting",
               "control": "toggle",
-              "key": "ttTeamPanel.mods.consumablesMonitor.hydro",
+              "key": "teamPanel.mods.consumablesMonitor.hydro",
               "label": "IDS_DOCK_CONSUME_TITLE_PCY016_SONARSEARCHPREMIUM",
               "hint": {
                 "text": "IDS_TT_HINT_TEAM_CONSUMABLE_WARNING"
@@ -491,7 +405,7 @@
                 "conditions": [
                   {
                     "kind": "compare",
-                    "key": "ttTeamPanel.mods.consumablesMonitor.displayMode",
+                    "key": "teamPanel.mods.consumablesMonitor.displayMode",
                     "op": "in",
                     "values": [
                       1,
@@ -504,7 +418,7 @@
             {
               "kind": "setting",
               "control": "toggle",
-              "key": "ttTeamPanel.mods.consumablesMonitor.radar",
+              "key": "teamPanel.mods.consumablesMonitor.radar",
               "label": "IDS_DOCK_CONSUME_TITLE_PCY020_RLSSEARCHPREMIUM",
               "hint": {
                 "text": "IDS_TT_HINT_TEAM_CONSUMABLE_WARNING"
@@ -516,7 +430,7 @@
                 "conditions": [
                   {
                     "kind": "compare",
-                    "key": "ttTeamPanel.mods.consumablesMonitor.displayMode",
+                    "key": "teamPanel.mods.consumablesMonitor.displayMode",
                     "op": "in",
                     "values": [
                       1,
@@ -529,7 +443,7 @@
             {
               "kind": "setting",
               "control": "toggle",
-              "key": "ttTeamPanel.mods.consumablesMonitor.subRadar",
+              "key": "teamPanel.mods.consumablesMonitor.subRadar",
               "label": "IDS_DOCK_CONSUME_TITLE_PCY048_SUBMARINELOCATOR",
               "hint": {
                 "text": "IDS_TT_HINT_TEAM_CONSUMABLE_WARNING"
@@ -541,7 +455,7 @@
                 "conditions": [
                   {
                     "kind": "compare",
-                    "key": "ttTeamPanel.mods.consumablesMonitor.displayMode",
+                    "key": "teamPanel.mods.consumablesMonitor.displayMode",
                     "op": "in",
                     "values": [
                       1,
@@ -554,7 +468,7 @@
             {
               "kind": "setting",
               "control": "toggle",
-              "key": "ttTeamPanel.mods.consumablesMonitor.others",
+              "key": "teamPanel.mods.consumablesMonitor.others",
               "label": "IDS_TT_OTHER_CONSUMABLES",
               "hint": {
                 "text": "IDS_TT_HINT_TEAM_CONSUMABLE_WARNING"
@@ -566,7 +480,7 @@
                 "conditions": [
                   {
                     "kind": "compare",
-                    "key": "ttTeamPanel.mods.consumablesMonitor.displayMode",
+                    "key": "teamPanel.mods.consumablesMonitor.displayMode",
                     "op": "in",
                     "values": [
                       1,
@@ -579,7 +493,7 @@
             {
               "kind": "setting",
               "control": "toggle",
-              "key": "ttTeamPanel.mods.consumablesMonitor.teamConsumables",
+              "key": "teamPanel.mods.consumablesMonitor.teamConsumables",
               "label": "IDS_TT_TEAM_CONSUMABLE",
               "hint": {
                 "text": "IDS_TT_HINT_TEAM_CONSUMABLE_WARNING"
@@ -591,7 +505,7 @@
                 "conditions": [
                   {
                     "kind": "compare",
-                    "key": "ttTeamPanel.mods.consumablesMonitor.displayMode",
+                    "key": "teamPanel.mods.consumablesMonitor.displayMode",
                     "op": "in",
                     "values": [
                       1,
@@ -625,7 +539,7 @@
             {
               "kind": "setting",
               "control": "toggle",
-              "key": "ttTeamPanel.mods.damageMonitor.hideOthers",
+              "key": "teamPanel.mods.damageMonitor.hideOthers",
               "label": "IDS_TT_DISABLE_NONPLAYER_DAMAGES",
               "default": false
             }
@@ -653,7 +567,7 @@
             {
               "kind": "setting",
               "control": "toggle",
-              "key": "ttTeamPanel.mods.buildViewer.hideOthers",
+              "key": "teamPanel.mods.buildViewer.hideOthers",
               "label": "IDS_TT_DISABLE_ALLY_BUILDS",
               "default": false
             }
@@ -671,7 +585,7 @@
         {
           "kind": "setting",
           "control": "toggle",
-          "key": "ttTeamPanel.shipParams.units",
+          "key": "teamPanel.shipParams.units",
           "label": "IDS_TT_SHOW_UNIT",
           "default": false
         },
@@ -683,7 +597,7 @@
             {
               "kind": "setting",
               "control": "toggle",
-              "key": "ttTeamPanel.shipParams.font.bold",
+              "key": "teamPanel.shipParams.font.bold",
               "label": "IDS_TT_BOLD_FONT",
               "default": true
             }
@@ -699,7 +613,7 @@
             {
               "kind": "setting",
               "control": "dropdown",
-              "key": "ttTeamPanel.shipParams.visibility.displayMode",
+              "key": "teamPanel.shipParams.visibility.displayMode",
               "label": "IDS_TT_DISPLAY_MODE",
               "hint": {
                 "text": "IDS_TT_HINT_DISPLAY_MODE"
@@ -725,7 +639,7 @@
             {
               "kind": "setting",
               "control": "toggle",
-              "key": "ttTeamPanel.shipParams.visibility.surface",
+              "key": "teamPanel.shipParams.visibility.surface",
               "label": "IDS_TT_SURFACE",
               "default": true,
               "enabledWhen": {
@@ -734,7 +648,7 @@
                 "conditions": [
                   {
                     "kind": "compare",
-                    "key": "ttTeamPanel.shipParams.visibility.displayMode",
+                    "key": "teamPanel.shipParams.visibility.displayMode",
                     "op": "in",
                     "values": [
                       1,
@@ -747,7 +661,7 @@
             {
               "kind": "setting",
               "control": "toggle",
-              "key": "ttTeamPanel.shipParams.visibility.air",
+              "key": "teamPanel.shipParams.visibility.air",
               "label": "IDS_TT_AIR",
               "default": false,
               "enabledWhen": {
@@ -756,7 +670,7 @@
                 "conditions": [
                   {
                     "kind": "compare",
-                    "key": "ttTeamPanel.shipParams.visibility.displayMode",
+                    "key": "teamPanel.shipParams.visibility.displayMode",
                     "op": "in",
                     "values": [
                       1,
@@ -778,7 +692,7 @@
             {
               "kind": "setting",
               "control": "dropdown",
-              "key": "ttTeamPanel.shipParams.speed.displayMode",
+              "key": "teamPanel.shipParams.speed.displayMode",
               "label": "IDS_TT_DISPLAY_MODE",
               "hint": {
                 "text": "IDS_TT_HINT_DISPLAY_MODE"
@@ -804,7 +718,7 @@
             {
               "kind": "setting",
               "control": "toggle",
-              "key": "ttTeamPanel.shipParams.speed.surface",
+              "key": "teamPanel.shipParams.speed.surface",
               "label": "IDS_TT_SURFACE",
               "default": true,
               "enabledWhen": {
@@ -813,7 +727,7 @@
                 "conditions": [
                   {
                     "kind": "compare",
-                    "key": "ttTeamPanel.shipParams.speed.displayMode",
+                    "key": "teamPanel.shipParams.speed.displayMode",
                     "op": "in",
                     "values": [
                       1,
@@ -826,7 +740,7 @@
             {
               "kind": "setting",
               "control": "toggle",
-              "key": "ttTeamPanel.shipParams.speed.underwater",
+              "key": "teamPanel.shipParams.speed.underwater",
               "label": "IDS_TT_UNDERWATER",
               "default": true,
               "enabledWhen": {
@@ -835,7 +749,7 @@
                 "conditions": [
                   {
                     "kind": "compare",
-                    "key": "ttTeamPanel.shipParams.speed.displayMode",
+                    "key": "teamPanel.shipParams.speed.displayMode",
                     "op": "in",
                     "values": [
                       1,
@@ -857,7 +771,7 @@
             {
               "kind": "setting",
               "control": "dropdown",
-              "key": "ttTeamPanel.shipParams.airSupport.displayMode",
+              "key": "teamPanel.shipParams.airSupport.displayMode",
               "label": "IDS_TT_DISPLAY_MODE",
               "hint": {
                 "text": "IDS_TT_HINT_DISPLAY_MODE"
@@ -883,7 +797,7 @@
             {
               "kind": "setting",
               "control": "toggle",
-              "key": "ttTeamPanel.shipParams.airSupport.range",
+              "key": "teamPanel.shipParams.airSupport.range",
               "label": "IDS_TT_RANGE",
               "default": true,
               "enabledWhen": {
@@ -892,7 +806,7 @@
                 "conditions": [
                   {
                     "kind": "compare",
-                    "key": "ttTeamPanel.shipParams.airSupport.displayMode",
+                    "key": "teamPanel.shipParams.airSupport.displayMode",
                     "op": "in",
                     "values": [
                       1,
@@ -905,7 +819,7 @@
             {
               "kind": "setting",
               "control": "toggle",
-              "key": "ttTeamPanel.shipParams.airSupport.reload",
+              "key": "teamPanel.shipParams.airSupport.reload",
               "label": "IDS_TT_RELOAD",
               "default": true,
               "enabledWhen": {
@@ -914,7 +828,7 @@
                 "conditions": [
                   {
                     "kind": "compare",
-                    "key": "ttTeamPanel.shipParams.airSupport.displayMode",
+                    "key": "teamPanel.shipParams.airSupport.displayMode",
                     "op": "in",
                     "values": [
                       1,
@@ -936,7 +850,7 @@
             {
               "kind": "setting",
               "control": "dropdown",
-              "key": "ttTeamPanel.shipParams.antiAir.displayMode",
+              "key": "teamPanel.shipParams.antiAir.displayMode",
               "label": "IDS_TT_DISPLAY_MODE",
               "hint": {
                 "text": "IDS_TT_HINT_DISPLAY_MODE"
@@ -962,7 +876,7 @@
             {
               "kind": "setting",
               "control": "toggle",
-              "key": "ttTeamPanel.shipParams.antiAir.range",
+              "key": "teamPanel.shipParams.antiAir.range",
               "label": "IDS_TT_RANGE",
               "default": true,
               "enabledWhen": {
@@ -971,7 +885,7 @@
                 "conditions": [
                   {
                     "kind": "compare",
-                    "key": "ttTeamPanel.shipParams.antiAir.displayMode",
+                    "key": "teamPanel.shipParams.antiAir.displayMode",
                     "op": "in",
                     "values": [
                       1,
@@ -984,7 +898,7 @@
             {
               "kind": "setting",
               "control": "toggle",
-              "key": "ttTeamPanel.shipParams.antiAir.rate",
+              "key": "teamPanel.shipParams.antiAir.rate",
               "label": "IDS_TT_RATING",
               "default": true,
               "enabledWhen": {
@@ -993,7 +907,7 @@
                 "conditions": [
                   {
                     "kind": "compare",
-                    "key": "ttTeamPanel.shipParams.antiAir.displayMode",
+                    "key": "teamPanel.shipParams.antiAir.displayMode",
                     "op": "in",
                     "values": [
                       1,
@@ -1015,7 +929,7 @@
             {
               "kind": "setting",
               "control": "dropdown",
-              "key": "ttTeamPanel.shipParams.atba.displayMode",
+              "key": "teamPanel.shipParams.atba.displayMode",
               "label": "IDS_TT_DISPLAY_MODE",
               "hint": {
                 "text": "IDS_TT_HINT_DISPLAY_MODE"
@@ -1041,7 +955,7 @@
             {
               "kind": "setting",
               "control": "toggle",
-              "key": "ttTeamPanel.shipParams.atba.range",
+              "key": "teamPanel.shipParams.atba.range",
               "label": "IDS_TT_RANGE",
               "default": true,
               "enabledWhen": {
@@ -1050,7 +964,7 @@
                 "conditions": [
                   {
                     "kind": "compare",
-                    "key": "ttTeamPanel.shipParams.atba.displayMode",
+                    "key": "teamPanel.shipParams.atba.displayMode",
                     "op": "in",
                     "values": [
                       1,
@@ -1072,7 +986,7 @@
             {
               "kind": "setting",
               "control": "dropdown",
-              "key": "ttTeamPanel.shipParams.artillery.displayMode",
+              "key": "teamPanel.shipParams.artillery.displayMode",
               "label": "IDS_TT_DISPLAY_MODE",
               "hint": {
                 "text": "IDS_TT_HINT_DISPLAY_MODE"
@@ -1098,7 +1012,7 @@
             {
               "kind": "setting",
               "control": "toggle",
-              "key": "ttTeamPanel.shipParams.artillery.range",
+              "key": "teamPanel.shipParams.artillery.range",
               "label": "IDS_TT_RANGE",
               "default": true,
               "enabledWhen": {
@@ -1107,7 +1021,7 @@
                 "conditions": [
                   {
                     "kind": "compare",
-                    "key": "ttTeamPanel.shipParams.artillery.displayMode",
+                    "key": "teamPanel.shipParams.artillery.displayMode",
                     "op": "in",
                     "values": [
                       1,
@@ -1120,7 +1034,7 @@
             {
               "kind": "setting",
               "control": "toggle",
-              "key": "ttTeamPanel.shipParams.artillery.reload",
+              "key": "teamPanel.shipParams.artillery.reload",
               "label": "IDS_TT_RELOAD",
               "default": true,
               "enabledWhen": {
@@ -1129,7 +1043,7 @@
                 "conditions": [
                   {
                     "kind": "compare",
-                    "key": "ttTeamPanel.shipParams.artillery.displayMode",
+                    "key": "teamPanel.shipParams.artillery.displayMode",
                     "op": "in",
                     "values": [
                       1,
@@ -1151,7 +1065,7 @@
             {
               "kind": "setting",
               "control": "dropdown",
-              "key": "ttTeamPanel.shipParams.torpedo.displayMode",
+              "key": "teamPanel.shipParams.torpedo.displayMode",
               "label": "IDS_TT_DISPLAY_MODE",
               "hint": {
                 "text": "IDS_TT_HINT_DISPLAY_MODE"
@@ -1177,7 +1091,7 @@
             {
               "kind": "setting",
               "control": "toggle",
-              "key": "ttTeamPanel.shipParams.torpedo.range",
+              "key": "teamPanel.shipParams.torpedo.range",
               "label": "IDS_TT_RANGE",
               "default": true,
               "enabledWhen": {
@@ -1186,7 +1100,7 @@
                 "conditions": [
                   {
                     "kind": "compare",
-                    "key": "ttTeamPanel.shipParams.torpedo.displayMode",
+                    "key": "teamPanel.shipParams.torpedo.displayMode",
                     "op": "in",
                     "values": [
                       1,
@@ -1208,7 +1122,7 @@
             {
               "kind": "setting",
               "control": "dropdown",
-              "key": "ttTeamPanel.shipParams.surfaceConsumable.displayMode",
+              "key": "teamPanel.shipParams.surfaceConsumable.displayMode",
               "label": "IDS_TT_DISPLAY_MODE",
               "hint": {
                 "text": "IDS_TT_HINT_DISPLAY_MODE"
@@ -1234,7 +1148,7 @@
             {
               "kind": "setting",
               "control": "toggle",
-              "key": "ttTeamPanel.shipParams.surfaceConsumable.hydroRange",
+              "key": "teamPanel.shipParams.surfaceConsumable.hydroRange",
               "label": "IDS_TT_HYDRO",
               "default": true,
               "enabledWhen": {
@@ -1243,7 +1157,7 @@
                 "conditions": [
                   {
                     "kind": "compare",
-                    "key": "ttTeamPanel.shipParams.surfaceConsumable.displayMode",
+                    "key": "teamPanel.shipParams.surfaceConsumable.displayMode",
                     "op": "in",
                     "values": [
                       1,
@@ -1256,7 +1170,7 @@
             {
               "kind": "setting",
               "control": "toggle",
-              "key": "ttTeamPanel.shipParams.surfaceConsumable.radarRange",
+              "key": "teamPanel.shipParams.surfaceConsumable.radarRange",
               "label": "IDS_TT_RADAR",
               "default": true,
               "enabledWhen": {
@@ -1265,7 +1179,7 @@
                 "conditions": [
                   {
                     "kind": "compare",
-                    "key": "ttTeamPanel.shipParams.surfaceConsumable.displayMode",
+                    "key": "teamPanel.shipParams.surfaceConsumable.displayMode",
                     "op": "in",
                     "values": [
                       1,
@@ -1287,7 +1201,7 @@
             {
               "kind": "setting",
               "control": "dropdown",
-              "key": "ttTeamPanel.shipParams.subConsumable.displayMode",
+              "key": "teamPanel.shipParams.subConsumable.displayMode",
               "label": "IDS_TT_DISPLAY_MODE",
               "hint": {
                 "text": "IDS_TT_HINT_DISPLAY_MODE"
@@ -1313,7 +1227,7 @@
             {
               "kind": "setting",
               "control": "toggle",
-              "key": "ttTeamPanel.shipParams.subConsumable.subHydroRange",
+              "key": "teamPanel.shipParams.subConsumable.subHydroRange",
               "label": "IDS_TT_SUB_HYDRO",
               "default": true,
               "enabledWhen": {
@@ -1322,7 +1236,7 @@
                 "conditions": [
                   {
                     "kind": "compare",
-                    "key": "ttTeamPanel.shipParams.subConsumable.displayMode",
+                    "key": "teamPanel.shipParams.subConsumable.displayMode",
                     "op": "in",
                     "values": [
                       1,
@@ -1335,7 +1249,7 @@
             {
               "kind": "setting",
               "control": "toggle",
-              "key": "ttTeamPanel.shipParams.subConsumable.subRadarRange",
+              "key": "teamPanel.shipParams.subConsumable.subRadarRange",
               "label": "IDS_TT_SUB_RADAR",
               "default": true,
               "enabledWhen": {
@@ -1344,7 +1258,7 @@
                 "conditions": [
                   {
                     "kind": "compare",
-                    "key": "ttTeamPanel.shipParams.subConsumable.displayMode",
+                    "key": "teamPanel.shipParams.subConsumable.displayMode",
                     "op": "in",
                     "values": [
                       1,
@@ -1366,7 +1280,7 @@
             {
               "kind": "setting",
               "control": "dropdown",
-              "key": "ttTeamPanel.shipParams.dcp.displayMode",
+              "key": "teamPanel.shipParams.dcp.displayMode",
               "label": "IDS_TT_DISPLAY_MODE",
               "hint": {
                 "text": "IDS_TT_HINT_DISPLAY_MODE"
@@ -1392,7 +1306,7 @@
             {
               "kind": "setting",
               "control": "toggle",
-              "key": "ttTeamPanel.shipParams.dcp.workTime",
+              "key": "teamPanel.shipParams.dcp.workTime",
               "label": "IDS_SHIP_PARAM_WORK_TIME",
               "default": true,
               "enabledWhen": {
@@ -1401,7 +1315,7 @@
                 "conditions": [
                   {
                     "kind": "compare",
-                    "key": "ttTeamPanel.shipParams.dcp.displayMode",
+                    "key": "teamPanel.shipParams.dcp.displayMode",
                     "op": "in",
                     "values": [
                       1,
@@ -1414,7 +1328,7 @@
             {
               "kind": "setting",
               "control": "toggle",
-              "key": "ttTeamPanel.shipParams.dcp.reloadTime",
+              "key": "teamPanel.shipParams.dcp.reloadTime",
               "label": "IDS_SHIP_PARAM_DEPTH_CHARGE_RELOAD_TIME",
               "default": true,
               "enabledWhen": {
@@ -1423,7 +1337,7 @@
                 "conditions": [
                   {
                     "kind": "compare",
-                    "key": "ttTeamPanel.shipParams.dcp.displayMode",
+                    "key": "teamPanel.shipParams.dcp.displayMode",
                     "op": "in",
                     "values": [
                       1,
@@ -1434,6 +1348,92 @@
               }
             }
           ]
+        }
+      ]
+    },
+    {
+      "kind": "group",
+      "key": "cmtktam83008yv0d4wp6mx9bs",
+      "display": "section",
+      "label": "IDS_TT_TITLE_BACKGROUND",
+      "collapse": "expanded",
+      "children": [
+        {
+          "kind": "setting",
+          "control": "dropdown",
+          "key": "teamPanel.background.displayMode",
+          "label": "IDS_TT_DISPLAY_MODE",
+          "hint": {
+            "text": "IDS_TT_HINT_DISPLAY_MODE"
+          },
+          "default": 0,
+          "options": [
+            {
+              "value": 0,
+              "phrase": "IDS_TURN_OFF"
+            },
+            {
+              "value": 1,
+              "phrase": "IDS_TURN_ON"
+            },
+            {
+              "value": 2,
+              "phrase": "IDS_ALT_VISION_MODE_1",
+              "icon": "CMD_ICONS"
+            }
+          ],
+          "optionStyle": "KEY"
+        },
+        {
+          "kind": "setting",
+          "control": "toggle",
+          "key": "teamPanel.background.useBlur",
+          "label": "IDS_TT_USE_BLUR",
+          "hint": {
+            "text": "IDS_TT_HINT_BLUR_PERFORMANCE_WARNING"
+          },
+          "default": true,
+          "enabledWhen": {
+            "kind": "group",
+            "join": "all",
+            "conditions": [
+              {
+                "kind": "compare",
+                "key": "teamPanel.background.displayMode",
+                "op": "in",
+                "values": [
+                  1,
+                  2
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "kind": "setting",
+          "control": "slider",
+          "key": "teamPanel.background.alpha",
+          "label": "IDS_TT_OPACITY",
+          "default": 0.4,
+          "min": 0.1,
+          "max": 1,
+          "step": 0.01,
+          "decimals": 2,
+          "enabledWhen": {
+            "kind": "group",
+            "join": "all",
+            "conditions": [
+              {
+                "kind": "compare",
+                "key": "teamPanel.background.displayMode",
+                "op": "in",
+                "values": [
+                  1,
+                  2
+                ]
+              }
+            ]
+          }
         }
       ]
     }

@@ -678,6 +678,342 @@
           }
         }
       ]
+    },
+    {
+      "version": 2,
+      "description": "key moves (auto) — 66 rename(s)",
+      "ops": [
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.background.alpha",
+          "to": "teamPanel.background.alpha"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.background.displayMode",
+          "to": "teamPanel.background.displayMode"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.background.useBlur",
+          "to": "teamPanel.background.useBlur"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.displayMode",
+          "to": "teamPanel.displayMode"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.healthBar.color.ally",
+          "to": "teamPanel.healthBar.color.ally"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.healthBar.color.banned",
+          "to": "teamPanel.healthBar.color.banned"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.healthBar.color.enemy",
+          "to": "teamPanel.healthBar.color.enemy"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.healthBar.color.flagshipAlly",
+          "to": "teamPanel.healthBar.color.flagshipAlly"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.healthBar.color.flagshipEnemy",
+          "to": "teamPanel.healthBar.color.flagshipEnemy"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.healthBar.color.self",
+          "to": "teamPanel.healthBar.color.self"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.healthBar.width",
+          "to": "teamPanel.healthBar.width"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.mods.buildViewer.hideOthers",
+          "to": "teamPanel.mods.buildViewer.hideOthers"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.mods.consumablesMonitor.displayMode",
+          "to": "teamPanel.mods.consumablesMonitor.displayMode"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.mods.consumablesMonitor.hydro",
+          "to": "teamPanel.mods.consumablesMonitor.hydro"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.mods.consumablesMonitor.others",
+          "to": "teamPanel.mods.consumablesMonitor.others"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.mods.consumablesMonitor.radar",
+          "to": "teamPanel.mods.consumablesMonitor.radar"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.mods.consumablesMonitor.subRadar",
+          "to": "teamPanel.mods.consumablesMonitor.subRadar"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.mods.consumablesMonitor.teamConsumables",
+          "to": "teamPanel.mods.consumablesMonitor.teamConsumables"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.mods.damageMonitor.hideOthers",
+          "to": "teamPanel.mods.damageMonitor.hideOthers"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.offset.x",
+          "to": "teamPanel.offset.x"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.offset.y",
+          "to": "teamPanel.offset.y"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.playerInfo.clan",
+          "to": "teamPanel.playerInfo.clan"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.playerInfo.clanIcon",
+          "to": "teamPanel.playerInfo.clanIcon"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.playerInfo.flowDirection",
+          "to": "teamPanel.playerInfo.flowDirection"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.playerInfo.name",
+          "to": "teamPanel.playerInfo.name"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.playerInfo.shipName",
+          "to": "teamPanel.playerInfo.shipName"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.scale",
+          "to": "teamPanel.scale"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.shipInfo.color",
+          "to": "teamPanel.shipInfo.color"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.shipInfo.detection",
+          "to": "teamPanel.shipInfo.detection"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.shipInfo.highlightPremium",
+          "to": "teamPanel.shipInfo.highlightPremium"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.shipInfo.icon",
+          "to": "teamPanel.shipInfo.icon"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.shipInfo.iconStatusOverwrite",
+          "to": "teamPanel.shipInfo.iconStatusOverwrite"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.shipInfo.kills",
+          "to": "teamPanel.shipInfo.kills"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.shipInfo.nation",
+          "to": "teamPanel.shipInfo.nation"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.shipInfo.tier",
+          "to": "teamPanel.shipInfo.tier"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.shipParams.airSupport.displayMode",
+          "to": "teamPanel.shipParams.airSupport.displayMode"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.shipParams.airSupport.range",
+          "to": "teamPanel.shipParams.airSupport.range"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.shipParams.airSupport.reload",
+          "to": "teamPanel.shipParams.airSupport.reload"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.shipParams.antiAir.displayMode",
+          "to": "teamPanel.shipParams.antiAir.displayMode"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.shipParams.antiAir.range",
+          "to": "teamPanel.shipParams.antiAir.range"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.shipParams.antiAir.rate",
+          "to": "teamPanel.shipParams.antiAir.rate"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.shipParams.artillery.displayMode",
+          "to": "teamPanel.shipParams.artillery.displayMode"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.shipParams.artillery.range",
+          "to": "teamPanel.shipParams.artillery.range"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.shipParams.artillery.reload",
+          "to": "teamPanel.shipParams.artillery.reload"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.shipParams.atba.displayMode",
+          "to": "teamPanel.shipParams.atba.displayMode"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.shipParams.atba.range",
+          "to": "teamPanel.shipParams.atba.range"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.shipParams.dcp.displayMode",
+          "to": "teamPanel.shipParams.dcp.displayMode"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.shipParams.dcp.reloadTime",
+          "to": "teamPanel.shipParams.dcp.reloadTime"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.shipParams.dcp.workTime",
+          "to": "teamPanel.shipParams.dcp.workTime"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.shipParams.font.bold",
+          "to": "teamPanel.shipParams.font.bold"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.shipParams.speed.displayMode",
+          "to": "teamPanel.shipParams.speed.displayMode"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.shipParams.speed.surface",
+          "to": "teamPanel.shipParams.speed.surface"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.shipParams.speed.underwater",
+          "to": "teamPanel.shipParams.speed.underwater"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.shipParams.subConsumable.displayMode",
+          "to": "teamPanel.shipParams.subConsumable.displayMode"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.shipParams.subConsumable.subHydroRange",
+          "to": "teamPanel.shipParams.subConsumable.subHydroRange"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.shipParams.subConsumable.subRadarRange",
+          "to": "teamPanel.shipParams.subConsumable.subRadarRange"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.shipParams.surfaceConsumable.displayMode",
+          "to": "teamPanel.shipParams.surfaceConsumable.displayMode"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.shipParams.surfaceConsumable.hydroRange",
+          "to": "teamPanel.shipParams.surfaceConsumable.hydroRange"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.shipParams.surfaceConsumable.radarRange",
+          "to": "teamPanel.shipParams.surfaceConsumable.radarRange"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.shipParams.torpedo.displayMode",
+          "to": "teamPanel.shipParams.torpedo.displayMode"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.shipParams.torpedo.range",
+          "to": "teamPanel.shipParams.torpedo.range"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.shipParams.units",
+          "to": "teamPanel.shipParams.units"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.shipParams.visibility.air",
+          "to": "teamPanel.shipParams.visibility.air"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.shipParams.visibility.displayMode",
+          "to": "teamPanel.shipParams.visibility.displayMode"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.shipParams.visibility.surface",
+          "to": "teamPanel.shipParams.visibility.surface"
+        },
+        {
+          "op": "rename",
+          "from": "ttTeamPanel.showDead",
+          "to": "teamPanel.showDead"
+        }
+      ]
     }
   ]
 }
