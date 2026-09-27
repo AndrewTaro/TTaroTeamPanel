@@ -5,6 +5,7 @@
   "modName": "Team Panel",
   "slug": "team-panel",
   "order": 5,
+  "migrationVersion": 1,
   "tree": [
     {
       "kind": "group",
