@@ -144,21 +144,21 @@
 	{renderer: 'TP_ShipTierItem', widthKey: '',						enableKey: 'ttaro.teamPanel.shipInfo.tier',		baseWidth: "MS"},
 	{renderer: 'TP_ShipIconItem', widthKey: '',						enableKey: 'ttaro.teamPanel.shipInfo.icon',		baseWidth: 20px}, # Actual width of the icon is 20px. Without this, there would be unnecessary visual margins on both sides.
 	# {renderer: 'TP_ShipWeightItem',						enableKey: '',				baseWidth: "MS"}, # TODO: Do something about this. The visibility of this element is controlled inside of it, not its renderer parent.
-	{renderer: 'TP_ShipDetectionItem', widthKey: '',					enableKey: 'ttaro.teamPanel.shipInfo.detection',headerTitle: 'IDS_HELP_DETECTION_INDICATORS',			headerDescriptions: ['IDS_HELP_ENEMY_DETECT'],				baseWidth: "M",	headerImage: 'url:../ttaro_team_panel/detection.png'},
+	{renderer: 'TP_ShipDetectionItem', widthKey: '',					enableKey: 'ttaro.teamPanel.shipInfo.detection',headerTitle: 'IDS_HELP_DETECTION_INDICATORS',			headerDescriptions: ['IDS_HELP_ENEMY_DETECT'],				baseWidth: "M",	headerImage: 'url:../ttaro/team_panel/detection.png'},
 	{renderer: 'TP_PlayerKillCountItem', widthKey: '',				enableKey: 'ttaro.teamPanel.shipInfo.kills',	headerTitle: 'IDS_DESTROYED_ENEMY_SHIPS_RESULT_SCREEN',	headerDescriptions: ['IDS_DESTROYED_ENEMY_SHIPS_TOOLTIP'],	baseWidth: "M", headerImage: 'bitmap:icon_stat_frag_tiny'},
 ])
 
 (def constant TP_SHIPCONFIG_RENDERER_SETTINGS [
-	{renderer: 'TP_ShipConfigVisibilityItem',			enableKey: 'ttaro.teamPanel.shipParams.visibility',			subKeys: ['surface', 'air'],					headerImage: 'url:../ttaro_team_panel/concealment.png',				headerTitle: 'IDS_SHIP_PARAM_DETECTION',	headerDescriptions: ['IDS_SHIP_PARAM_VISIBILITY_DIST_BY_SHIP','IDS_SHIP_PARAM_VISIBILITY_DIST_BY_PLANE']},
-	{renderer: 'TP_ShipConfigMobilityItem',				enableKey: 'ttaro.teamPanel.shipParams.speed',					subKeys: ['surface', 'underwater'],				headerImage: 'url:../ttaro_team_panel/speed.png',					headerTitle: 'IDS_SHIP_PARAM_MAXSPEED',		headerDescriptions: ['IDS_SHIP_PARAM_MOBILITY','IDS_SHIP_PARAM_UNDERWATER_MOBILITY']},
-	{renderer: 'TP_ShipConfigAirSupportItem',			enableKey: 'ttaro.teamPanel.shipParams.airSupport',			subKeys: ['range', 'reload'],					headerImage: 'url:../ttaro_team_panel/air_support.png',				headerTitle: 'IDS_SHIP_PARAM_AIR_SUPPORT',	headerDescriptions: ['IDS_SHIP_PARAM_MAX_DIST','IDS_SHIP_PARAM_SHOT_DELAY']},
-	{renderer: 'TP_ShipConfigAirDefenseItem',			enableKey: 'ttaro.teamPanel.shipParams.antiAir',				subKeys: ['range', 'rate'],						headerImage: 'url:../ttaro_team_panel/anti_air.png',				headerTitle: 'IDS_SHIP_PARAM_AIR_DEFENSE',	headerDescriptions: ['IDS_SHIP_PARAM_MAX_DIST','IDS_SHIP_PARAM_AIR_DEFENSE']},
-	{renderer: 'TP_ShipConfigAtbaItem',					enableKey: 'ttaro.teamPanel.shipParams.atba',					subKeys: ['range'],								headerImage: 'url:../ttaro_team_panel/secondary_gun.png',			headerTitle: 'IDS_SHIP_PARAM_ATBA',			headerDescriptions: ['IDS_SHIP_PARAM_MAX_DIST']},
-	{renderer: 'TP_ShipConfigArtilleryItem',			enableKey: 'ttaro.teamPanel.shipParams.artillery',				subKeys: ['range', 'reload'],					headerImage: 'url:../ttaro_team_panel/main_gun.png',				headerTitle: 'IDS_SHIP_PARAM_MAIN_GUN',		headerDescriptions: ['IDS_SHIP_PARAM_MAX_DIST','IDS_SHIP_PARAM_SHOT_DELAY']},
-	{renderer: 'TP_ShipConfigTorpedoItem',				enableKey: 'ttaro.teamPanel.shipParams.torpedo',				subKeys: ['range'],								headerImage: 'url:../ttaro_team_panel/torpedo.png',					headerTitle: 'IDS_SHIP_PARAM_TORPEDOES',	headerDescriptions: ['IDS_SHIP_PARAM_MAX_DIST']},
-	{renderer: 'TP_ShipConfigSurfaceConsumableItem',	enableKey: 'ttaro.teamPanel.shipParams.surfaceConsumable',	subKeys: ['hydroRange', 'radarRange'],		headerImage: 'url:../ttaro_team_panel/surface_consumables.png',		headerTitle: 'IDS_TITLE_CONSUMABLES',		headerDescriptions: ['IDS_DOCK_CONSUME_TITLE_PCY008_SONARSEARCH','IDS_DOCK_CONSUME_TITLE_PCY019_RLSSEARCH']},
-	{renderer: 'TP_ShipConfigSubmarineConsumableItem',	enableKey: 'ttaro.teamPanel.shipParams.subConsumable',		subKeys: ['subHydroRange', 'subRadarRange'],headerImage: 'url:../ttaro_team_panel/submarine_consumables.png',	headerTitle: 'IDS_TITLE_CONSUMABLES',		headerDescriptions: ['IDS_DOCK_CONSUME_TITLE_PCY045_HYDROPHONE','IDS_DOCK_CONSUME_TITLE_PCY048_SUBMARINELOCATOR']},
-	{renderer: 'TP_ShipConfigCrashCrewConsumableItem',	enableKey: 'ttaro.teamPanel.shipParams.dcp',					subKeys: ['workTime', 'reloadTime'],			headerImage: 'url:../ttaro_team_panel/crash_crew.png',				headerTitle: 'IDS_TITLE_CONSUMABLES',		headerDescriptions: ['IDS_SHIP_PARAM_WORK_TIME','IDS_SHIP_PARAM_DEPTH_CHARGE_RELOAD_TIME']},
+	{renderer: 'TP_ShipConfigVisibilityItem',			enableKey: 'ttaro.teamPanel.shipParams.visibility',			subKeys: ['surface', 'air'],					headerImage: 'url:../ttaro/team_panel/concealment.png',				headerTitle: 'IDS_SHIP_PARAM_DETECTION',	headerDescriptions: ['IDS_SHIP_PARAM_VISIBILITY_DIST_BY_SHIP','IDS_SHIP_PARAM_VISIBILITY_DIST_BY_PLANE']},
+	{renderer: 'TP_ShipConfigMobilityItem',				enableKey: 'ttaro.teamPanel.shipParams.speed',					subKeys: ['surface', 'underwater'],				headerImage: 'url:../ttaro/team_panel/speed.png',					headerTitle: 'IDS_SHIP_PARAM_MAXSPEED',		headerDescriptions: ['IDS_SHIP_PARAM_MOBILITY','IDS_SHIP_PARAM_UNDERWATER_MOBILITY']},
+	{renderer: 'TP_ShipConfigAirSupportItem',			enableKey: 'ttaro.teamPanel.shipParams.airSupport',			subKeys: ['range', 'reload'],					headerImage: 'url:../ttaro/team_panel/air_support.png',				headerTitle: 'IDS_SHIP_PARAM_AIR_SUPPORT',	headerDescriptions: ['IDS_SHIP_PARAM_MAX_DIST','IDS_SHIP_PARAM_SHOT_DELAY']},
+	{renderer: 'TP_ShipConfigAirDefenseItem',			enableKey: 'ttaro.teamPanel.shipParams.antiAir',				subKeys: ['range', 'rate'],						headerImage: 'url:../ttaro/team_panel/anti_air.png',				headerTitle: 'IDS_SHIP_PARAM_AIR_DEFENSE',	headerDescriptions: ['IDS_SHIP_PARAM_MAX_DIST','IDS_SHIP_PARAM_AIR_DEFENSE']},
+	{renderer: 'TP_ShipConfigAtbaItem',					enableKey: 'ttaro.teamPanel.shipParams.atba',					subKeys: ['range'],								headerImage: 'url:../ttaro/team_panel/secondary_gun.png',			headerTitle: 'IDS_SHIP_PARAM_ATBA',			headerDescriptions: ['IDS_SHIP_PARAM_MAX_DIST']},
+	{renderer: 'TP_ShipConfigArtilleryItem',			enableKey: 'ttaro.teamPanel.shipParams.artillery',				subKeys: ['range', 'reload'],					headerImage: 'url:../ttaro/team_panel/main_gun.png',				headerTitle: 'IDS_SHIP_PARAM_MAIN_GUN',		headerDescriptions: ['IDS_SHIP_PARAM_MAX_DIST','IDS_SHIP_PARAM_SHOT_DELAY']},
+	{renderer: 'TP_ShipConfigTorpedoItem',				enableKey: 'ttaro.teamPanel.shipParams.torpedo',				subKeys: ['range'],								headerImage: 'url:../ttaro/team_panel/torpedo.png',					headerTitle: 'IDS_SHIP_PARAM_TORPEDOES',	headerDescriptions: ['IDS_SHIP_PARAM_MAX_DIST']},
+	{renderer: 'TP_ShipConfigSurfaceConsumableItem',	enableKey: 'ttaro.teamPanel.shipParams.surfaceConsumable',	subKeys: ['hydroRange', 'radarRange'],		headerImage: 'url:../ttaro/team_panel/surface_consumables.png',		headerTitle: 'IDS_TITLE_CONSUMABLES',		headerDescriptions: ['IDS_DOCK_CONSUME_TITLE_PCY008_SONARSEARCH','IDS_DOCK_CONSUME_TITLE_PCY019_RLSSEARCH']},
+	{renderer: 'TP_ShipConfigSubmarineConsumableItem',	enableKey: 'ttaro.teamPanel.shipParams.subConsumable',		subKeys: ['subHydroRange', 'subRadarRange'],headerImage: 'url:../ttaro/team_panel/submarine_consumables.png',	headerTitle: 'IDS_TITLE_CONSUMABLES',		headerDescriptions: ['IDS_DOCK_CONSUME_TITLE_PCY045_HYDROPHONE','IDS_DOCK_CONSUME_TITLE_PCY048_SUBMARINELOCATOR']},
+	{renderer: 'TP_ShipConfigCrashCrewConsumableItem',	enableKey: 'ttaro.teamPanel.shipParams.dcp',					subKeys: ['workTime', 'reloadTime'],			headerImage: 'url:../ttaro/team_panel/crash_crew.png',				headerTitle: 'IDS_TITLE_CONSUMABLES',		headerDescriptions: ['IDS_SHIP_PARAM_WORK_TIME','IDS_SHIP_PARAM_DEPTH_CHARGE_RELOAD_TIME']},
 ])
 
 (def css $TP_ShipConfigText()
@@ -1077,7 +1077,7 @@
 			(bind visible "isPremiumIconVisible")
 			(class $FullsizeAbsolute)
 			(style
-				(backgroundImage = 'url:../ttaro_team_panel/premium_indicator.png')
+				(backgroundImage = 'url:../ttaro/team_panel/premium_indicator.png')
 			)
 		)
 		# For Clear Contour
