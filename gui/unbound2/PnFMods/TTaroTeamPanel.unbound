@@ -535,6 +535,8 @@
 
 		# For tooltip
 		(event evHideInfotip)
+		# DEFAULT_MENU_BEHAVIOUR reads isContextMenuHideBlocked (13533378+).
+		(macro CONTEXT_MENU_HIDE_GUARD_SCOPE)
 		(event evMenuItemClicked) # maybe unnecessary?
 		(var selfPlayer:gfx = "$datahub.getSingleEntity(CC.playerAvatar)")
 		(var isSelf:bool = "selfPlayer.id == _markerEntity.id")
@@ -2629,11 +2631,6 @@
 		(var torpedoAltTTX:gfx = "torpedoesTTX ? torpedoesTTX.torpedoAlt : null")
 		# Reload
 		(var reload:number = "torpedoesTTX ? torpedoesTTX.reloadTime.value : null")
-
-		(var bowGroup:gfx = "torpedoesTTX ? torpedoesTTX.bowGroup : null")
-		(var sternGroup:gfx = "torpedoesTTX ? torpedoesTTX.sternGroup : null")
-		(var bowTorps:number = "bowGroup ? bowGroup.numGuns.value * bowGroup.numBarrels.value : 0")
-		(var sternTorps:number = "sternGroup ? sternGroup.numGuns.value * sternGroup.numBarrels.value : 0")
 
 		(var ungroupedLaunchers:gfx = "torpedoesTTX ? torpedoesTTX.ungroupedLaunchers : null")
 		(var launchers:array = "ungroupedLaunchers ? ungroupedLaunchers.launchers : []")
